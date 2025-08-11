@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="/css/qr.css">
+    <script src="../js/qrcode.min.js" defer></script>
+    <script src="../js/qr.js" defer></script>
+</head>
+
+<body>
+    <header class="qr-header">
+        <h1 class="qr-title">QR Code Generator</h1>
+        <p class="qr-subtitle">Generate QR codes from any text or link.</p>
+    </header>
+    <main class="qr-main">
+        <form id="qr-form" class="qr-form">
+            <label for="qr-input" class="qr-label">Enter text or URL:</label>
+            <input type="text" id="qr-input" class="qr-input" placeholder="https://example.com" required>
+            <button type="submit" class="qr-button">Generate QR Code</button>
+        </form>
+        <div id="qr-output" class="qr-output"></div>
+    </main>
+    <footer class="qr-footer">
+        <p class="qr-footer-text">&copy; 2024-<script>
+            document.write(new Date().getFullYear());
+        </script> Çağan Efe Çalıdağ (cagann.dev). All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

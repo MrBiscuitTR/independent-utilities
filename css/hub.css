@@ -1,0 +1,82 @@
+/* hub.css */
+
+/* Base styles */
+body.hub-body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.hub-header {
+  background-color: #4a90e2;
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.hub-title {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.hub-subtitle {
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+}
+
+/* Navigation list */
+.hub-nav {
+  flex: 1;
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hub-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hub-item {
+  margin-bottom: 1.25rem;
+}
+
+.hub-link {
+  display: block;
+  padding: 1rem;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.hub-link:hover {
+  background-color: #f0f8ff;
+  border-color: #4a90e2;
+  color: #4a90e2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Footer */
+.hub-footer {
+  background-color: #222;
+  color: #aaa;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+.hub-footer-text {
+  margin: 0;
+}
