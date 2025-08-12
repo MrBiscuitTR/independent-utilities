@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Batch Image Resizer → ICO</title>
+  <link rel="stylesheet" href="../../css/image-ico-converter.css" />
+  <!-- pica for client-side resizing -->
+  <script src="./js/pica.min.js"></script>
+  <!-- https://cdnjs.cloudflare.com/ajax/libs/pica/9.0.1/pica.min.js -->
+   <script src="./js/jszip.min.js"></script>
+</head>
+<body class="tool-body">
+  <header class="tool-header">
+    <h1 class="tool-title">Batch Resizer → ICO</h1>
+    <p class="tool-subtitle">Upload one image, generate PNG + single-image .ICO for 16, 32, 96, 128, 192, 512. <br> Square Images Only.</p>
+  </header>
+
+  <main class="tool-main">
+    <form class="tool-form" id="resizer-form" onsubmit="return false;">
+      <label class="tool-label" for="source-file">Select source image (PNG/JPEG):</label>
+      <input class="tool-input" id="source-file" type="file" accept="image/png, image/jpeg" />
+      <button class="tool-button" id="generate-btn" type="button">Generate Sizes & ICOs</button>
+      <p style="font-size:0.95rem;margin-top:.5rem;color:#555;">
+        Tip: For best results start with a large PNG (≥512×512). On iPhone, tap "Open PNG" then long-press the image to save to Photos.
+      </p>
+    </form>
+
+    <button class="tool-button" id="download-zip-btn" style="display:none; margin-bottom:1rem;">
+        Download All PNG + ICO as ZIP
+    </button>
+    <div id="results" class="tool-output"></div>
+  </main>
+
+  <footer class="tool-footer">
+    <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear())</script> Çağan Efe Çalıdağ (cagann.dev). All rights reserved.</p>
+  </footer>
+
+  <script src="./js/image-resize-convert-ico.js"></script>
+</body>
+</html>

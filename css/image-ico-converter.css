@@ -1,0 +1,138 @@
+/* image-resizer.css */
+body.tool-body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.tool-header {
+  background-color: #4a90e2;
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.tool-title {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.tool-subtitle {
+  margin: 0.5rem 0 0;
+}
+
+.tool-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+.tool-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  width: 100%;
+}
+
+.tool-label {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.tool-input {
+  padding: 0.7rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.tool-button {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #4a90e2;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tool-button:hover { background-color: #357ABD; }
+
+.tool-output {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 920px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.preview-card {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.preview-size {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.preview-img {
+  display: block;
+  margin: 0 auto 10px;
+  border: 1px solid #ddd;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+
+.action-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #4a90e2;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.action-btn.secondary {
+  background: #6c757d;
+}
+
+.small-note {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+.tool-footer {
+  background-color: #222;
+  color: #aaa;
+  text-align: center;
+  padding: 1rem;
+  margin-top: auto;
+}

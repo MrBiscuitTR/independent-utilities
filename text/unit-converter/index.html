@@ -1,0 +1,157 @@
+<!-- unit converter (all kinds, such as between all temperature units, all length units, all volume units, etc. scientific units/metric units/American units like yards, feet, inches etc. Keep in mind I'll be a university student, I need physics and mathematics units. give their symbols, unit signs, international scientific units etc. however, on the top, have a "most commonly used" section with the most common units like cm, m, km, mm, g, kg, lb, oz, °C, °F, K, etc. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Converter</title>
+<link rel="stylesheet" href="../../css/unit-converter.css">
+</head>
+<body>
+    <header class="tool-header">
+        <h1 class="tool-title">📏 Unit Converter</h1>
+        <p class="tool-subtitle">Convert between common and scientific units in real time.</p>
+    </header>
+<div class="container">
+    
+
+    <!-- Most Common Section
+    <section>
+        <h2>Most Common Units</h2>
+        <div class="unit-group" data-category="common">
+            <label>Centimeters (cm) <input type="number" data-unit="cm"></label>
+            <label>Meters (m) <input type="number" data-unit="m"></label>
+            <label>Feet (ft) <input type="number" data-unit="ft"></label>
+            <label>Kilograms (kg) <input type="number" data-unit="kg"></label>
+            <label>Pounds (lb) <input type="number" data-unit="lb"></label>
+            <label>Ounces (oz) <input type="number" data-unit="oz"></label>
+            <label>Celsius (°C) <input type="number" data-unit="C"></label>
+            <label>Fahrenheit (°F) <input type="number" data-unit="F"></label>
+            <label>Kelvin (K) <input type="number" data-unit="K"></label>
+            <label>Liters (L) <input type="number" data-unit="L"></label>
+            <label>Milliliters (mL) <input type="number" data-unit="mL"></label>
+            <label>Cubic meters (m³) <input type="number" data-unit="m3"></label>
+        </div>
+    </section> -->
+
+    <!-- Collapsible Sections -->
+    <div class="collapsible-container">
+        <button class="collapsible">Length</button>
+        <div class="content unit-group" data-category="length">
+            <label>Millimeters (mm) <input type="number" data-unit="mm"></label>
+            <label>Centimeters (cm) <input type="number" data-unit="cm"></label>
+            <label>Meters (m) <input type="number" data-unit="m"></label>
+            <label>Kilometers (km) <input type="number" data-unit="km"></label>
+            <label>Inches (in) <input type="number" data-unit="in"></label>
+            <label>Feet (ft) <input type="number" data-unit="ft"></label>
+            <label>Yards (yd) <input type="number" data-unit="yd"></label>
+            <label>Miles (mi) <input type="number" data-unit="mi"></label>
+            <label>Micrometers (µm) <input type="number" data-unit="um"></label>
+            <label>Nanometers (nm) <input type="number" data-unit="nm"></label>
+            <label>Nautical Miles (nmi) <input type="number" data-unit="nmi"></label>
+            <label>Astronomical Units (AU) <input type="number" data-unit="au"></label>
+        </div>
+
+        <button class="collapsible">Mass</button>
+        <div class="content unit-group" data-category="mass">
+            <label>Milligrams (mg) <input type="number" data-unit="mg"></label>
+            <label>Grams (g) <input type="number" data-unit="g"></label>
+            <label>Kilograms (kg) <input type="number" data-unit="kg"></label>
+            <label>Tonnes (t) <input type="number" data-unit="t"></label>
+            <label>Pounds (lb) <input type="number" data-unit="lb"></label>
+            <label>Ounces (oz) <input type="number" data-unit="oz"></label>
+            <label>Stone (st) <input type="number" data-unit="st"></label>
+            <label>Slug <input type="number" data-unit="slug"></label>
+        </div>
+
+        <button class="collapsible">Temperature</button>
+        <div class="content unit-group" data-category="temperature">
+            <label>Celsius (°C) <input type="number" data-unit="C"></label>
+            <label>Fahrenheit (°F) <input type="number" data-unit="F"></label>
+            <label>Kelvin (K) <input type="number" data-unit="K"></label>
+            <label>Rankine (°R) <input type="number" data-unit="R"></label>
+        </div>
+
+        <button class="collapsible">Volume</button>
+        <div class="content unit-group" data-category="volume">
+            <label>Milliliters (mL) <input type="number" data-unit="mL"></label>
+            <label>Liters (L) <input type="number" data-unit="L"></label>
+            <label>Cubic meters (m³) <input type="number" data-unit="m3"></label>
+            <label>Cubic centimeters (cm³) <input type="number" data-unit="cm3"></label>
+            <label>Cubic millimeters (mm³) <input type="number" data-unit="mm3"></label>
+            <label>Cubic inches (in³) <input type="number" data-unit="in3"></label>
+            <label>Cubic feet (ft³) <input type="number" data-unit="ft3"></label>
+            <label>Gallons (US) <input type="number" data-unit="gal_us"></label>
+            <label>Gallons (UK) <input type="number" data-unit="gal_uk"></label>
+            <label>Oil Barrel (bbl) <input type="number" data-unit="bbl"></label>
+            <label>Cubic kilometers (km³) <input type="number" data-unit="km3"></label>
+        </div>
+
+        <button class="collapsible">Area</button>
+        <div class="content unit-group" data-category="area">
+            <label>Square millimeters (mm²) <input type="number" data-unit="mm2"></label>
+            <label>Square centimeters (cm²) <input type="number" data-unit="cm2"></label>
+            <label>Square meters (m²) <input type="number" data-unit="m2"></label>
+            <label>Hectares (ha) <input type="number" data-unit="ha"></label>
+            <label>Square kilometers (km²) <input type="number" data-unit="km2"></label>
+            <label>Square inches (in²) <input type="number" data-unit="in2"></label>
+            <label>Square feet (ft²) <input type="number" data-unit="ft2"></label>
+            <label>Square yards (yd²) <input type="number" data-unit="yd2"></label>
+            <label>Square miles (mi²) <input type="number" data-unit="mi2"></label>
+            <label>Acre <input type="number" data-unit="acre"></label>
+        </div>
+
+        <button class="collapsible">Speed</button>
+        <div class="content unit-group" data-category="speed">
+            <label>Meters per second (m/s) <input type="number" data-unit="mps"></label>
+            <label>Kilometers per hour (km/h) <input type="number" data-unit="kmph"></label>
+            <label>Miles per hour (mph) <input type="number" data-unit="mph"></label>
+            <label>Knot (kn) <input type="number" data-unit="kn"></label>
+            <label>Feet per second (ft/s) <input type="number" data-unit="fps"></label>
+            <label>Speed of light (c) <input type="number" data-unit="c"></label>
+        </div>
+
+        <button class="collapsible">Time</button>
+        <div class="content unit-group" data-category="time">
+            <label>Nanoseconds (ns) <input type="number" data-unit="ns"></label>
+            <label>Microseconds (µs) <input type="number" data-unit="us"></label>
+            <label>Milliseconds (ms) <input type="number" data-unit="ms"></label>
+            <label>Seconds (s) <input type="number" data-unit="s"></label>
+            <label>Minutes (min) <input type="number" data-unit="min"></label>
+            <label>Hours (h) <input type="number" data-unit="h"></label>
+            <label>Days (d) <input type="number" data-unit="day"></label>
+            <label>Weeks (wk) <input type="number" data-unit="wk"></label>
+            <label>Months (mo) <input type="number" data-unit="mo"></label>
+            <label>Years (yr) <input type="number" data-unit="yr"></label>
+            <label>Centuries (cent) <input type="number" data-unit="cent"></label>
+        </div>
+
+        <button class="collapsible">Energy</button>
+        <div class="content unit-group" data-category="energy">
+            <label>Joules (J) <input type="number" data-unit="J"></label>
+            <label>Kilojoules (kJ) <input type="number" data-unit="kJ"></label>
+            <label>Megajoules (MJ) <input type="number" data-unit="MJ"></label>
+            <label>Gigajoules (GJ) <input type="number" data-unit="GJ"></label>
+            <label>Calories (cal) <input type="number" data-unit="cal"></label>
+            <label>Kilocalories (kcal) <input type="number" data-unit="kcal"></label>
+            <label>Watt-hours (Wh) <input type="number" data-unit="Wh"></label>
+            <label>Kilowatt-hours (kWh) <input type="number" data-unit="kWh"></label>
+            <label>Electronvolt (eV) <input type="number" data-unit="eV"></label>
+            <label>BTU <input type="number" data-unit="BTU"></label>
+        </div>
+
+        <button class="collapsible">Pressure</button>
+        <div class="content unit-group" data-category="pressure">
+            <label>Pascals (Pa) <input type="number" data-unit="Pa"></label>
+            <label>Kilopascals (kPa) <input type="number" data-unit="kPa"></label>
+            <label>Megapascals (MPa) <input type="number" data-unit="MPa"></label>
+            <label>Bar <input type="number" data-unit="bar"></label>
+            <label>Atmospheres (atm) <input type="number" data-unit="atm"></label>
+            <label>Pounds per square inch (psi) <input type="number" data-unit="psi"></label>
+            <label>Torr <input type="number" data-unit="torr"></label>
+        </div>
+    </div>
+</div>
+<script src="./js/unit-converter.js"></script>
+</body>
+</html>
