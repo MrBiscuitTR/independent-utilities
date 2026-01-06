@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const sizes = [16, 32, 96, 128, 192, 512];
+  const sizes = [16, 32, 64, 96, 128, 192, 256, 512];
   const input = document.getElementById('source-file');
   const btn = document.getElementById('generate-btn');
   const results = document.getElementById('results');
