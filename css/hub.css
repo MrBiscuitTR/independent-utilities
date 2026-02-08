@@ -80,7 +80,9 @@ body.hub-body {
   text-align: center;
   padding: 1rem;
   font-size: 0.9rem;
-  margin-top: auto;
+  bottom: 0;
+  position: fixed;
+  width: -webkit-fill-available;
 }
 
 .hub-footer-text {

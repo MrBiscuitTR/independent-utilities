@@ -23,11 +23,11 @@
       <h2 class="hub-category-title">🏞️ Image Tools</h2>
       <ul class="hub-list">
         <li class="hub-item">
-          <a href="/image/qr-generator" class="hub-link">QR Code Generator for Links</a>
+          <a href="/tools/image/qr-generator" class="hub-link">QR Code Generator for Links</a>
         </li> 
         <!-- done -->
         <li class="hub-item">
-          <a href="/image/resizer-ico-converter" class="hub-link">Image Resizer & .ICO Converter</a>
+          <a href="/tools/image/resizer-ico-converter" class="hub-link">Image Resizer & .ICO Converter</a>
         </li>
         <!-- to implement -->
       </ul>
@@ -37,55 +37,61 @@
     <section class="hub-category">
       <h2 class="hub-category-title">📝 Text Tools</h2>
       <!-- 
-          Regex Tester
+          1 - Regex Tester/creator based on expected input and output
 
-          Markdown to html converter
+          2 - Markdown to html converter and vice versa, with preview split window.
 
-          URL Encoder / Decoder
+          3 - api call json preparer with good gui (and calls too). shows final payload, method, headers, params, etc...
+            with execute button and visualized result preview, as well as raw json view (indented). also gives user python and 
+            js code to send that request and capture the output., as well as allowing them to check which fields they 
+            want, and give them the necessary code snippet to get the response and only return the fields they want.in json
+            format.
 
-          Base64 Encoder / Decoder
+          4 - hash generator and reverser if applicable.
 
-          Text Transformer
+          5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download 
+          as JSON. add json importing to get the same organization table back. add option to save to mongodb, 
+          create .env for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits
+          for tasks, colors for tasks, descriptions, locations, and labels (once a label has been created, add option to add
+          that label to other tasks as well, with one click.)
 
-          Task Organizer Drag and Drop and save to local storage OR download as JSON or save to mongoDB.
+          6 Use public APIs to get data and display it nicely. E.g. weather, news, etc. 
+            N8N integration. but secured with authentication: Basic Auth or JWT.
 
-          Use public APIs to get data and display it nicely. E.g. weather, news, etc. 
-          N8N integration. but secured with authentication: Basic Auth or JWT.
+          7 JSON visualizer/editor, with dragging, reordering, branches, trees, types, length, size, etc. 
+            + prettifier, smart reordering + a good search system that shows source file, field, data.
+            importing files/folders, multiple file edition, zip or individual downloads. tabs for differenr files.
 
-          JSON visualizer/editor, with dragging, reordering, branches, trees, types, length, size, etc. 
-          + prettifier, smart reordering + a good search system that shows source file, field, data.
-          importing files/folders, multiple file edition, zip or individual downloads. tabs for differenr files.
-
-          publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated, anti bot and bruteforce. 
+          publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated, anti bot and anti bruteforce. 
 
           Private notes site/PWA with authentication and encryption. turn on or off localstorage saving; if off, use server-side storage with encryption.
           Self hosted, open source and self-hostable by everyone, private, includes all necessary features, like 
           notion or google keep etc. most important feature is a notepad feature and cross-device sharing.
           Simple and reliable at first, more advanced later. If 3rd party services are used, keep them privacy friendly.
-          Encrypt data on send, decrypt on end devices. Use safe keys.
+          Encrypt data on send in client before sending, decrypt on end devices. Use safe keys. indexeddb for offline pwa and browser support on all platforms.
           
          -->
       <ul class="hub-list">
         <li class="hub-item">
-          <a href="/text/unit-converter" class="hub-link">Unit Converter</a>
+          <a href="/tools/text/unit-converter" class="hub-link">Unit Converter</a>
         </li>
         <li class="hub-item">
-          <a href="/text/word-letter-count" class="hub-link">Word, Line & Character Counter</a>
+          <a href="/tools/text/word-letter-count" class="hub-link">Word, Line & Character Counter</a>
         </li>
         <!-- <li class="hub-item">
-          <a href="/text/regex-tester" class="hub-link">Regex Tester</a>
+          <a href="/tools/text/regex-tester" class="hub-link">Regex Tester</a>
         </li>
         <li class="hub-item">
-          <a href="/text/markdown-to-html" class="hub-link">Markdown to HTML Converter</a>
+          <a href="/tools/text/markdown-to-html" class="hub-link">Markdown to HTML Converter</a>
         </li>
         <li class="hub-item">
-          <a href="/text/url-encoder-decoder" class="hub-link">URL Encoder / Decoder</a>
+          <a href="/tools/text/url-encoder-decoder" class="hub-link">URL Encoder / Decoder</a>
         </li>
         <li class="hub-item">
-          <a href="/text/base64-encoder-decoder" class="hub-link">Base64 Encoder / Decoder</a>
+          <a href="/tools/text/base64-encoder-decoder" class="hub-link">Base64 Encoder / Decoder</a>
         </li>
         <li class="hub-item">
-          <a href="/text/text-transformer" class="hub-link">Text Transformer</a>
+          <a href="/tools/text/text-transformer" class="hub-link">Text Transformer</a>
         </li> -->
       </ul>
     </section>

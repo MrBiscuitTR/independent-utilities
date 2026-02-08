@@ -1,16 +1,21 @@
-body {
+html, body {
     font-family: Arial, sans-serif;
     background: #f8f9fa;
     color: #222;
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
 }
 
 .container {
     max-width: 900px;
-    margin: auto;
     padding: 20px;
+    flex-grow: 1;
+    margin: 0 auto;
+    width: -webkit-fill-available;  /* WebKit-specific solution */
+    width: 100%;  /* Fallback for non-WebKit browsers */
 }
 
 h1 {
@@ -99,13 +104,14 @@ section h2 {
 
 
 .hub-footer {
-  background-color: #222;
-  color: #aaa;
-  text-align: center;
-  padding: 1rem;
-  font-size: 0.9rem;
-  margin-top: auto;
-  bottom: 0;
+    background-color: #222;
+    color: #aaa;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    margin-top: auto; /* This pushes the footer to the bottom */
+    width: 100%; /* Ensures it takes up full width */
+    /* Removed fixed positioning */
 }
 
 .hub-footer-text {
