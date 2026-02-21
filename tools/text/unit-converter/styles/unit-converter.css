@@ -47,9 +47,10 @@
     gap: 0.6rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .unit-group {
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column;
     }
 }
 

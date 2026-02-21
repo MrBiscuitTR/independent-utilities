@@ -87,8 +87,8 @@
         <!-- tools to be added here as they are built -->
         <li class="hub-item"><a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a></li>
         <!--
-          Internet / network tools to implement (see internet-tools TODO):
-          - What is My IP (critical)
+          Internet / network tools to implement (see ./TODO.md for more details) (if flask necessary, use port 5501. for backend, and make sure to handle CORS properly. integrate existing tools and functions to the flask webui. all internet tools must go under C:\Users\cagan\Documents\GitHub\independent-utilities\tools\internet, currently theres a python folder with ip-tools, you can safely add new relevant functions there, without breaking the existing ones. focus on security and privacy, as well as LONG term reliability, so avoid using external websites, except for heavily reliably ones like cloudflare etc. only non-api key tools should be allowed to use external websites, and even then, only if they are heavily reliable and privacy friendly. for api key tools, either use free APIs that don't require keys, or build the necessary functionality yourself using python or js, without relying on external services. for tools that require flask backend, make sure to implement them in a way that they can be easily integrated into the existing flask app, and that they follow the same security and privacy standards as the rest of the tools. also make sure to document the code properly, so that it can be easily maintained and updated in the future. you can put multiple tools mentioned in the todo.md in the same file if you think they fit together, or if they are small enough to be in the same file, but make sure to keep the code organized and modular, so that it's easy to find and update specific tools in the future. also make sure to test the tools thoroughly before adding them to the hub, to ensure that they work properly and don't have any security or privacy issues. integrate the python tools to the hub too, but grey them out if a request to the api ON LOCALHOST (http://localhost:5501)):
+          - What is My IP (critical) --done
           - DNS Lookup (DNS-over-HTTPS, no key)
           - IP Location Lookup (ip-api.com, no key)
           - Subnet Calculator (pure JS)
@@ -100,6 +100,7 @@
           - Password Generator / Strength Checker (pure JS)
           - MAC Address Lookup (maclookup.app, no key)
           - Ping / Traceroute (needs Flask)
+          check C:\Users\cagan\Documents\GitHub\independent-utilities\TODO.md for the rest and/or more details.
         -->
       </ul>
     </section>
