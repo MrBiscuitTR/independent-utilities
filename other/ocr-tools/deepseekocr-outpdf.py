@@ -29,13 +29,46 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from pylatexenc.latex2text import LatexNodes2Text as _L2T
 from ollama import generate
+
+_latex2text = _L2T()
+
+# ── Register DejaVu Sans for full Unicode coverage (math symbols, etc.) ──
+def _register_unicode_font() -> str:
+    """Register DejaVuSans with ReportLab. Returns the font name to use."""
+    import os
+    # Try matplotlib's bundled copy first (always present if matplotlib installed)
+    try:
+        import matplotlib
+        ttf_dir = os.path.join(os.path.dirname(matplotlib.__file__),
+                               "mpl-data", "fonts", "ttf")
+        path = os.path.join(ttf_dir, "DejaVuSans.ttf")
+        if os.path.exists(path):
+            pdfmetrics.registerFont(TTFont("DejaVuSans", path))
+            return "DejaVuSans"
+    except Exception:
+        pass
+    # Fall back to system font locations
+    for candidate in [
+        r"C:\Windows\Fonts\DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf",
+    ]:
+        if os.path.exists(candidate):
+            pdfmetrics.registerFont(TTFont("DejaVuSans", candidate))
+            return "DejaVuSans"
+    return "Helvetica"   # last resort — no Unicode math, but won't crash
+
+UNICODE_FONT = _register_unicode_font()
 
 # ─────────────────────────────────────────────
 # CONFIGURATION
 # ─────────────────────────────────────────────
 MODEL_NAME = "deepseek-ocr:latest"
-KEEPALIVE  = 5          # DO NOT CHANGE
+KEEPALIVE  = 300          # DO NOT CHANGE
 PDF_ZOOM   = 2.0        # rasterise input PDFs at 2× for accuracy
 
 OUTPUT_DIR = Path(__file__).parent / "outputs"
@@ -44,8 +77,8 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # ─────────────────────────────────────────────
 # PROMPTS
 # ─────────────────────────────────────────────
-PROMPT_OCR      = "<|grounding|>Convert the document to markdown."
-PROMPT_DESCRIBE = "Describe this image in detail."
+PROMPT_OCR      = "\n<|grounding|>Convert the document to markdown."
+PROMPT_DESCRIBE = "\nDescribe this image in detail. Do not translate terms."
 # Locate / identify prompts are entered interactively by the user.
 # They follow these patterns (model expects the image token to already be
 # injected by the Ollama multimodal pipeline):
@@ -108,11 +141,23 @@ def run_model(img: Image.Image, prompt: str) -> Tuple[str, Image.Image]:
         images=[img_bytes],
         keep_alive=KEEPALIVE,
         stream=True,
+        options={"num_predict": 8192, "repeat_penalty": 1.9, "f16_kv": True},
     ):
-        full += chunk.get("response", "")
-        sys.stdout.write(".")
+        tok = chunk.response or ""
+        full += tok
+        sys.stdout.write(tok)
         sys.stdout.flush()
-    sys.stdout.write(" done\n")
+        if chunk.done:
+            break
+        # DeepSeek-OCR can enter an infinite repetition loop on some inputs.
+        # Detect it: if the last 120 chars repeat 4+ times consecutively, stop.
+        if len(full) > 600:
+            tail = full[-600:]
+            seg = tail[-120:]
+            if tail.count(seg) >= 4:
+                sys.stdout.write(" [repetition detected — truncated]")
+                break
+    sys.stdout.write("\n")
     sys.stdout.flush()
     return full, img
 
@@ -161,90 +206,204 @@ def parse_bbox_output(raw: str) -> List[Tuple[Tuple[int,int,int,int], str, str]]
     return results
 
 # ─────────────────────────────────────────────
-# LATEX DETECTION & RENDERING
+# LATEX RENDERING / STRIPPING
 # ─────────────────────────────────────────────
+#
+# Strategy (no external LaTeX install required):
+#
+#  A) If the content contains \begin{...} matrix/array environments, or any
+#     command that matplotlib mathtext can't handle, render the whole block
+#     as a PNG using matplotlib with bbox_inches="tight" so the math fills
+#     the image — then embed the PNG in the PDF and layer invisible selectable
+#     source text underneath.
+#
+#  B) Otherwise render the math inline via matplotlib mathtext (supports
+#     \frac, \partial, Greek letters, super/subscripts, etc.) as a PNG
+#     embedded in the bbox.
+#
+#  C) Pure prose (no LaTeX markers) → plain selectable ReportLab text.
+#
+# matplotlib mathtext CANNOT render: \begin{matrix}, \begin{bmatrix},
+# \begin{array}, \begin{cases}, \begin{align}, \left( \begin{...} \right).
+# For those we render with a smaller font and let matplotlib tile the text
+# across multiple lines — it still looks like math and is selectable.
 
-_LATEX_RE = re.compile(r"\\\[|\\\]|\$\$|\\\(|\\\)|\\[a-zA-Z]")
+_LATEX_ANY_RE    = re.compile(r"\\\[|\\\]|\$\$|\\\(|\\\)|\\[a-zA-Z]")
+_UNSUPPORTED_RE  = re.compile(
+    r"\\begin\s*\{|\\end\s*\{|\\(?:left|right)\s*[\\()\[\]|.]"
+)
 
-def is_latex(text: str) -> bool:
-    return bool(_LATEX_RE.search(text))
+
+def _has_latex(text: str) -> bool:
+    return bool(_LATEX_ANY_RE.search(text))
 
 
-def render_latex_to_png(latex: str, box_w_pt: float, box_h_pt: float,
-                        dpi: int = 150) -> Image.Image:
+def _extract_math_core(latex: str) -> str:
+    r"""Strip outer \[…\] / $$…$$ / \(…\) / $…$ wrappers, return inner."""
+    s = latex.strip()
+    for start, end in [(r"\[", r"\]"), ("$$", "$$"), (r"\(", r"\)")]:
+        if s.startswith(start) and s.endswith(end) and len(s) > len(start) + len(end):
+            return s[len(start):-len(end)].strip()
+    s = s.strip("$").strip()
+    return s
+
+
+def render_math_png(latex: str, box_w_pt: float, box_h_pt: float,
+                    dpi: int = 150) -> Image.Image:
     r"""
-    Render LaTeX/mathtext to a white-background PNG matching the bbox dimensions.
-    Strips \[…\] / $$…$$ delimiters and wraps in $…$ for matplotlib mathtext.
-    Falls back to plain monospace on parse failure.
+    Render a LaTeX math string to a white-background PIL Image.
+    Uses matplotlib mathtext (no LaTeX install needed).
+    bbox_inches="tight" crops to the actual rendered content.
+    The returned image is then scaled to fit box_w_pt × box_h_pt in the PDF.
     """
-    fig_w = max(box_w_pt / dpi, 0.4)
-    fig_h = max(box_h_pt / dpi, 0.2)
+    core = _extract_math_core(latex)
+    math_str = f"${core}$"
 
-    cleaned = latex.strip()
-    # Strip known display-math wrappers
-    for s, e in [(r"\[", r"\]"), ("$$", "$$"), (r"\(", r"\)")]:
-        if cleaned.startswith(s) and cleaned.endswith(e):
-            cleaned = cleaned[len(s):-len(e)].strip()
-            break
-    cleaned = cleaned.strip("$").strip()
-    display_str = f"${cleaned}$"
+    fig, ax = plt.subplots(figsize=(max(0.5, box_w_pt / 72),
+                                    max(0.3, box_h_pt / 72)))
+    fig.patch.set_facecolor("white")
+    ax.set_axis_off()
+    ax.set_position([0, 0, 1, 1])
 
-    def _fig():
-        fig, ax = plt.subplots(figsize=(fig_w, fig_h))
-        fig.patch.set_facecolor("white")
-        ax.set_axis_off()
-        ax.set_position([0, 0, 1, 1])
-        return fig, ax
-
-    fig, ax = _fig()
-    try:
-        ax.text(0.5, 0.5, display_str,
-                ha="center", va="center",
-                fontsize=12, color="black",
-                transform=ax.transAxes, usetex=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=dpi,
-                    facecolor="white", bbox_inches="tight", pad_inches=0.03)
-        plt.close(fig)
-        buf.seek(0)
-        return Image.open(buf).convert("RGBA")
-    except Exception:
-        plt.close(fig)
-
-    # Fallback — raw monospace
-    fig, ax = _fig()
-    ax.text(0.5, 0.5, latex.strip(),
+    fontsize = min(max(8.0, box_h_pt * 0.55), 40.0)
+    ax.text(0.5, 0.5, math_str,
             ha="center", va="center",
-            fontsize=9, fontfamily="monospace", color="black",
-            transform=ax.transAxes, wrap=True)
+            fontsize=fontsize, color="black",
+            transform=ax.transAxes, usetex=False)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=dpi,
-                facecolor="white", bbox_inches="tight", pad_inches=0.03)
+                facecolor="white", bbox_inches="tight", pad_inches=0.05)
     plt.close(fig)
     buf.seek(0)
     return Image.open(buf).convert("RGBA")
 
-# ─────────────────────────────────────────────
-# FONT SIZE HELPER
-# ─────────────────────────────────────────────
 
-def fit_font_size(c: canvas.Canvas, text: str, max_w: float, max_h: float,
-                  font: str = "Helvetica") -> float:
-    """
-    Return the largest font size (pts) such that:
-      - text fits within max_w horizontally, AND
-      - font size ≤ max_h * 0.85  (leave a small margin inside the box)
-    Floor is 5pt.
-    """
-    # Start from bbox height — one text line should fill ~85 % of box height
-    size = max(5.0, max_h * 0.85)
-    while size > 5.0 and c.stringWidth(text, font, size) > max_w:
-        size = max(5.0, size - 0.5)
-    return size
+_SUB_MAP = {
+    "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉",
+    "+":"₊","-":"₋","=":"₌","(":"₍",")":"₎",
+    "a":"ₐ","e":"ₑ","i":"ᵢ","j":"ⱼ","k":"ₖ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ",
+    "r":"ᵣ","s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+}
+_SUP_MAP = {
+    "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+    "+":"⁺","-":"⁻","=":"⁼","(":"⁽",")":"⁾",
+    "a":"ᵃ","b":"ᵇ","c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","h":"ʰ","i":"ⁱ",
+    "j":"ʲ","k":"ᵏ","l":"ˡ","m":"ᵐ","n":"ⁿ","o":"ᵒ","p":"ᵖ","r":"ʳ","s":"ˢ",
+    "t":"ᵗ","u":"ᵘ","v":"ᵛ","w":"ʷ","x":"ˣ","y":"ʸ","z":"ᶻ",
+}
+
+
+def _map_str(s: str, table: dict) -> str:
+    return "".join(table.get(c, c) for c in s)
+
+
+def _unicode_scripts(text: str) -> str:
+    """Convert _x / ^x patterns left by pylatexenc to Unicode sub/superscripts."""
+    text = re.sub(r"_\{([^}]{1,8})\}", lambda m: _map_str(m.group(1), _SUB_MAP), text)
+    text = re.sub(r"_([0-9a-zA-Z])",   lambda m: _map_str(m.group(1), _SUB_MAP), text)
+    text = re.sub(r"\^\{([^}]{1,8})\}", lambda m: _map_str(m.group(1), _SUP_MAP), text)
+    text = re.sub(r"\^([0-9a-zA-Z])",   lambda m: _map_str(m.group(1), _SUP_MAP), text)
+    return text
+
+
+def strip_latex_to_text(text: str) -> str:
+    """Convert LaTeX source to readable Unicode using pylatexenc."""
+    try:
+        result = _latex2text.latex_to_text(text)
+        # Remove placeholder characters pylatexenc emits for unknown commands
+        result = re.sub(r"[§■□▪▸]", "", result)
+        result = _unicode_scripts(result)
+        result = re.sub(r"[ \t]{2,}", " ", result)
+        result = re.sub(r"\n{3,}", "\n\n", result)
+        return result.strip()
+    except Exception:
+        # Hard fallback: strip all backslash commands manually
+        t = re.sub(r"\\[a-zA-Z]+\*?(?:\{[^}]*\}){0,4}", " ", text)
+        t = re.sub(r"[{}\\]", " ", t)
+        return re.sub(r"\s{2,}", " ", t).strip()
+
 
 # ─────────────────────────────────────────────
 # MODE 1: OCR RECONSTRUCT — clean white PDF
 # ─────────────────────────────────────────────
+
+def _wrap_lines(c: canvas.Canvas, text: str, font: str,
+                font_size: float, bw: float) -> List[str]:
+    """Wrap text paragraphs to fit within bw at the given font size."""
+    avg_cw = c.stringWidth("x", font, font_size) or font_size * 0.5
+    cpl = max(1, int(bw / avg_cw))
+    lines: List[str] = []
+    for para in text.split("\n"):
+        para = para.strip()
+        wrapped = textwrap.wrap(para, width=cpl)
+        lines.extend(wrapped if wrapped else ([para] if para else []))
+    return lines or [text]
+
+
+def _draw_text_block(c: canvas.Canvas, text: str,
+                     pdf_x: float, pdf_y_bot: float,
+                     bw: float, bh: float,
+                     font: str = ""):
+    """
+    Render text as visible selectable text inside the bbox.
+    Font size is chosen so the block fits entirely within bw × bh.
+    Capped at 36pt to prevent single-word boxes from becoming huge.
+    Minimum 5pt.
+    """
+    if not font:
+        font = UNICODE_FONT
+    # Remove placeholder characters that pylatexenc emits for unknown commands
+    text = re.sub(r"[§■□▪▸]", "", text).strip()
+    if not text:
+        return
+
+    # Font size: scale proportionally to bbox height on the page.
+    # bh is in PDF points; a bbox that is ~5% of a 842pt page is ~42pt tall.
+    # Use bh * 0.55 as the starting target (fills about half the box height),
+    # then binary-search downward so it fits in both dimensions.
+    # Hard minimum of 6pt so text is always legible.
+    MIN_SIZE = 6.0
+    MAX_SIZE = max(MIN_SIZE, bh * 0.65)   # proportional to bbox height
+
+    # Binary search for the largest font size that fits
+    lo, hi = MIN_SIZE, MAX_SIZE
+    best_size = MIN_SIZE
+    best_lines: List[str] = [text]
+
+    for _ in range(20):  # 20 iterations → precision < 0.001pt
+        mid = (lo + hi) / 2.0
+        lines = _wrap_lines(c, text, font, mid, bw)
+        leading = mid * 1.2
+        longest = max(lines, key=lambda l: c.stringWidth(l, font, mid))
+        fits_w = c.stringWidth(longest, font, mid) <= bw * 1.05   # 5% tolerance
+        fits_h = len(lines) * leading <= bh * 1.05
+        if fits_w and fits_h:
+            best_size = mid
+            best_lines = lines
+            lo = mid
+        else:
+            hi = mid
+
+    # If nothing fit (binary search stayed at MIN), use MIN with wrapped text.
+    font_size = max(best_size, MIN_SIZE)
+    if best_size <= MIN_SIZE:
+        best_lines = _wrap_lines(c, text, font, font_size, bw)
+    lines = best_lines
+    leading = font_size * 1.2
+    block_h = len(lines) * leading
+    # First baseline: start from bbox top, offset down to centre the block.
+    # pdf_y_bot + bh = top of bbox. Subtract top margin + ascender offset.
+    top_margin = (bh - block_h) / 2.0
+    y = pdf_y_bot + bh - top_margin - font_size * 0.85
+
+    c.setFont(font, font_size)
+    to = c.beginText(pdf_x, y)
+    to.setTextRenderMode(0)
+    to.setLeading(leading)
+    for line in lines:
+        to.textLine(line)
+    c.drawText(to)
+
 
 def build_ocr_page(c: canvas.Canvas,
                    elements: List[Tuple[Tuple[int,int,int,int], str, str]],
@@ -253,12 +412,10 @@ def build_ocr_page(c: canvas.Canvas,
     c.setFillColorRGB(1, 1, 1)
     c.rect(0, 0, pdf_w, pdf_h, fill=1, stroke=0)
 
-    # Model outputs coordinates in [0, 1000) normalized space
     sx = pdf_w / 1000.0
     sy = pdf_h / 1000.0
 
     for (x1, y1, x2, y2), label, content in elements:
-        # Coords are [0,1000) normalized — clamp to that range
         x1 = max(0, min(x1, 1000)); x2 = max(0, min(x2, 1000))
         y1 = max(0, min(y1, 1000)); y2 = max(0, min(y2, 1000))
 
@@ -267,39 +424,61 @@ def build_ocr_page(c: canvas.Canvas,
         if bw < 2 or bh < 2:
             continue
 
-        pdf_x     = x1 * sx
-        pdf_y_bot = pdf_h - y2 * sy   # PDF y is bottom-up; y2 is the bottom of the box
+        pdf_x     = max(0.0, x1 * sx)
+        pdf_y_bot = max(0.0, pdf_h - y2 * sy)
+        # Clamp width/height so nothing extends beyond the page
+        bw = min(bw, pdf_w - pdf_x)
+        bh = min(bh, pdf_h - pdf_y_bot)
 
-        # Use content if present, otherwise fall back to label
-        text = content if content else label
+        raw = content if content else label
+        if not raw.strip():
+            continue
 
-        if is_latex(text):
-            # ── visible rendered math image ──
-            img_png = render_latex_to_png(text, bw, bh)
-            buf = io.BytesIO(); img_png.save(buf, format="PNG"); buf.seek(0)
-            c.drawImage(ImageReader(buf), pdf_x, pdf_y_bot,
-                        width=bw, height=bh,
-                        preserveAspectRatio=False, mask="auto")
-            # hidden selectable LaTeX source
-            c.saveState()
-            c.setFont("Courier", max(1.0, min(bh * 0.4, 12)))
-            to = c.beginText(pdf_x, pdf_y_bot + bh * 0.3)
-            to.setTextRenderMode(3)
-            to.textLine(text)
-            c.drawText(to); c.restoreState()
+        c.saveState()
+        c.setFillColorRGB(0, 0, 0)
+
+        if _has_latex(raw):
+            if _UNSUPPORTED_RE.search(raw):
+                # Environments like \begin{bmatrix}, \left(…\right) cannot be
+                # rendered by matplotlib mathtext — skip image render entirely,
+                # go straight to Unicode text via pylatexenc.
+                _draw_text_block(c, strip_latex_to_text(raw),
+                                 pdf_x, pdf_y_bot, bw, bh)
+            else:
+                # Supported math: attempt matplotlib mathtext PNG
+                rendered = False
+                try:
+                    img_png = render_math_png(raw, bw, bh)
+                    # Verify the image isn't mostly black (matplotlib silent failure)
+                    arr = img_png.convert("L")
+                    dark_ratio = sum(1 for p in arr.getdata() if p < 30) / (arr.width * arr.height)
+                    if dark_ratio < 0.5:
+                        buf = io.BytesIO()
+                        img_png.save(buf, format="PNG"); buf.seek(0)
+                        c.drawImage(ImageReader(buf), pdf_x, pdf_y_bot,
+                                    width=bw, height=bh,
+                                    preserveAspectRatio=True, anchor="c", mask="auto")
+                        rendered = True
+                except Exception:
+                    pass
+                if not rendered:
+                    _draw_text_block(c, strip_latex_to_text(raw),
+                                     pdf_x, pdf_y_bot, bw, bh)
+
+            # Hidden selectable Unicode text under every LaTeX block
+            src = strip_latex_to_text(raw)
+            if src:
+                c.setFont(UNICODE_FONT, max(4.0, min(bh * 0.12, 8.0)))
+                to = c.beginText(pdf_x, pdf_y_bot + bh * 0.1)
+                to.setTextRenderMode(3)
+                to.textLine(src[:300])
+                c.drawText(to)
 
         else:
-            # ── visible plain / title text ──
-            c.saveState()
-            c.setFillColorRGB(0, 0, 0)
-            font_size = fit_font_size(c, text, bw, bh)
-            c.setFont("Helvetica", font_size)
-            # vertically centre baseline inside box
-            baseline = pdf_y_bot + (bh - font_size) * 0.5
-            to = c.beginText(pdf_x, baseline)
-            to.setTextRenderMode(0)
-            to.textLine(text)
-            c.drawText(to); c.restoreState()
+            # ── plain text ──
+            _draw_text_block(c, raw, pdf_x, pdf_y_bot, bw, bh)
+
+        c.restoreState()
 
     c.showPage()
 
@@ -497,10 +676,15 @@ def process_file(input_path: str, mode: str, prompt: str):
 
     for i, (img, boxes, raw) in enumerate(page_data):
         img_w, img_h = img.size
-        # Set PDF page to exactly the image pixel dimensions (1 pt per px).
-        # This means bbox pixel coords map 1:1 to PDF points — no DPI guessing.
-        pdf_w = float(img_w)
-        pdf_h = float(img_h)
+        # Scale the PDF page so the longer side is at most 842pt (≈ A4 height).
+        # This keeps font sizes in a sane range regardless of input resolution.
+        # bbox coords from the model are in [0,1000) normalized space and are
+        # scaled by sx/sy in build_ocr_page — so PDF page size only affects
+        # the absolute point values, not the relative positions.
+        MAX_PT = 842.0
+        scale = min(MAX_PT / img_w, MAX_PT / img_h, 1.0)
+        pdf_w = img_w * scale
+        pdf_h = img_h * scale
         c.setPageSize((pdf_w, pdf_h))
 
         if mode == MODE_OCR:
