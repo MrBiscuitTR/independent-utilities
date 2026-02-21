@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener("click", () => {
             btn.classList.toggle("active");
             let content = btn.nextElementSibling;
-            content.style.display = (content.style.display === "block") ? "none" : "block";
+            content.style.display = (content.style.display === "grid") ? "none" : "grid";
         });
     });
 

@@ -1,0 +1,190 @@
+/* hash-generator.css — tool-specific styles */
+
+.hash-main {
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── Mode / options row ────────────────────────────────────────────────────── */
+.mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.mode-tabs {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.mode-tab {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.mode-tab.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-label input { accent-color: var(--color-primary); width: 1rem; height: 1rem; }
+
+/* ── File drop zone ────────────────────────────────────────────────────────── */
+.file-drop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, background 0.2s;
+    text-align: center;
+    min-height: 100px;
+}
+
+.file-drop:hover, .file-drop.dragover {
+    border-color: var(--color-primary);
+    background: #f0f8ff;
+    color: var(--color-primary);
+}
+
+/* ── Hash result table ─────────────────────────────────────────────────────── */
+.hash-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.hash-row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.hash-row:last-child { border-bottom: none; }
+.hash-row:nth-child(even) { background: #fafafa; }
+
+.hash-algo {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.hash-value {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-text);
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.hash-value.computing { color: #bbb; font-style: italic; }
+.hash-value.match     { color: #155724; background: #d4edda; padding: 0.1rem 0.4rem; border-radius: 3px; }
+.hash-value.no-match  { color: #721c24; background: #f8d7da; padding: 0.1rem 0.4rem; border-radius: 3px; }
+
+.hash-copy {
+    padding: 0.28rem 0.65rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.hash-copy:hover { background: var(--color-primary-dk); }
+.hash-copy.copied { background: #28a745; }
+
+/* ── HMAC / Compare panels ─────────────────────────────────────────────────── */
+.hmac-panel, .compare-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.hmac-summary {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.92rem;
+    user-select: none;
+    list-style: none;
+}
+
+.hmac-summary::-webkit-details-marker { display: none; }
+
+.hmac-body {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.hmac-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.hmac-row .tool-label { margin: 0; white-space: nowrap; }
+.hmac-row .tool-input, .hmac-row .tool-select { flex: 1; min-width: 160px; }
+
+/* ── Compare result ────────────────────────────────────────────────────────── */
+.compare-result {
+    padding: 0.55rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.compare-result.match    { background: #d4edda; color: #155724; }
+.compare-result.no-match { background: #f8d7da; color: #721c24; }
+.compare-result.hidden   { display: none; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 500px) {
+    .hash-row { grid-template-columns: 70px 1fr; }
+    .hash-copy { grid-column: 2; justify-self: start; }
+    .hash-algo { font-size: 0.72rem; }
+    .hash-value { font-size: 0.75rem; }
+}

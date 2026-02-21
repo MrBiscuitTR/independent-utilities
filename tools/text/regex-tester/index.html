@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/regex-tester.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">🔍 Regex Tester</h1>
+        <p class="tool-subtitle">Test regular expressions live with match highlighting and code snippets.</p>
+    </header>
+
+    <main class="tool-main regex-main">
+
+        <!-- ── Input panel ───────────────────────────────────────────────── -->
+        <div class="panel">
+            <label for="regexInput" class="tool-label">Regular Expression</label>
+            <div class="regex-row">
+                <span class="regex-slash">/</span>
+                <input type="text" id="regexInput" class="regex-input" placeholder="e.g. \d+" spellcheck="false" autocomplete="off">
+                <span class="regex-slash">/</span>
+                <div class="flag-toggles">
+                    <button class="flag-btn" data-flag="g" title="Global — find all matches">g</button>
+                    <button class="flag-btn" data-flag="i" title="Ignore case">i</button>
+                    <button class="flag-btn" data-flag="m" title="Multiline — ^ and $ match line boundaries">m</button>
+                    <button class="flag-btn" data-flag="s" title="Dotall — . matches newlines">s</button>
+                </div>
+            </div>
+            <div id="regexError" class="regex-error hidden"></div>
+        </div>
+
+        <!-- ── Test string ───────────────────────────────────────────────── -->
+        <div class="panel">
+            <label for="testString" class="tool-label">Test String</label>
+            <div class="test-wrap">
+                <!-- highlighted layer behind textarea -->
+                <div id="highlight-layer" class="highlight-layer" aria-hidden="true"></div>
+                <textarea id="testString" class="tool-textarea test-textarea" spellcheck="false" placeholder="Type or paste text to test against..."></textarea>
+            </div>
+        </div>
+
+        <!-- ── Results ───────────────────────────────────────────────────── -->
+        <div class="panel" id="resultsPanel">
+            <div class="results-header">
+                <span class="tool-label" style="margin:0">Results</span>
+                <span id="matchBadge" class="match-badge">0 matches</span>
+            </div>
+            <div id="matchList" class="match-list">
+                <p class="no-matches">Enter a regex and test string above.</p>
+            </div>
+        </div>
+
+        <!-- ── Code snippets ─────────────────────────────────────────────── -->
+        <div class="panel" id="snippetPanel">
+            <div class="results-header">
+                <span class="tool-label" style="margin:0">Code Snippets</span>
+                <div class="snippet-tabs">
+                    <button class="snippet-tab active" data-lang="js">JavaScript</button>
+                    <button class="snippet-tab" data-lang="py">Python</button>
+                </div>
+            </div>
+            <pre id="snippetCode" class="code-block"></pre>
+            <button class="copy-btn" id="copySnippet">Copy</button>
+        </div>
+
+        <!-- ── Flag reference ────────────────────────────────────────────── -->
+        <details class="panel collapsible-panel">
+            <summary class="panel-summary">📖 Flag Reference</summary>
+            <div class="reference-grid">
+                <div class="ref-item"><code>g</code><strong>Global</strong><span>Find all matches instead of stopping at the first.</span></div>
+                <div class="ref-item"><code>i</code><strong>Ignore Case</strong><span>Match uppercase and lowercase interchangeably.</span></div>
+                <div class="ref-item"><code>m</code><strong>Multiline</strong><span><code>^</code> and <code>$</code> match the start/end of each line, not just the whole string.</span></div>
+                <div class="ref-item"><code>s</code><strong>Dotall</strong><span><code>.</code> matches any character including newlines.</span></div>
+            </div>
+        </details>
+
+        <!-- ── Quick regex guide ─────────────────────────────────────────── -->
+        <details class="panel collapsible-panel">
+            <summary class="panel-summary">📚 Regex Quick Guide</summary>
+            <div class="guide-section">
+                <h3>Character Classes</h3>
+                <div class="guide-grid">
+                    <div class="guide-item"><code>.</code><span>Any character except newline</span></div>
+                    <div class="guide-item"><code>\d</code><span>Digit [0–9]</span></div>
+                    <div class="guide-item"><code>\D</code><span>Non-digit</span></div>
+                    <div class="guide-item"><code>\w</code><span>Word character [a–z A–Z 0–9 _]</span></div>
+                    <div class="guide-item"><code>\W</code><span>Non-word character</span></div>
+                    <div class="guide-item"><code>\s</code><span>Whitespace (space, tab, newline)</span></div>
+                    <div class="guide-item"><code>\S</code><span>Non-whitespace</span></div>
+                    <div class="guide-item"><code>[abc]</code><span>One of: a, b, or c</span></div>
+                    <div class="guide-item"><code>[^abc]</code><span>Anything except a, b, or c</span></div>
+                    <div class="guide-item"><code>[a-z]</code><span>Character in range a to z</span></div>
+                </div>
+            </div>
+            <div class="guide-section">
+                <h3>Quantifiers</h3>
+                <div class="guide-grid">
+                    <div class="guide-item"><code>*</code><span>0 or more</span></div>
+                    <div class="guide-item"><code>+</code><span>1 or more</span></div>
+                    <div class="guide-item"><code>?</code><span>0 or 1 (optional)</span></div>
+                    <div class="guide-item"><code>{n}</code><span>Exactly n times</span></div>
+                    <div class="guide-item"><code>{n,}</code><span>n or more times</span></div>
+                    <div class="guide-item"><code>{n,m}</code><span>Between n and m times</span></div>
+                    <div class="guide-item"><code>*?</code><span>0 or more (lazy)</span></div>
+                    <div class="guide-item"><code>+?</code><span>1 or more (lazy)</span></div>
+                </div>
+            </div>
+            <div class="guide-section">
+                <h3>Anchors & Boundaries</h3>
+                <div class="guide-grid">
+                    <div class="guide-item"><code>^</code><span>Start of string (or line with m)</span></div>
+                    <div class="guide-item"><code>$</code><span>End of string (or line with m)</span></div>
+                    <div class="guide-item"><code>\b</code><span>Word boundary</span></div>
+                    <div class="guide-item"><code>\B</code><span>Non-word boundary</span></div>
+                </div>
+            </div>
+            <div class="guide-section">
+                <h3>Groups & Lookaround</h3>
+                <div class="guide-grid">
+                    <div class="guide-item"><code>(abc)</code><span>Capturing group</span></div>
+                    <div class="guide-item"><code>(?:abc)</code><span>Non-capturing group</span></div>
+                    <div class="guide-item"><code>(?&lt;name&gt;abc)</code><span>Named capturing group</span></div>
+                    <div class="guide-item"><code>a|b</code><span>Alternation — a or b</span></div>
+                    <div class="guide-item"><code>(?=abc)</code><span>Positive lookahead</span></div>
+                    <div class="guide-item"><code>(?!abc)</code><span>Negative lookahead</span></div>
+                    <div class="guide-item"><code>(?&lt;=abc)</code><span>Positive lookbehind</span></div>
+                    <div class="guide-item"><code>(?&lt;!abc)</code><span>Negative lookbehind</span></div>
+                </div>
+            </div>
+        </details>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/script.js"></script>
+</body>
+</html>

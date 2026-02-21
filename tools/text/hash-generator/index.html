@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/hash-generator.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Hash Generator</h1>
+        <p class="tool-subtitle">Generate MD5, SHA-1, SHA-256, SHA-512 hashes — entirely in your browser, nothing sent to any server.</p>
+    </header>
+
+    <main class="tool-main hash-main">
+
+        <!-- Input mode toggle -->
+        <div class="mode-row">
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="text">Text</button>
+                <button class="mode-tab" data-mode="file">File</button>
+            </div>
+            <label class="toggle-label">
+                <input type="checkbox" id="uppercaseToggle">
+                Uppercase
+            </label>
+        </div>
+
+        <!-- Text input -->
+        <div id="textInputWrap">
+            <textarea id="textInput" class="tool-textarea" placeholder="Type or paste text to hash…" rows="4"></textarea>
+        </div>
+
+        <!-- File input -->
+        <div id="fileInputWrap" style="display:none">
+            <label class="file-drop" id="fileDrop" for="fileInput">
+                <span id="fileLabel">Drop a file here or click to browse</span>
+                <input type="file" id="fileInput" style="display:none">
+            </label>
+        </div>
+
+        <!-- Hash results -->
+        <div class="hash-table" id="hashTable">
+            <!-- rows injected by JS -->
+        </div>
+
+        <!-- HMAC section -->
+        <details class="hmac-panel">
+            <summary class="hmac-summary">🔑 HMAC (keyed hash)</summary>
+            <div class="hmac-body">
+                <div class="hmac-row">
+                    <label class="tool-label" for="hmacKey">Secret key</label>
+                    <input type="text" id="hmacKey" class="tool-input" placeholder="secret">
+                </div>
+                <div class="hmac-row">
+                    <label class="tool-label" for="hmacAlgo">Algorithm</label>
+                    <select id="hmacAlgo" class="tool-select">
+                        <option value="SHA-256">HMAC-SHA-256</option>
+                        <option value="SHA-384">HMAC-SHA-384</option>
+                        <option value="SHA-512">HMAC-SHA-512</option>
+                        <option value="SHA-1">HMAC-SHA-1</option>
+                    </select>
+                </div>
+                <div class="hash-row" id="hmacRow">
+                    <span class="hash-algo">HMAC-SHA-256</span>
+                    <span class="hash-value" id="hmacValue">—</span>
+                    <button class="hash-copy" data-target="hmacValue">Copy</button>
+                </div>
+            </div>
+        </details>
+
+        <!-- Compare panel -->
+        <details class="compare-panel">
+            <summary class="hmac-summary">🔍 Compare / Verify</summary>
+            <div class="hmac-body">
+                <label class="tool-label" for="compareInput">Paste a known hash to compare:</label>
+                <input type="text" id="compareInput" class="tool-input" placeholder="e.g. 5d41402abc…" spellcheck="false">
+                <div id="compareResult" class="compare-result hidden"></div>
+            </div>
+        </details>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/hash-generator.js"></script>
+</body>
+</html>

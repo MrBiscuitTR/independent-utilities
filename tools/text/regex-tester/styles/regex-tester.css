@@ -1,0 +1,374 @@
+/* regex-tester.css — tool-specific styles only */
+
+.regex-main {
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ── Panels ────────────────────────────────────────────────────────────────── */
+.panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.25rem;
+}
+
+/* ── Regex input row ───────────────────────────────────────────────────────── */
+.regex-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-surface);
+    margin-top: 0.4rem;
+}
+
+.regex-slash {
+    padding: 0.7rem 0.6rem;
+    background: #f0f0f0;
+    color: #888;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    user-select: none;
+    line-height: 1;
+}
+
+.regex-input {
+    flex: 1;
+    padding: 0.7rem 0.6rem;
+    border: none;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    min-width: 0;
+}
+
+/* Flag toggle buttons inside the regex row */
+.flag-toggles {
+    display: flex;
+    gap: 0;
+    background: #f0f0f0;
+    border-left: 1px solid var(--color-border);
+}
+
+.flag-btn {
+    padding: 0.7rem 0.7rem;
+    border: none;
+    background: transparent;
+    color: #888;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+}
+
+.flag-btn:hover {
+    background: #e0e0e0;
+    color: #444;
+}
+
+.flag-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+/* Error message */
+.regex-error {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-sm);
+    color: #c00;
+    font-size: 0.88rem;
+}
+
+.regex-error.hidden { display: none; }
+
+/* ── Test string with highlight overlay ───────────────────────────────────── */
+.test-wrap {
+    position: relative;
+    margin-top: 0.4rem;
+}
+
+/* The highlight layer sits behind the textarea and mirrors its content.
+   Matched spans inside get coloured backgrounds. */
+.highlight-layer {
+    position: absolute;
+    inset: 0;
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    border: 1px solid transparent; /* match textarea border width */
+    border-radius: var(--radius-sm);
+    color: transparent; /* text invisible, only highlights show */
+    box-sizing: border-box;
+}
+
+.test-textarea {
+    position: relative;
+    background: transparent;
+    caret-color: var(--color-text);
+    min-height: 120px;
+    width: 100%;
+    /* Must exactly match highlight-layer metrics */
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+mark.hl {
+    background: rgba(74, 144, 226, 0.25);
+    border-radius: 2px;
+    color: transparent;
+}
+
+/* ── Results ───────────────────────────────────────────────────────────────── */
+.results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.match-badge {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.match-badge.none {
+    background: #bbb;
+}
+
+.match-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.no-matches {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.match-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.88rem;
+}
+
+.match-card-top {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.match-num {
+    font-weight: 700;
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.match-value {
+    font-family: var(--font-mono);
+    background: rgba(74,144,226,0.12);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    word-break: break-all;
+}
+
+.match-pos {
+    color: #999;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.match-groups {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.group-row {
+    display: flex;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+}
+
+.group-idx {
+    color: var(--color-primary);
+    font-weight: 700;
+    min-width: 1.5rem;
+}
+
+.group-val {
+    color: var(--color-text-muted);
+    word-break: break-all;
+}
+
+/* ── Code snippets ─────────────────────────────────────────────────────────── */
+.snippet-tabs {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.snippet-tab {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.snippet-tab.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.code-block {
+    margin: 0.75rem 0 0.5rem;
+    padding: 0.85rem 1rem;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.copy-btn {
+    padding: 0.35rem 0.9rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.copy-btn:hover { background: var(--color-primary-dk); }
+.copy-btn.copied { background: #28a745; }
+
+/* ── Collapsible reference panels ─────────────────────────────────────────── */
+.collapsible-panel {
+    padding: 0;
+}
+
+.panel-summary {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.panel-summary::-webkit-details-marker { display: none; }
+
+.collapsible-panel[open] .panel-summary {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.reference-grid,
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.6rem;
+    padding: 1rem 1.25rem;
+}
+
+@media (max-width: 500px) {
+    .reference-grid,
+    .guide-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ref-item,
+.guide-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+}
+
+.ref-item code,
+.guide-item code {
+    font-family: var(--font-mono);
+    background: rgba(74,144,226,0.1);
+    color: var(--color-primary);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.ref-item strong {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ref-item span,
+.guide-item span {
+    color: var(--color-text-muted);
+}
+
+.guide-section {
+    padding: 0.75rem 1.25rem 0;
+}
+
+.guide-section:last-child {
+    padding-bottom: 1rem;
+}
+
+.guide-section h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
