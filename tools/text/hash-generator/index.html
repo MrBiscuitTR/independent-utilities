@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator & Identifier</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/hash-generator.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Hash Generator & Tools</h1>
+        <p class="tool-subtitle">Generate, identify, and verify hashes — 100% local, nothing leaves your browser.</p>
+    </header>
+
+    <main class="tool-main hash-main">
+
+        <!-- ── Input mode ────────────────────────────────────────────────── -->
+        <div class="mode-row">
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="text">Text</button>
+                <button class="mode-tab" data-mode="file">File</button>
+            </div>
+            <label class="toggle-label">
+                <input type="checkbox" id="uppercaseToggle"> Uppercase
+            </label>
+        </div>
+
+        <!-- Text input -->
+        <div id="textInputWrap">
+            <textarea id="textInput" class="tool-textarea" placeholder="Type or paste text to hash…" rows="4"></textarea>
+        </div>
+
+        <!-- File input — label wraps hidden input; no JS click() needed -->
+        <div id="fileInputWrap" style="display:none">
+            <label class="file-drop" id="fileDrop">
+                <span id="fileLabel">Drop a file here or click to browse</span>
+                <input type="file" id="fileInput">
+            </label>
+            <div id="fileProgress" class="file-progress hidden">
+                <div class="file-progress-bar" id="fileProgressBar"></div>
+            </div>
+        </div>
+
+        <!-- ── Common hashes (always visible) ───────────────────────────── -->
+        <div class="hash-table" id="hashTableCommon"></div>
+
+        <!-- ── Rare hashes (collapsed) ───────────────────────────────────── -->
+        <details class="extra-panel">
+            <summary class="hmac-summary">⬇ More hash algorithms</summary>
+            <div class="hash-table extra-table" id="hashTableExtra"></div>
+        </details>
+
+        <!-- ── Hash Identifier ──────────────────────────────────────────── -->
+        <details class="hmac-panel" id="identifierPanel">
+            <summary class="hmac-summary">🔎 Hash / Token Identifier</summary>
+            <div class="hmac-body">
+                <label class="tool-label" for="identifyInput">Paste any hash, JWT, or encoded string:</label>
+                <input type="text" id="identifyInput" class="tool-input" placeholder="e.g. 5d41402abc4b2a76b9719d911017c592" spellcheck="false" autocomplete="off">
+                <div id="identifyResult" class="identify-result"></div>
+            </div>
+        </details>
+
+        <!-- ── JWT Decoder ──────────────────────────────────────────────── -->
+        <details class="hmac-panel">
+            <summary class="hmac-summary">🪙 JWT Decoder</summary>
+            <div class="hmac-body">
+                <label class="tool-label" for="jwtInput">Paste a JWT:</label>
+                <textarea id="jwtInput" class="tool-textarea jwt-textarea" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…" spellcheck="false"></textarea>
+                <div id="jwtResult" class="jwt-result"></div>
+            </div>
+        </details>
+
+        <!-- ── Base64 encode / decode ────────────────────────────────────── -->
+        <details class="hmac-panel">
+            <summary class="hmac-summary">📦 Base64 Encode / Decode</summary>
+            <div class="hmac-body">
+                <div class="b64-row">
+                    <div class="b64-col">
+                        <label class="tool-label">Input</label>
+                        <textarea id="b64Input" class="tool-textarea" rows="3" placeholder="Text or Base64…" spellcheck="false"></textarea>
+                    </div>
+                    <div class="b64-btns">
+                        <button class="tool-button sm-btn" id="b64EncodeBtn">Encode →</button>
+                        <button class="tool-button sm-btn" id="b64DecodeBtn">← Decode</button>
+                    </div>
+                    <div class="b64-col">
+                        <label class="tool-label">Output</label>
+                        <textarea id="b64Output" class="tool-textarea" rows="3" readonly spellcheck="false"></textarea>
+                    </div>
+                </div>
+                <div id="b64Error" class="body-error hidden"></div>
+            </div>
+        </details>
+
+        <!-- ── HMAC ─────────────────────────────────────────────────────── -->
+        <details class="hmac-panel">
+            <summary class="hmac-summary">🔑 HMAC (keyed hash)</summary>
+            <div class="hmac-body">
+                <div class="hmac-row">
+                    <label class="tool-label" for="hmacKey">Secret key</label>
+                    <input type="text" id="hmacKey" class="tool-input" placeholder="secret">
+                </div>
+                <div class="hmac-row">
+                    <label class="tool-label" for="hmacAlgo">Algorithm</label>
+                    <select id="hmacAlgo" class="tool-select">
+                        <option value="SHA-256">HMAC-SHA-256</option>
+                        <option value="SHA-384">HMAC-SHA-384</option>
+                        <option value="SHA-512">HMAC-SHA-512</option>
+                        <option value="SHA-1">HMAC-SHA-1</option>
+                    </select>
+                </div>
+                <div class="hash-table" style="margin-top:0.5rem">
+                    <div class="hash-row" id="hmacRow">
+                        <span class="hash-algo" id="hmacAlgoLabel">HMAC-SHA-256</span>
+                        <span class="hash-value" id="hmacValue">—</span>
+                        <button class="hash-copy" data-target="hmacValue">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <!-- ── Compare / verify ─────────────────────────────────────────── -->
+        <details class="compare-panel">
+            <summary class="hmac-summary">✅ Compare / Verify</summary>
+            <div class="hmac-body">
+                <label class="tool-label" for="compareInput">Paste a known hash to compare against current input:</label>
+                <input type="text" id="compareInput" class="tool-input" placeholder="e.g. 5d41402abc…" spellcheck="false">
+                <div id="compareResult" class="compare-result hidden"></div>
+            </div>
+        </details>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/hash-generator.js"></script>
+</body>
+</html>

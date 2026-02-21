@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Request Builder</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/api-builder.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">API Request Builder</h1>
+        <p class="tool-subtitle">Build, execute, and generate code for HTTP requests.</p>
+    </header>
+
+    <main class="tool-main api-main">
+
+        <!-- ── URL bar ───────────────────────────────────────────────────── -->
+        <div class="url-bar">
+            <select id="methodSelect" class="method-select">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+                <option>HEAD</option>
+                <option>OPTIONS</option>
+            </select>
+            <input type="text" id="urlInput" class="url-input" placeholder="https://api.example.com/endpoint" spellcheck="false">
+            <button class="tool-button send-btn" id="sendBtn">Send</button>
+        </div>
+
+        <!-- ── Tabs: Params / Headers / Body ────────────────────────────── -->
+        <div class="section-card">
+            <div class="section-tabs" id="reqTabs">
+                <button class="section-tab active" data-tab="params">Params</button>
+                <button class="section-tab" data-tab="headers">Headers</button>
+                <button class="section-tab" data-tab="body">Body</button>
+                <button class="section-tab" data-tab="auth">Auth</button>
+            </div>
+
+            <!-- Params -->
+            <div class="tab-pane active" id="tab-params">
+                <div class="kv-list" id="paramsList"></div>
+                <button class="add-row-btn" data-target="paramsList">+ Add param</button>
+            </div>
+
+            <!-- Headers -->
+            <div class="tab-pane" id="tab-headers">
+                <div class="kv-list" id="headersList"></div>
+                <button class="add-row-btn" data-target="headersList">+ Add header</button>
+            </div>
+
+            <!-- Body -->
+            <div class="tab-pane" id="tab-body">
+                <div class="body-type-row">
+                    <label class="radio-label"><input type="radio" name="bodyType" value="none" checked> None</label>
+                    <label class="radio-label"><input type="radio" name="bodyType" value="json"> JSON</label>
+                    <label class="radio-label"><input type="radio" name="bodyType" value="form"> Form</label>
+                    <label class="radio-label"><input type="radio" name="bodyType" value="text"> Plain text</label>
+                </div>
+                <div id="bodyEditor" style="display:none">
+                    <textarea id="bodyTextarea" class="body-textarea" spellcheck="false" placeholder="{}"></textarea>
+                    <div id="bodyError" class="body-error hidden"></div>
+                </div>
+                <div id="bodyForm" style="display:none">
+                    <div class="kv-list" id="formList"></div>
+                    <button class="add-row-btn" data-target="formList">+ Add field</button>
+                </div>
+            </div>
+
+            <!-- Auth -->
+            <div class="tab-pane" id="tab-auth">
+                <div class="auth-type-row">
+                    <label class="radio-label"><input type="radio" name="authType" value="none" checked> None</label>
+                    <label class="radio-label"><input type="radio" name="authType" value="bearer"> Bearer token</label>
+                    <label class="radio-label"><input type="radio" name="authType" value="basic"> Basic auth</label>
+                    <label class="radio-label"><input type="radio" name="authType" value="apikey"> API key header</label>
+                </div>
+                <div id="authFields"></div>
+            </div>
+        </div>
+
+        <!-- ── Payload preview ───────────────────────────────────────────── -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-title">Request Preview</span>
+                <button class="copy-btn sm-copy" id="copyRequest">Copy</button>
+            </div>
+            <pre id="requestPreview" class="code-block"></pre>
+        </div>
+
+        <!-- ── Response ─────────────────────────────────────────────────── -->
+        <div class="section-card" id="responseCard" style="display:none">
+            <div class="section-header">
+                <span class="section-title">Response</span>
+                <div class="response-meta">
+                    <span id="statusBadge" class="status-badge"></span>
+                    <span id="timeBadge" class="time-badge"></span>
+                </div>
+                <button class="copy-btn sm-copy" id="copyResponse">Copy</button>
+            </div>
+            <div class="resp-tabs">
+                <button class="resp-tab active" data-view="pretty">Pretty</button>
+                <button class="resp-tab" data-view="raw">Raw</button>
+                <button class="resp-tab" data-view="headers">Headers</button>
+            </div>
+            <pre id="responsePretty" class="code-block resp-view"></pre>
+            <pre id="responseRaw"    class="code-block resp-view" style="display:none"></pre>
+            <pre id="responseHeaders" class="code-block resp-view" style="display:none"></pre>
+            <!-- Field extractor -->
+            <div class="extractor-row">
+                <label class="section-title" style="font-size:0.85rem">Extract fields:</label>
+                <div class="kv-list" id="fieldList"></div>
+                <button class="add-row-btn" data-target="fieldList">+ Add field</button>
+            </div>
+            <pre id="extractedCode" class="code-block" style="display:none"></pre>
+        </div>
+
+        <!-- ── Code snippets ────────────────────────────────────────────── -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-title">Code Snippet</span>
+                <div class="snippet-tabs">
+                    <button class="snippet-tab active" data-lang="js">JS fetch</button>
+                    <button class="snippet-tab" data-lang="py">Python</button>
+                    <button class="snippet-tab" data-lang="curl">cURL</button>
+                </div>
+                <button class="copy-btn sm-copy" id="copySnippet">Copy</button>
+            </div>
+            <pre id="snippetCode" class="code-block"></pre>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/api-builder.js"></script>
+</body>
+</html>

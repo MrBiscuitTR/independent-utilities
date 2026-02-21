@@ -5,28 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>QR Code Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/qr.css">
     <script src="./js/qrcode.min.js" defer></script>
     <script src="./js/qr.js" defer></script>
 </head>
 
-<body>
-    <header class="qr-header">
-        <h1 class="qr-title">QR Code Generator</h1>
-        <p class="qr-subtitle">Generate QR codes from any text or link.</p>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">QR Code Generator</h1>
+        <p class="tool-subtitle">Generate QR codes from any text or link.</p>
     </header>
-    <main class="qr-main">
+
+    <main class="tool-main qr-main">
         <form id="qr-form" class="qr-form">
-            <label for="qr-input" class="qr-label">Enter text or URL:</label>
-            <input type="text" id="qr-input" class="qr-input" placeholder="https://example.com" required>
-            <button type="submit" class="qr-button">Generate QR Code</button>
+            <label for="qr-input" class="tool-label">Enter text or URL:</label>
+            <input type="text" id="qr-input" class="tool-input" placeholder="https://example.com" required>
+            <button type="submit" class="tool-button">Generate QR Code</button>
         </form>
         <div id="qr-output" class="qr-output"></div>
     </main>
-    <footer class="qr-footer">
-        <p class="qr-footer-text">&copy; 2024-<script>
-            document.write(new Date().getFullYear());
-        </script> Çağan Efe Çalıdağ (cagann.dev). All rights reserved.</p>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
     </footer>
 </body>
 

@@ -1,9 +1,10 @@
 <!-- hub for all the links. this is a page for all sorts of independent utilities that I will be using. -->
-<!-- the main purpose of this subdomain (utilities.cagann.dev) is to be independent on 3rd party sites -->
+<!-- the main purpose of this subdomain (utilities.cagancalidag.com) is to be independent on 3rd party sites, apps, or other tools. -->
 
 <!-- hub page with classes for styles. -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,90 +12,131 @@
   <link rel="stylesheet" href="/css/hub.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
+
 <body class="hub-body">
   <header class="hub-header">
     <h1 class="hub-title">Utilities Hub</h1>
-    <p class="hub-subtitle">Welcome to the hub for all my independent utilities.</p>
+    <p class="hub-subtitle">Independent tools, no third-party dependencies.</p>
   </header>
 
   <nav class="hub-nav">
-    <!-- Image Tools -->
+
+    <!-- ── Image Tools ──────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🏞️ Image Tools</h2>
       <ul class="hub-list">
-        <li class="hub-item">
-          <a href="/tools/image/qr-generator" class="hub-link">QR Code Generator for Links</a>
-        </li> 
-        <li class="hub-item">
-          <a href="/tools/image/resizer-ico-converter" class="hub-link">Image Resizer & .ICO Converter</a>
-        </li>
+        <li class="hub-item"><a href="/tools/image/qr-generator" class="hub-link">QR Code Generator</a></li>
+        <li class="hub-item"><a href="/tools/image/resizer-ico-converter" class="hub-link">Image Resizer & ICO</a></li>
         <!-- to implement -->
       </ul>
     </section>
 
-    <!-- Text Tools -->
+    <!-- ── Text Tools ───────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">📝 Text Tools</h2>
-      <!-- 
-          1 - Regex Tester
-          
-          2 - Markdown to html converter and vice versa, with preview split window.
-
-          3 - api call json preparer with good gui (and calls too). shows final payload, method, headers, params, etc...
-            with execute button and visualized result preview, as well as raw json view (indented). also gives user python and 
-            js code to send that request and capture the output., as well as allowing them to check which fields they 
-            want, and give them the necessary code snippet to get the response and only return the fields they want.in json
-            format.
-
-          4 - hash generator and reverser if applicable.
-
-          5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download 
-          as JSON. add json importing to get the same organization table back. add option to save to mongodb, 
+      <!--
+          5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download
+          as JSON. add json importing to get the same organization table back. add option to save to mongodb,
           create .env for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits
           for tasks, colors for tasks, descriptions, locations, and labels (once a label has been created, add option to add
           that label to other tasks as well, with one click.)
 
-          7 - JSON visualizer/editor, with dragging, reordering, branches, trees, types, length, size, etc. 
-            as well as prettifier, smart reordering + a good search system that shows source file, field, data.
-            importing files/folders, multiple file edition, zip or individual downloads. tabs for differenr files.
+          8 - publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated (double, both cloudflare and another), anti bot and anti bruteforce for security. important because POTATO uses my computer's resources. it should be secure otherwise.
 
-          8 - publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated (double, both cloudflare and another), anti bot and anti bruteforce. 
-
-          Public instance -- Hostable by everyone, open source. Private notes site/PWA with authentication and end to end encryption (military grade). turn on or off localstorage saving; if off, use server-side storage with encryption.
-          Self hosted, open source and self-hostable by everyone, private, includes all necessary features, like 
-          notion or google keep etc. most important feature is a notepad feature and cross-device sharing.
-          Simple and reliable at first, more advanced later. If 3rd party services are used, keep them privacy friendly.
-          Encrypt data on send in client before sending, decrypt on end devices. Use safe keys. indexeddb for offline pwa and browser support on all platforms.
-          
-         -->
+          9 - [BIG PROJECT, SEPERATE REPO] Public instance -- Hostable by everyone, open source.
+          Private notes site/PWA with authentication and end to end encryption (military grade).
+          Use locally hosted (or vps hosted) PRIVATE database for storing data, not 3rd party services.
+          Self hosted, open source and self-hostable by everyone, private, includes all necessary features, like
+          notion or google keep etc. most minimal and basic core feature is a notepad feature and e2ee (maybe key derived from password hash? passwords are also never stored as plain text in anywhere.) cross-device sharing.
+          Simple and reliable at first, more advanced features (like markdown formatting, settings, advanced text formatting, file insertions [uploaded files should also get encrypted] etc.) later. If 3rd party services are used, keep them privacy friendly.
+          Encrypt data on send in client before sending, decrypt on end devices. Use safe keys.
+          indexeddb for offline use, pwa and browser support on all platforms. IOS, android, windows, macos, linux, etc.
+          use service workers for offline support and sync when back online. encryption keys should never leave the client, and should be stored securely on the client.
+          syncing should be done in a way that doesn't cause conflicts, and should be able to handle conflicts gracefully if they do occur.
+          server shouldnt have access to the data, and should only be used for syncing and storing encrypted data.
+          for pwas, especially ios, use a manifest and all necessary features to make it installable and work well as a pwa.
+          prevent rubberbanding and other ios specific issues with pwas. make sure it works well on all platforms and browsers, with a focus on privacy and security.
+          prevent ios text field and input field zooming issues. make sure the app is responsive and works well on all screen sizes. for fields that users can click on, use font size 16px or larger to prevent zooming issues on ios. use meta tags and other techniques to prevent zooming issues on ios.
+          prevent whole app container scrolling up and down when keyboard is open on ios. use techniques to prevent this, such as preventing default behavior on focus and blur events, and using fixed positioning for the app container. make sure the app is usable and doesn't have any issues on ios when the keyboard is open.
+          also prevent whole app scrolling up and down when user drags a non scrollable area on ios. use techniques to prevent this, such as preventing default behavior on touchmove events, and using overflow hidden for non scrollable areas. make sure the app is usable and doesn't have any issues on ios when user drags a non scrollable area.
+          also prevent data loss in case of uninstallation by keeping data in indexeddb and allowing export of data as json or other formats. ( warn of security risks, exported data is not encrypted and should be kept safe by the user.)
+      -->
       <ul class="hub-list">
-        <li class="hub-item">
-          <a href="/tools/text/unit-converter" class="hub-link">Unit Converter</a>
-        </li>
-        <li class="hub-item">
-          <a href="/tools/text/word-letter-count" class="hub-link">Word, Line & Character Counter</a>
-        </li>
-        <!-- <li class="hub-item">
-          <a href="/tools/text/regex-tester" class="hub-link">Regex Tester</a>
-        </li>
-        <li class="hub-item">
-          <a href="/tools/text/markdown-to-html" class="hub-link">Markdown to HTML Converter</a>
-        </li>
-        <li class="hub-item">
-          <a href="/tools/text/url-encoder-decoder" class="hub-link">URL Encoder / Decoder</a>
-        </li>
-        <li class="hub-item">
-          <a href="/tools/text/base64-encoder-decoder" class="hub-link">Base64 Encoder / Decoder</a>
-        </li>
-        <li class="hub-item">
-          <a href="/tools/text/text-transformer" class="hub-link">Text Transformer</a>
-        </li> -->
+        <li class="hub-item"><a href="/tools/text/unit-converter" class="hub-link">Unit Converter</a></li>
+        <li class="hub-item"><a href="/tools/text/word-letter-count" class="hub-link">Word & Char Counter</a></li>
+        <li class="hub-item"><a href="/tools/text/regex-tester" class="hub-link">Regex Tester</a></li>
+        <li class="hub-item"><a href="/tools/text/markdown-converter" class="hub-link">Markdown ↔ HTML</a></li>
+
+        <li class="hub-item"><a href="/tools/text/hash-generator" class="hub-link">Hash Generator</a></li>
       </ul>
     </section>
+
+    <!-- ── Quality of Life ──────────────────────────────────────────────── -->
+    <section class="hub-category">
+      <h2 class="hub-category-title">✨ Quality of Life</h2>
+      <ul class="hub-list">
+        <li class="hub-item"><a href="/tools/qol/json-viewer" class="hub-link">JSON Viewer & Editor</a></li>
+        <!-- to implement -->
+      </ul>
+    </section>
+
+    <!-- ── Internet Tools ───────────────────────────────────────────────── -->
+    <section class="hub-category">
+      <h2 class="hub-category-title">🌐 Internet Tools</h2>
+      <ul class="hub-list">
+        <!-- tools to be added here as they are built -->
+        <li class="hub-item"><a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a></li>
+        <!--
+          Internet / network tools to implement (see internet-tools TODO):
+          - What is My IP (critical)
+          - DNS Lookup (DNS-over-HTTPS, no key)
+          - IP Location Lookup (ip-api.com, no key)
+          - Subnet Calculator (pure JS)
+          - Port Checker (needs Flask backend)
+          - IP to Decimal / IPv4↔IPv6 converters (pure JS)
+          - IPv6 CIDR/Range, Compression/Expansion (pure JS)
+          - HTTP Headers Check (needs Flask or CORS proxy)
+          - SSL Certificate Checker (needs Flask)
+          - Password Generator / Strength Checker (pure JS)
+          - MAC Address Lookup (maclookup.app, no key)
+          - Ping / Traceroute (needs Flask)
+        -->
+      </ul>
+    </section>
+
+    <!-- ── Other Tools ───────────────────────────────────────────────────── -->
+    <section class="hub-category">
+      <h2 class="hub-category-title">🔧 Other Tools</h2>
+      <!--
+          Miscellaneous tools to implement:
+          - Lorem Ipsum Generator (pure JS)
+          - Password Generator + Strength Checker (pure JS)
+          - ROT13 Encoder/Decoder (pure JS)
+          - Morse Code Translator (pure JS)
+          - Online Notepad (rich text, download as .txt, pure JS)
+          - Cool Text Generator (Unicode/alt chars, pure JS)
+          - ASCII Art Generator (text → ASCII, pure JS)
+          - Base64/Hex/Binary converters (pure JS) — some already in hash tool
+          - RAID Calculator (pure JS)
+          - Robots.txt Generator (pure JS)
+          - Google SERP Simulator (pure HTML preview)
+          - Punycode Converter (pure JS)
+          - Credit Card Checker (Luhn algo, pure JS)
+          - Open Graph Preview Generator (pure JS)
+      -->
+      <ul class="hub-list">
+        <!-- tools to be added here as they are built -->
+      </ul>
+    </section>
+
   </nav>
 
   <footer class="hub-footer">
-    <p class="hub-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (cagann.dev). All rights reserved.</p>
+    <p class="hub-footer-text">&copy; 2024–
+      <script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com"
+        target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.
+    </p>
   </footer>
 </body>
+
 </html>

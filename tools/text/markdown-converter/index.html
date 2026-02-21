@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown ↔ HTML Converter</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/markdown-converter.css">
+    <!-- marked.js for Markdown→HTML parsing (local copy in js/) -->
+    <script src="./js/marked.min.js"></script>
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Markdown ↔ HTML</h1>
+        <p class="tool-subtitle">Convert between Markdown and HTML with a live split preview.</p>
+    </header>
+
+    <main class="tool-main md-main">
+
+        <!-- Toolbar -->
+        <div class="md-toolbar">
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="md-to-html">Markdown → HTML</button>
+                <button class="mode-tab" data-mode="html-to-md">HTML → Markdown</button>
+            </div>
+            <div class="toolbar-right">
+                <label class="toggle-label">
+                    <input type="checkbox" id="splitToggle" checked>
+                    Split preview
+                </label>
+                <button class="tool-button sm-btn" id="copyOutput">Copy output</button>
+                <button class="tool-button sm-btn secondary-btn" id="clearAll">Clear</button>
+            </div>
+        </div>
+
+        <!-- Editor / Preview panes -->
+        <div class="md-workspace" id="workspace">
+            <div class="md-pane" id="inputPane">
+                <div class="pane-label" id="inputLabel">Markdown input</div>
+                <textarea id="inputArea" class="pane-editor" spellcheck="false" placeholder="Type or paste Markdown here…"></textarea>
+            </div>
+            <div class="pane-divider" id="divider"></div>
+            <div class="md-pane" id="outputPane">
+                <div class="pane-label-row">
+                    <span class="pane-label" id="outputLabel">HTML output</span>
+                    <div class="view-tabs">
+                        <button class="view-tab active" data-view="rendered">Rendered</button>
+                        <button class="view-tab" data-view="source">Source</button>
+                    </div>
+                </div>
+                <!-- rendered preview -->
+                <div id="renderedView" class="pane-rendered markdown-body"></div>
+                <!-- raw HTML/Markdown source -->
+                <textarea id="sourceView" class="pane-editor source-editor" readonly spellcheck="false" style="display:none"></textarea>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/markdown-converter.js"></script>
+</body>
+</html>
