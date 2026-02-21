@@ -1,0 +1,82 @@
+/* mac-lookup.css */
+
+.mac-main { max-width: 600px; }
+
+.backend-banner {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+.backend-banner.hidden { display: none; }
+
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+}
+.input-row .tool-input { flex: 1; min-width: 200px; }
+
+.hint-text {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 0 0 1.2rem;
+}
+
+.mac-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.mac-card-header {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.85rem 1.2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.mac-fields { padding: 0.5rem 0; }
+
+.mac-field {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    padding: 0.55rem 1.2rem;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+}
+.mac-field:last-child { border-bottom: none; }
+
+.mac-field-key {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.mac-field-val {
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.mac-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) { .input-row { flex-direction: column; } }

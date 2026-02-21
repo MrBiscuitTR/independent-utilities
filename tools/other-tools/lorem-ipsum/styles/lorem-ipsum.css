@@ -1,0 +1,87 @@
+/* lorem-ipsum.css */
+
+.lorem-main { max-width: 760px; }
+
+.lorem-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.2rem;
+}
+
+.ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ctrl-toggle {
+    gap: 0.4rem;
+}
+
+.num-input {
+    width: 90px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.generate-btn {
+    align-self: flex-end;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.lorem-output-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lorem-output {
+    min-height: 280px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.output-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.word-count-info {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+
+.copy-btn {
+    padding: 0.35rem 0.85rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: background 0.15s;
+}
+.copy-btn:hover { background: var(--color-primary-dk); }
+.copy-btn.copied { background: #28a745; }
+
+@media (max-width: 540px) {
+    .generate-btn { margin-left: 0; width: 100%; }
+}

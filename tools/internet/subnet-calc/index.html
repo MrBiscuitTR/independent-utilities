@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subnet Calculator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/subnet-calc.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Subnet Calculator</h1>
+        <p class="tool-subtitle">IPv4 subnet details — network, broadcast, host range, and more.</p>
+    </header>
+
+    <main class="tool-main subnet-main">
+
+        <div class="input-row">
+            <input type="text" id="cidrInput" class="tool-input" placeholder="192.168.1.0/24" autocomplete="off" spellcheck="false">
+            <button class="tool-button" id="calcBtn">Calculate</button>
+        </div>
+        <p class="hint-text">Enter an IPv4 CIDR block (e.g. 10.0.0.0/8) or an IP with mask (e.g. 192.168.1.1/255.255.255.0).</p>
+
+        <div id="resultArea"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/subnet-calc.js"></script>
+</body>
+</html>

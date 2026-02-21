@@ -26,8 +26,11 @@
       <h2 class="hub-category-title">🏞️ Image Tools</h2>
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/image/qr-generator" class="hub-link">QR Code Generator</a></li>
+        <!-- pure JS — uses locally bundled qrcode.min.js, no external requests -->
+        <li class="hub-item"><a href="/tools/image/qr-scanner" class="hub-link">QR Code Scanner</a></li>
+        <!-- pure JS — uses locally bundled jsQR.js, no external requests; webcam via browser MediaDevices API -->
         <li class="hub-item"><a href="/tools/image/resizer-ico-converter" class="hub-link">Image Resizer & ICO</a></li>
-        <!-- to implement -->
+        <!-- pure JS — uses locally bundled pica.min.js + jszip.min.js, no external requests -->
       </ul>
     </section>
 
@@ -66,7 +69,7 @@
         <li class="hub-item"><a href="/tools/text/word-letter-count" class="hub-link">Word & Char Counter</a></li>
         <li class="hub-item"><a href="/tools/text/regex-tester" class="hub-link">Regex Tester</a></li>
         <li class="hub-item"><a href="/tools/text/markdown-converter" class="hub-link">Markdown ↔ HTML</a></li>
-
+        <!-- uses bundled local copy of marked.js (https://marked.js.org) — file is downloaded and served locally, no CDN request at runtime -->
         <li class="hub-item"><a href="/tools/text/hash-generator" class="hub-link">Hash Generator</a></li>
       </ul>
     </section>
@@ -83,50 +86,127 @@
     <!-- ── Internet Tools ───────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🌐 Internet Tools</h2>
+
+      <!-- Backend status bar — polled every 3 s by inline script below -->
+      <div class="backend-status-bar" id="backendStatusBar">
+        <span class="bs-dot" id="bsDot"></span>
+        <span id="bsText">Checking local backend (port 5501)…</span>
+      </div>
+
       <ul class="hub-list">
-        <!-- tools to be added here as they are built -->
-        <li class="hub-item"><a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a></li>
-        <!--
-          Internet / network tools to implement (see ./TODO.md for more details) (if flask necessary, use port 5501. for backend, and make sure to handle CORS properly. integrate existing tools and functions to the flask webui. all internet tools must go under C:\Users\cagan\Documents\GitHub\independent-utilities\tools\internet, currently theres a python folder with ip-tools, you can safely add new relevant functions there, without breaking the existing ones. focus on security and privacy, as well as LONG term reliability, so avoid using external websites, except for heavily reliably ones like cloudflare etc. only non-api key tools should be allowed to use external websites, and even then, only if they are heavily reliable and privacy friendly. for api key tools, either use free APIs that don't require keys, or build the necessary functionality yourself using python or js, without relying on external services. for tools that require flask backend, make sure to implement them in a way that they can be easily integrated into the existing flask app, and that they follow the same security and privacy standards as the rest of the tools. also make sure to document the code properly, so that it can be easily maintained and updated in the future. you can put multiple tools mentioned in the todo.md in the same file if you think they fit together, or if they are small enough to be in the same file, but make sure to keep the code organized and modular, so that it's easy to find and update specific tools in the future. also make sure to test the tools thoroughly before adding them to the hub, to ensure that they work properly and don't have any security or privacy issues. integrate the python tools to the hub too, but grey them out if a request to the api ON LOCALHOST (http://localhost:5501)):
-          - What is My IP (critical) --done
-          - DNS Lookup (DNS-over-HTTPS, no key)
-          - IP Location Lookup (ip-api.com, no key)
-          - Subnet Calculator (pure JS)
-          - Port Checker (needs Flask backend)
-          - IP to Decimal / IPv4↔IPv6 converters (pure JS)
-          - IPv6 CIDR/Range, Compression/Expansion (pure JS)
-          - HTTP Headers Check (needs Flask or CORS proxy)
-          - SSL Certificate Checker (needs Flask)
-          - Password Generator / Strength Checker (pure JS)
-          - MAC Address Lookup (maclookup.app, no key)
-          - Ping / Traceroute (needs Flask)
-          check C:\Users\cagan\Documents\GitHub\independent-utilities\TODO.md for the rest and/or more details.
-        -->
+
+        <!-- ── Pure JS / no external runtime dependency ── -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/what-is-my-ip" class="hub-link">What Is My IP</a>
+        </li>
+        <!-- browser-side fallback: https://1.1.1.1/cdn-cgi/trace (Cloudflare, no key, no auth) -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/dns-lookup" class="hub-link">DNS Lookup</a>
+        </li>
+        <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query (Cloudflare, no key)
+                          or https://dns.google/resolve (Google, no key) — user's choice -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/subnet-calc" class="hub-link">Subnet Calculator</a>
+        </li>
+
+        <li class="hub-item">
+          <a href="/tools/internet/ip-tools" class="hub-link">IP Converters & IPv6 Tools</a>
+        </li>
+
+        <li class="hub-item">
+          <a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a>
+        </li>
+
+        <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/ip-location" class="hub-link">
+            IP Location Lookup<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend proxies to http://ip-api.com/json/{ip} (ip-api.com, free, no key, ≤45 req/min) -->
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/mac-lookup" class="hub-link">
+            MAC Address Lookup<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend proxies to https://api.maclookup.app/v2/macs/{mac} (maclookup.app, free, no key) -->
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/port-checker" class="hub-link">
+            Port Checker<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/http-headers" class="hub-link">
+            HTTP Headers Check<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/ssl-checker" class="hub-link">
+            SSL Certificate Checker<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/ping-traceroute" class="hub-link">
+            Ping & Traceroute<span class="backend-dot"></span>
+          </a>
+        </li>
+
       </ul>
     </section>
 
     <!-- ── Other Tools ───────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🔧 Other Tools</h2>
-      <!--
-          Miscellaneous tools to implement:
-          - Lorem Ipsum Generator (pure JS)
-          - Password Generator + Strength Checker (pure JS)
-          - ROT13 Encoder/Decoder (pure JS)
-          - Morse Code Translator (pure JS)
-          - Online Notepad (rich text, download as .txt, pure JS)
-          - Cool Text Generator (Unicode/alt chars, pure JS)
-          - ASCII Art Generator (text → ASCII, pure JS)
-          - Base64/Hex/Binary converters (pure JS) — some already in hash tool
-          - RAID Calculator (pure JS)
-          - Robots.txt Generator (pure JS)
-          - Google SERP Simulator (pure HTML preview)
-          - Punycode Converter (pure JS)
-          - Credit Card Checker (Luhn algo, pure JS)
-          - Open Graph Preview Generator (pure JS)
-      -->
       <ul class="hub-list">
-        <!-- tools to be added here as they are built -->
+
+        <li class="hub-item"><a href="/tools/internet/password-gen" class="hub-link">Password Generator</a></li>
+        <!-- pure JS — Web Crypto API, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/lorem-ipsum" class="hub-link">Lorem Ipsum Generator</a></li>
+        <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/rot13" class="hub-link">ROT13 Encoder / Decoder</a></li>
+        <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/morse-code" class="hub-link">Morse Code Translator</a></li>
+        <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/credit-card" class="hub-link">Credit Card Checker</a></li>
+        <!-- pure JS — Luhn algorithm, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/notepad" class="hub-link">Online Notepad</a></li>
+        <!-- pure JS — multi-tab plain text editor; ZIP download uses locally bundled jszip.min.js -->
+
+        <li class="hub-item"><a href="/tools/other-tools/cool-text" class="hub-link">Cool Text Generator</a></li>
+        <!-- pure JS — Unicode transforms, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/text-art" class="hub-link">Text Art Clipboard</a></li>
+        <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/text-converters" class="hub-link">Binary / Hex / RGB Converter</a></li>
+        <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/multi-url-opener" class="hub-link">Multi URL Opener</a></li>
+        <!-- pure JS — opens tabs via window.open, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/user-agent" class="hub-link">What Is My User Agent?</a></li>
+        <!-- pure JS — reads navigator.userAgent, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/punycode" class="hub-link">Punycode Converter</a></li>
+        <!-- pure JS — uses URL API for encoding; includes RFC 3492 decoder, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/robots-txt" class="hub-link">Robots.txt Generator</a></li>
+        <!-- pure JS — no external requests -->
+
       </ul>
     </section>
 
@@ -138,6 +218,56 @@
         target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.
     </p>
   </footer>
+
+  <script>
+    /* Hub backend health poller
+       Polls http://localhost:5501/api/health every 3 s (lightweight — response is ~20 bytes).
+       - Items with data-needs-backend get class "backend-offline" (greyed, non-clickable)
+         until the backend responds 200, then switch to "backend-online".
+       - The status bar above the list shows a live coloured dot + message.
+    */
+    (function () {
+      "use strict";
+      const HEALTH_URL    = "http://localhost:5501/api/health";
+      const POLL_INTERVAL = 3000;
+
+      const dot   = document.getElementById("bsDot");
+      const txt   = document.getElementById("bsText");
+      const items = document.querySelectorAll("[data-needs-backend]");
+      const bdots = document.querySelectorAll(".backend-dot");
+
+      let lastStatus = null; // "online" | "offline" | null
+
+      function setStatus(online) {
+        if (online === lastStatus) return;
+        lastStatus = online;
+
+        if (online) {
+          dot.classList.add("online");  dot.classList.remove("offline");
+          txt.textContent = "Local backend online (port 5501) — all tools available";
+          items.forEach(li => { li.classList.add("backend-online");  li.classList.remove("backend-offline"); });
+          bdots.forEach(d  => { d.classList.add("dot-online");       d.classList.remove("dot-offline"); });
+        } else {
+          dot.classList.add("offline"); dot.classList.remove("online");
+          txt.textContent = "Local backend offline — start python app.py for tools marked with ●";
+          items.forEach(li => { li.classList.add("backend-offline"); li.classList.remove("backend-online"); });
+          bdots.forEach(d  => { d.classList.add("dot-offline");      d.classList.remove("dot-online"); });
+        }
+      }
+
+      async function poll() {
+        try {
+          const r = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(2500), cache: "no-store" });
+          setStatus(r.ok);
+        } catch (_) {
+          setStatus(false);
+        }
+      }
+
+      poll();
+      setInterval(poll, POLL_INTERVAL);
+    })();
+  </script>
 </body>
 
 </html>

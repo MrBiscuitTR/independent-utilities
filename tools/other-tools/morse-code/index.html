@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Translator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/morse-code.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Morse Code Translator</h1>
+        <p class="tool-subtitle">Translate text to Morse code and Morse code back to text.</p>
+    </header>
+
+    <main class="tool-main morse-main">
+
+        <div class="mode-row">
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="text-to-morse">Text → Morse</button>
+                <button class="mode-tab" data-mode="morse-to-text">Morse → Text</button>
+            </div>
+        </div>
+
+        <div class="morse-layout">
+            <div class="morse-col">
+                <label class="tool-label" id="inputLabel" for="morseInput">Text</label>
+                <textarea id="morseInput" class="tool-textarea" rows="7" placeholder="Type text here…" spellcheck="false"></textarea>
+            </div>
+
+            <div class="morse-mid">
+                <button class="tool-button morse-btn" id="translateBtn">Translate ⟶</button>
+                <button class="tool-button morse-btn secondary-btn" id="swapBtn">⇄ Swap</button>
+            </div>
+
+            <div class="morse-col">
+                <label class="tool-label" id="outputLabel">Morse Code</label>
+                <textarea id="morseOutput" class="tool-textarea" rows="7" readonly spellcheck="false" placeholder="Result appears here…"></textarea>
+                <button class="copy-btn" id="morseCopyBtn">Copy output</button>
+            </div>
+        </div>
+
+        <p class="hint-text">
+            Dots (.) and dashes (-) separated by spaces between letters, and <code>/</code> between words.
+            Only letters A–Z, digits 0–9, and common punctuation are supported.
+        </p>
+
+        <!-- Reference table -->
+        <details class="ref-panel">
+            <summary class="ref-summary">Morse Code Reference Chart</summary>
+            <div id="morseRefGrid" class="morse-ref-grid"></div>
+        </details>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/morse-code.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorem Ipsum Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/lorem-ipsum.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Lorem Ipsum Generator</h1>
+        <p class="tool-subtitle">Generate placeholder text of any length — 100% local.</p>
+    </header>
+
+    <main class="tool-main lorem-main">
+
+        <div class="lorem-controls">
+            <div class="ctrl-group">
+                <label class="tool-label" for="loremCount">Amount</label>
+                <input type="number" id="loremCount" class="tool-input num-input" value="5" min="1" max="1000">
+            </div>
+
+            <div class="ctrl-group">
+                <label class="tool-label" for="loremUnit">Unit</label>
+                <select id="loremUnit" class="tool-select">
+                    <option value="words">Words</option>
+                    <option value="sentences" selected>Sentences</option>
+                    <option value="paragraphs">Paragraphs</option>
+                </select>
+            </div>
+
+            <div class="ctrl-group ctrl-toggle">
+                <label class="tool-label">Options</label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="startClassic" checked> Start with "Lorem ipsum…"
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="htmlWrapped"> Wrap in &lt;p&gt; tags
+                </label>
+            </div>
+
+            <button class="tool-button generate-btn" id="generateBtn">Generate</button>
+        </div>
+
+        <div class="lorem-output-wrap">
+            <textarea id="loremOutput" class="tool-textarea lorem-output" rows="14" readonly spellcheck="false" placeholder="Click Generate to create text…"></textarea>
+            <div class="output-footer">
+                <span id="wordCountInfo" class="word-count-info"></span>
+                <button class="copy-btn" id="loremCopyBtn">Copy</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/lorem-ipsum.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/credit-card.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Credit Card Number Checker</h1>
+        <p class="tool-subtitle">Validate credit card numbers using the Luhn algorithm — runs entirely in your browser.</p>
+    </header>
+
+    <main class="tool-main cc-main">
+
+        <div class="form-group">
+            <label class="tool-label" for="ccInput">Card Number</label>
+            <div class="cc-input-wrap">
+                <input type="text" id="ccInput" class="tool-input mono cc-input"
+                    placeholder="4111 1111 1111 1111"
+                    maxlength="23"
+                    autocomplete="off"
+                    inputmode="numeric"
+                    spellcheck="false">
+                <span id="ccNetworkBadge" class="cc-badge"></span>
+            </div>
+        </div>
+
+        <div id="ccResult" class="cc-result hidden"></div>
+
+        <details class="ref-panel">
+            <summary class="ref-summary">Test numbers (not real cards)</summary>
+            <div class="test-numbers">
+                <div class="test-row"><span class="test-network">Visa</span><code class="test-num">4111 1111 1111 1111</code></div>
+                <div class="test-row"><span class="test-network">Mastercard</span><code class="test-num">5500 0000 0000 0004</code></div>
+                <div class="test-row"><span class="test-network">Amex</span><code class="test-num">3714 496353 98431</code></div>
+                <div class="test-row"><span class="test-network">Discover</span><code class="test-num">6011 1111 1111 1117</code></div>
+                <div class="test-row"><span class="test-network">Diners</span><code class="test-num">3056 930902 5904</code></div>
+                <div class="test-row"><span class="test-network">JCB</span><code class="test-num">3530 1113 3330 0000</code></div>
+            </div>
+            <p class="hint-text" style="margin-top:0.6rem">Click a number to load it. These are public test numbers used by payment processors.</p>
+        </details>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/credit-card.js"></script>
+</body>
+</html>

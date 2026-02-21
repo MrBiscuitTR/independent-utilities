@@ -1,0 +1,114 @@
+/* dns-lookup.css */
+
+.dns-main { max-width: 760px; }
+
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.input-row .tool-input { flex: 1; min-width: 180px; }
+
+.type-sel {
+    width: auto;
+    min-width: 130px;
+    padding: 0.75rem 0.6rem;
+}
+
+.doh-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.doh-row label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+/* ── Record tables ─────────────────────────────────────────────────── */
+.dns-section {
+    margin-bottom: 1.2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.dns-section-title {
+    padding: 0.55rem 1rem;
+    background: #f0f4fa;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dns-count {
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    padding: 0.05rem 0.5rem;
+}
+
+.dns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    font-family: var(--font-mono);
+}
+
+.dns-table th {
+    background: #f8fafd;
+    padding: 0.35rem 0.8rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-main);
+    font-weight: 600;
+}
+
+.dns-table td {
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+    word-break: break-all;
+}
+
+.dns-table tr:last-child td { border-bottom: none; }
+
+.dns-no-records {
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.dns-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .input-row { flex-direction: column; }
+    .type-sel { width: 100%; }
+}

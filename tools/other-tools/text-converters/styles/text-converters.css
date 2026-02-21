@@ -1,0 +1,183 @@
+/* text-converters.css */
+
+.tc-main { max-width: 860px; }
+
+.conv-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.4rem;
+}
+
+.conv-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 1rem;
+}
+
+.conv-layout {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+}
+
+.conv-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.conv-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1.7rem;
+    flex-shrink: 0;
+}
+
+.conv-btn {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.8rem;
+}
+
+.conv-ta { font-size: 0.9rem; }
+
+.conv-copy-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    justify-content: flex-end;
+}
+
+.copy-btn {
+    padding: 0.3rem 0.75rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: background 0.15s;
+}
+.copy-btn:hover { background: var(--color-primary-dk); }
+.copy-btn.copied { background: #28a745; }
+
+/* ── Color section ─────────────────────────────────────────────────────────── */
+.color-layout {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.rgb-inputs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.rgb-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.rgb-num {
+    width: 68px;
+    font-family: var(--font-mono);
+    text-align: center;
+    padding: 0.55rem 0.4rem;
+}
+
+.color-picker {
+    width: 68px;
+    height: 43px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    padding: 2px;
+    background: var(--color-surface);
+}
+
+.hex-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.hex-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-surface);
+    transition: border-color 0.2s;
+}
+.hex-input-wrap:focus-within { border-color: var(--color-primary); }
+
+.hex-hash {
+    padding: 0 0.5rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    background: var(--color-bg);
+    border-right: 1px solid var(--color-border);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.hex-input {
+    border: none;
+    width: 90px;
+    font-size: 1rem;
+    padding: 0.75rem 0.5rem;
+    text-transform: lowercase;
+}
+.hex-input:focus { outline: none; }
+
+.color-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.color-preview {
+    width: 60px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.color-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.mono { font-family: var(--font-mono); font-size: 0.9rem; }
+
+@media (max-width: 620px) {
+    .conv-layout { flex-direction: column; }
+    .conv-btns {
+        flex-direction: row;
+        padding-top: 0;
+        flex-wrap: wrap;
+    }
+    .rgb-inputs { flex-wrap: wrap; }
+    .color-layout { flex-direction: column; align-items: stretch; }
+}

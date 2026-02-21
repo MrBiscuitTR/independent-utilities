@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Converters</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/text-converters.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Text Converters</h1>
+        <p class="tool-subtitle">Binary, Hex, Decimal text encoding — plus RGB ↔ Hex color converter.</p>
+    </header>
+
+    <main class="tool-main tc-main">
+
+        <!-- ── Binary ↔ Text ──────────────────────────────────────────── -->
+        <section class="conv-section">
+            <h2 class="conv-title">Binary ↔ Text</h2>
+            <div class="conv-layout">
+                <div class="conv-col">
+                    <label class="tool-label" for="binText">Text</label>
+                    <textarea id="binText" class="tool-textarea conv-ta" rows="5" placeholder="Hello, World!" spellcheck="false"></textarea>
+                </div>
+                <div class="conv-btns">
+                    <button class="tool-button conv-btn" id="textToBinBtn">Text → Binary</button>
+                    <button class="tool-button conv-btn" id="binToTextBtn">Binary → Text</button>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label" for="binOutput">Binary</label>
+                    <textarea id="binOutput" class="tool-textarea conv-ta mono" rows="5" placeholder="01001000 01100101 …" spellcheck="false"></textarea>
+                </div>
+            </div>
+            <div class="conv-copy-row">
+                <button class="copy-btn" data-target="binText">Copy text</button>
+                <button class="copy-btn" data-target="binOutput">Copy binary</button>
+            </div>
+        </section>
+
+        <!-- ── Hex ↔ Text ──────────────────────────────────────────────── -->
+        <section class="conv-section">
+            <h2 class="conv-title">Hex ↔ Text</h2>
+            <div class="conv-layout">
+                <div class="conv-col">
+                    <label class="tool-label" for="hexText">Text</label>
+                    <textarea id="hexText" class="tool-textarea conv-ta" rows="5" placeholder="Hello, World!" spellcheck="false"></textarea>
+                </div>
+                <div class="conv-btns">
+                    <button class="tool-button conv-btn" id="textToHexBtn">Text → Hex</button>
+                    <button class="tool-button conv-btn" id="hexToTextBtn">Hex → Text</button>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label" for="hexOutput">Hex</label>
+                    <textarea id="hexOutput" class="tool-textarea conv-ta mono" rows="5" placeholder="48 65 6c 6c 6f …" spellcheck="false"></textarea>
+                </div>
+            </div>
+            <div class="conv-copy-row">
+                <button class="copy-btn" data-target="hexText">Copy text</button>
+                <button class="copy-btn" data-target="hexOutput">Copy hex</button>
+            </div>
+        </section>
+
+        <!-- ── RGB ↔ Hex ────────────────────────────────────────────────── -->
+        <section class="conv-section">
+            <h2 class="conv-title">RGB ↔ Hex Color</h2>
+            <div class="color-layout">
+                <div class="rgb-inputs">
+                    <div class="rgb-group">
+                        <label class="tool-label" for="rgbR">R</label>
+                        <input type="number" id="rgbR" class="tool-input rgb-num" value="74" min="0" max="255">
+                    </div>
+                    <div class="rgb-group">
+                        <label class="tool-label" for="rgbG">G</label>
+                        <input type="number" id="rgbG" class="tool-input rgb-num" value="144" min="0" max="255">
+                    </div>
+                    <div class="rgb-group">
+                        <label class="tool-label" for="rgbB">B</label>
+                        <input type="number" id="rgbB" class="tool-input rgb-num" value="226" min="0" max="255">
+                    </div>
+                    <div class="rgb-group">
+                        <label class="tool-label" for="colorPicker">Picker</label>
+                        <input type="color" id="colorPicker" class="color-picker" value="#4a90e2">
+                    </div>
+                </div>
+
+                <div class="conv-btns">
+                    <button class="tool-button conv-btn" id="rgbToHexBtn">RGB → Hex</button>
+                    <button class="tool-button conv-btn" id="hexToRgbBtn">Hex → RGB</button>
+                </div>
+
+                <div class="hex-group">
+                    <label class="tool-label" for="hexColor">Hex</label>
+                    <div class="hex-input-wrap">
+                        <span class="hex-hash">#</span>
+                        <input type="text" id="hexColor" class="tool-input hex-input mono" value="4a90e2" maxlength="6" spellcheck="false" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-preview-row">
+                <div id="colorPreview" class="color-preview" style="background:#4a90e2"></div>
+                <div class="color-info">
+                    <span id="colorInfoText" class="mono">#4a90e2 — rgb(74, 144, 226)</span>
+                    <button class="copy-btn" id="colorCopyBtn">Copy hex</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/text-converters.js"></script>
+</body>
+</html>

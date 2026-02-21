@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robots.txt Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/robots-txt.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Robots.txt Generator</h1>
+        <p class="tool-subtitle">Generate a robots.txt file for your website — 100% local.</p>
+    </header>
+
+    <main class="tool-main robots-main">
+
+        <div id="rulesContainer">
+            <!-- Rule blocks injected by JS -->
+        </div>
+
+        <button class="tool-button add-rule-btn secondary-btn" id="addRuleBtn">+ Add Bot Rule</button>
+
+        <div class="sitemap-group form-group">
+            <label class="tool-label" for="sitemapUrl">Sitemap URL <span style="font-weight:400;color:var(--color-text-muted)">(optional)</span></label>
+            <input type="text" id="sitemapUrl" class="tool-input" placeholder="https://example.com/sitemap.xml" spellcheck="false">
+        </div>
+
+        <div class="robots-output-wrap">
+            <label class="tool-label">Generated robots.txt</label>
+            <textarea id="robotsOutput" class="tool-textarea robots-output mono" rows="16" readonly spellcheck="false"></textarea>
+            <div class="output-footer">
+                <button class="copy-btn" id="robotsCopyBtn">Copy</button>
+                <button class="copy-btn download-btn" id="robotsDownloadBtn">Download robots.txt</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/robots-txt.js"></script>
+</body>
+</html>

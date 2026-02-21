@@ -1,0 +1,104 @@
+/* what-is-my-ip.css */
+
+.ip-main { max-width: 680px; }
+
+.backend-banner {
+    background: #e8f4fd;
+    border: 1px solid #90c4f0;
+    color: #1a5a8a;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+.backend-banner.hidden { display: none; }
+
+.ip-card-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.ip-card {
+    flex: 1;
+    min-width: 200px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+.ip-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+}
+
+.ip-value {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    word-break: break-all;
+}
+
+.ip-value.loading { color: var(--color-text-muted); font-style: italic; font-size: 1rem; }
+.ip-value.unavail { color: #aaa; font-style: italic; font-size: 1rem; }
+
+.copy-btn {
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.7rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: background 0.15s;
+}
+.copy-btn:hover { background: var(--color-primary-dk); }
+.copy-btn.copied { background: #28a745; }
+
+.ip-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.4rem;
+}
+
+.secondary-btn { background: #6c757d; }
+.secondary-btn:hover { background: #545b62; }
+
+/* Location result box */
+.location-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.4rem;
+}
+.location-box.hidden { display: none; }
+
+.loc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.6rem 1.2rem;
+}
+
+.loc-row { font-size: 0.9rem; }
+.loc-key { color: var(--color-text-muted); font-size: 0.8rem; }
+.loc-val { font-weight: 600; font-family: var(--font-mono); }
+
+.loc-error { color: #c00; font-size: 0.9rem; }
+
+@media (max-width: 480px) {
+    .ip-card-row { flex-direction: column; }
+    .ip-value { font-size: 1rem; }
+}

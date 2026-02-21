@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC Address Lookup</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/mac-lookup.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">MAC Address Lookup</h1>
+        <p class="tool-subtitle">Look up the vendor/manufacturer from a MAC address OUI.</p>
+    </header>
+
+    <main class="tool-main mac-main">
+
+        <div id="backendBanner" class="backend-banner hidden">
+            ⚠️ Local backend offline — run <code>python app.py</code> in the <code>python/</code> folder.
+        </div>
+
+        <div class="input-row">
+            <input type="text" id="macInput" class="tool-input mono" placeholder="AA:BB:CC:DD:EE:FF or AABBCC" autocomplete="off" spellcheck="false">
+            <button class="tool-button" id="lookupBtn">Lookup</button>
+        </div>
+        <p class="hint-text">You can enter a full MAC or just the first 3 octets (OUI). Separators (colon, dash, dot, none) all accepted.</p>
+
+        <div id="resultArea"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/mac-lookup.js"></script>
+</body>
+</html>

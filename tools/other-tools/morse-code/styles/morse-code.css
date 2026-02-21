@@ -1,0 +1,141 @@
+/* morse-code.css */
+
+.morse-main { max-width: 860px; }
+
+.mode-row {
+    margin-bottom: 1.2rem;
+}
+
+.mode-tabs {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.mode-tab {
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+.mode-tab:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.mode-tab.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.morse-layout {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.morse-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.morse-mid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1.8rem;
+    flex-shrink: 0;
+}
+
+.morse-btn {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.9rem;
+}
+
+.secondary-btn { background: #6c757d; }
+.secondary-btn:hover { background: #545b62; }
+
+.copy-btn {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: background 0.15s;
+}
+.copy-btn:hover { background: var(--color-primary-dk); }
+.copy-btn.copied { background: #28a745; }
+
+.hint-text {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+}
+
+.ref-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+}
+
+.ref-summary {
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--color-primary);
+    list-style: none;
+    padding: 0.2rem 0;
+}
+.ref-summary::-webkit-details-marker { display: none; }
+.ref-summary::before { content: "▶ "; font-size: 0.75em; }
+details[open] .ref-summary::before { content: "▼ "; }
+
+.morse-ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.morse-ref-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.5rem;
+    font-size: 0.82rem;
+}
+
+.ref-char {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-primary);
+}
+.ref-morse {
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+}
+
+@media (max-width: 600px) {
+    .morse-layout { flex-direction: column; }
+    .morse-mid {
+        flex-direction: row;
+        padding-top: 0;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL Certificate Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/ssl-checker.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">SSL Certificate Checker</h1>
+        <p class="tool-subtitle">Inspect TLS certificate details for any domain. Requires local backend.</p>
+    </header>
+
+    <main class="tool-main ssl-main">
+
+        <div id="backendBanner" class="backend-banner hidden">
+            ⚠️ Local backend offline — run <code>python app.py</code> in the <code>python/</code> folder.
+        </div>
+
+        <div class="input-row">
+            <input type="text" id="hostInput" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+            <button class="tool-button" id="checkBtn">Check</button>
+        </div>
+
+        <div id="resultArea"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/ssl-checker.js"></script>
+</body>
+</html>

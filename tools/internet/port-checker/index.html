@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/port-checker.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Port Checker</h1>
+        <p class="tool-subtitle">Check TCP/UDP ports on any public host. Leave host blank to use your own IP.</p>
+    </header>
+
+    <main class="tool-main pc-main">
+
+        <div id="backendBanner" class="backend-banner hidden">
+            ⚠️ Local backend offline — run <code>python app.py</code> in the <code>python/</code> folder.
+        </div>
+
+        <div class="form-group">
+            <label class="tool-label" for="pcHost">Host / IP <span style="font-weight:400;color:var(--color-text-muted)">(leave blank to use your current public IP)</span></label>
+            <input type="text" id="pcHost" class="tool-input mono" placeholder="example.com or 1.2.3.4 — blank = my IP" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="form-group">
+            <label class="tool-label">Port preset</label>
+            <div class="preset-row">
+                <button class="preset-btn active" data-preset="web">Web</button>
+                <button class="preset-btn" data-preset="server">Server</button>
+                <button class="preset-btn" data-preset="gaming">Gaming</button>
+                <button class="preset-btn" data-preset="vuln">Vulnerable</button>
+                <button class="preset-btn" data-preset="vpn">VPN</button>
+                <button class="preset-btn" data-preset="custom">Custom</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="tool-label" for="pcPorts">Ports to scan</label>
+            <textarea id="pcPorts" class="tool-textarea mono" rows="3" placeholder="80, 443, 53/udp">80, 443</textarea>
+            <p class="hint-text">Up to 30 ports. Comma/space separated. Append <code>/udp</code> for UDP (e.g. <code>51820/udp</code>). TCP is default.</p>
+        </div>
+
+        <button class="tool-button" id="pcScanBtn">Scan ports</button>
+
+        <div id="resultArea"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/port-checker.js"></script>
+</body>
+</html>

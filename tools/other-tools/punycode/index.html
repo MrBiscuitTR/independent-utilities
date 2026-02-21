@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punycode Converter</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/punycode.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Punycode Converter</h1>
+        <p class="tool-subtitle">Convert internationalized domain names (IDN) to Punycode (ACE) and back.</p>
+    </header>
+
+    <main class="tool-main pny-main">
+
+        <div class="conv-layout">
+            <div class="conv-col">
+                <label class="tool-label" for="unicodeDomain">Unicode Domain (IDN)</label>
+                <input type="text" id="unicodeDomain" class="tool-input mono" placeholder="例え.jp" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="conv-btns">
+                <button class="tool-button conv-btn" id="toPunyBtn">→ Punycode</button>
+                <button class="tool-button conv-btn secondary-btn" id="toUnicodeBtn">← Unicode</button>
+            </div>
+
+            <div class="conv-col">
+                <label class="tool-label" for="punyDomain">Punycode (ACE)</label>
+                <input type="text" id="punyDomain" class="tool-input mono" placeholder="xn--r8jz45g.jp" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+
+        <div id="pnyResult" class="pny-result hidden"></div>
+
+        <div class="pny-examples">
+            <p class="hint-text">Examples (click to load):</p>
+            <div class="example-list">
+                <button class="example-btn" data-unicode="münchen.de" data-puny="xn--mnchen-3ya.de">münchen.de</button>
+                <button class="example-btn" data-unicode="例え.jp" data-puny="xn--r8jz45g.jp">例え.jp</button>
+                <button class="example-btn" data-unicode="правительство.рф" data-puny="xn--e1afmapc5bf.xn--p1ai">правительство.рф</button>
+                <button class="example-btn" data-unicode="中文.com" data-puny="xn--fiq228c.com">中文.com</button>
+                <button class="example-btn" data-unicode="مثال.إختبار" data-puny="xn--mgbh0fb.xn--kgbechtv">مثال.إختبار</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/punycode.js"></script>
+</body>
+</html>

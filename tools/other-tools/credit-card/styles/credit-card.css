@@ -1,0 +1,122 @@
+/* credit-card.css */
+
+.cc-main { max-width: 560px; }
+
+.cc-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cc-input {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    letter-spacing: 0.08em;
+    padding-right: 90px;
+}
+
+.cc-badge {
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: #e9ecef;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.cc-badge.visa       { background: #1a1f71; color: #fff; }
+.cc-badge.mastercard { background: #eb001b; color: #fff; }
+.cc-badge.amex       { background: #2e77bc; color: #fff; }
+.cc-badge.discover   { background: #f76f20; color: #fff; }
+.cc-badge.diners     { background: #555; color: #fff; }
+.cc-badge.jcb        { background: #0e4c96; color: #fff; }
+.cc-badge.unionpay   { background: #c0392b; color: #fff; }
+.cc-badge.maestro    { background: #5f259f; color: #fff; }
+
+.cc-result {
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-weight: 600;
+}
+.cc-result.hidden { display: none; }
+
+.cc-result.valid {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+.cc-result.invalid {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.cc-result .result-icon { font-size: 1.3rem; margin-right: 0.5rem; }
+.cc-detail {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+    font-size: 0.88rem;
+    font-weight: 400;
+}
+.cc-detail span strong { font-weight: 600; }
+
+.ref-panel {
+    margin-top: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+}
+
+.ref-summary {
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--color-primary);
+    list-style: none;
+    padding: 0.2rem 0;
+}
+.ref-summary::-webkit-details-marker { display: none; }
+.ref-summary::before { content: "▶ "; font-size: 0.75em; }
+details[open] .ref-summary::before { content: "▼ "; }
+
+.test-numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+}
+
+.test-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+}
+.test-row:hover { background: var(--color-bg); }
+
+.test-network {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    min-width: 80px;
+}
+
+.test-num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-primary);
+}
+
+.hint-text { color: var(--color-text-muted); font-size: 0.85rem; margin: 0; }

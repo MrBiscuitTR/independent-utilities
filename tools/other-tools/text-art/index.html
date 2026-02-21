@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Art Clipboard</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/text-art.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Text Art Clipboard</h1>
+        <p class="tool-subtitle">Quickly find and copy text emoticons, symbols, and art — search by name or character.</p>
+    </header>
+
+    <main class="tool-main ta-main">
+
+        <div class="ta-search-bar">
+            <input type="text" id="taSearch" class="tool-input ta-search" placeholder="Search by name or character (e.g. shrug, bear, ¯)…" autocomplete="off" spellcheck="false">
+            <div class="ta-filters">
+                <label class="filter-label">Max length:
+                    <select id="taMaxLen" class="tool-select ta-select">
+                        <option value="0">Any</option>
+                        <option value="3">≤ 3</option>
+                        <option value="5">≤ 5</option>
+                        <option value="10">≤ 10</option>
+                        <option value="20">≤ 20</option>
+                        <option value="50">≤ 50</option>
+                    </select>
+                </label>
+                <label class="filter-label">Category:
+                    <select id="taCat" class="tool-select ta-select">
+                        <option value="">All</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div id="taCount" class="ta-count"></div>
+
+        <div id="taGrid" class="ta-grid"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/text-art.js"></script>
+</body>
+</html>

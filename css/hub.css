@@ -110,6 +110,65 @@ body.hub-body {
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
 }
 
+/* ── Backend-dependent tool states ───────────────────────────────────────── */
+
+/* Greyed out while backend is offline */
+.hub-item.backend-offline .hub-link {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+}
+
+/* Restored when backend comes online */
+.hub-item.backend-online .hub-link {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: none;
+}
+
+/* Small status dot appended after link text */
+.backend-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background: #ccc; /* unknown */
+  transition: background 0.3s;
+  margin-top: 4px;
+}
+.backend-dot.dot-online  { background: #28a745; }
+.backend-dot.dot-offline { background: #313131; }
+
+/* Backend status bar below the Internet Tools heading */
+.backend-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #666);
+  margin-bottom: 0.6rem;
+  padding: 0.35rem 0.6rem;
+  background: #f5f7fa;
+  border: 1px solid #e0e4ea;
+  border-radius: 6px;
+}
+
+.bs-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+.bs-dot.online  { background: #28a745; }
+.bs-dot.offline { background: #dc3545; }
+
 /* ── Footer ───────────────────────────────────────────────────────────────── */
 .hub-footer {
   background-color: #222;
