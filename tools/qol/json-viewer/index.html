@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer & Editor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/json-viewer.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">JSON Viewer & Editor</h1>
+        <p class="tool-subtitle">Visualize, edit, search, and format JSON — drag nodes, right-click to modify, import files.</p>
+    </header>
+
+    <main class="tool-main json-main">
+
+        <!-- ── Tab bar ───────────────────────────────────────────────────── -->
+        <div class="tab-bar" id="tabBar">
+            <!-- tabs injected by JS -->
+            <button class="tab-add" id="addTabBtn" title="New tab">+</button>
+        </div>
+
+        <!-- ── Toolbar ───────────────────────────────────────────────────── -->
+        <div class="json-toolbar">
+            <div class="toolbar-left">
+                <button class="tool-button sm-tbtn" id="importBtn">Import file</button>
+                <input type="file" id="fileInput" accept=".json,.txt" multiple style="display:none">
+                <button class="tool-button sm-tbtn secondary-btn" id="prettifyBtn">Prettify</button>
+                <button class="tool-button sm-tbtn secondary-btn" id="minifyBtn">Minify</button>
+                <button class="tool-button sm-tbtn secondary-btn" id="sortBtn">Sort keys</button>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-wrap">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search keys or values…">
+                    <span class="search-count" id="searchCount"></span>
+                </div>
+                <button class="tool-button sm-tbtn" id="downloadBtn">Download JSON</button>
+                <button class="tool-button sm-tbtn secondary-btn" id="copyJsonBtn">Copy JSON</button>
+            </div>
+        </div>
+
+        <!-- ── Split workspace: editor + tree ──────────────────────────── -->
+        <div class="json-workspace" id="workspace">
+
+            <!-- Left: raw editor -->
+            <div class="json-pane editor-pane" id="editorPane">
+                <div class="pane-header">
+                    <span class="pane-label">Raw Editor</span>
+                    <div class="view-tabs">
+                        <button class="view-tab active" data-view="editor">Editor</button>
+                        <button class="view-tab" data-view="info">Info</button>
+                    </div>
+                </div>
+                <textarea id="rawEditor" class="raw-editor" spellcheck="false" placeholder='Paste JSON here or click "Import file"&#10;&#10;{"example": "data"}'></textarea>
+                <div id="editorError" class="editor-error hidden"></div>
+                <div id="infoPanel" class="info-panel" style="display:none"></div>
+            </div>
+
+            <div class="split-handle" id="splitHandle"></div>
+
+            <!-- Right: tree view -->
+            <div class="json-pane tree-pane" id="treePane">
+                <div class="pane-header">
+                    <span class="pane-label">Tree View</span>
+                    <button class="icon-btn" id="expandAllBtn" title="Expand all">⊞</button>
+                    <button class="icon-btn" id="collapseAllBtn" title="Collapse all">⊟</button>
+                </div>
+                <div class="tree-scroll" id="treeScroll">
+                    <div id="treeRoot" class="tree-root"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Context menu (shown on right-click of tree node) ─────────── -->
+        <div id="contextMenu" class="context-menu" style="display:none">
+            <button class="ctx-item" data-action="edit">✏️ Edit value</button>
+            <button class="ctx-item" data-action="rename">🔤 Rename key</button>
+            <button class="ctx-item" data-action="add-sibling">➕ Add sibling</button>
+            <button class="ctx-item" data-action="add-child">🌿 Add child</button>
+            <button class="ctx-item ctx-danger" data-action="delete">🗑️ Delete</button>
+            <div class="ctx-sep"></div>
+            <button class="ctx-item" data-action="copy-value">📋 Copy value</button>
+            <button class="ctx-item" data-action="copy-path">📍 Copy path</button>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="./js/json-viewer.js"></script>
+</body>
+</html>
