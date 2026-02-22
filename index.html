@@ -43,7 +43,8 @@
 <body class="hub-body">
   <header class="hub-header">
     <h1 class="hub-title">Utilities Hub</h1>
-    <p class="hub-subtitle">Independent tools, no third-party dependencies.</p>
+    <p class="hub-subtitle">Independent tools, no unreliable external dependencies.</p>
+    <p class="hub-desc">This is a collection of independent utilities that do not rely on third-party services or external APIs (except for a few that are necessary for specific functionality, such as DNS lookups or IP tracing, even then the dependencies are extremely secure and reliable for long term use).</p>
   </header>
 
   <nav class="hub-nav">
@@ -119,6 +120,8 @@
         <!-- pure JS — no external requests -->
         <li class="hub-item"><a href="/tools/text/punycode" class="hub-link">Punycode Converter</a></li>
         <!-- pure JS — uses URL API for encoding; includes RFC 3492 decoder, no external requests -->
+        <li class="hub-item"><a href="/tools/text/ascii-art" class="hub-link">ASCII Art Generator</a></li>
+        <!-- pure JS — hand-written font bitmaps, no external requests -->
       </ul>
     </section>
 
@@ -127,7 +130,9 @@
       <h2 class="hub-category-title">✨ Quality of Life</h2>
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/qol/json-viewer" class="hub-link">JSON Viewer & Editor</a></li>
-        <!-- more to implement -->
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/qol/task-organizer" class="hub-link">Task Organizer</a></li>
+        <!-- pure JS — drag-and-drop board; localStorage (30-day auto-clear); JSON export/import; no external requests -->
       </ul>
     </section>
 
@@ -155,12 +160,6 @@
         -->
 
         <li class="hub-item">
-          <a href="/tools/internet/dns-lookup" class="hub-link">DNS Lookup</a>
-        </li>
-        <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query (Cloudflare, no key)
-                          or https://dns.google/resolve (Google, no key) — user's choice -->
-
-        <li class="hub-item">
           <a href="/tools/internet/subnet-calc" class="hub-link">Subnet Calculator</a>
         </li>
 
@@ -177,6 +176,28 @@
         </li>
         <!-- calls ip-api.com/json/{ip} directly from browser (free, no key, CORS-enabled, ≤45 req/min) 
          + Same dependencies as what is my ip tool, for detecting current ip when left empty. -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/dns-lookup" class="hub-link">DNS Tools</a>
+        </li>
+        <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query (Cloudflare) or https://dns.google/resolve (Google)
+             Tabs: DNS Records (A/AAAA/MX/NS/TXT/CNAME/SOA/PTR/CAA/SRV/DKIM), DMARC Validation, DNSKEY/DS Lookup, DNS Health Check -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/whois-lookup" class="hub-link">WHOIS Lookup (IP / ASN / Domain)</a>
+        </li>
+        <!-- RDAP: https://rdap.arin.net, https://rdap.db.ripe.net, https://rdap.apnic.net, https://rdap.lacnic.net, https://rdap.afrinic.net
+             Domain resolution: https://cloudflare-dns.com/dns-query (Cloudflare DoH) -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/reverse-ip" class="hub-link">Reverse IP &amp; Website to IP</a>
+        </li>
+        <!-- Reverse IP requires local backend /api/hostname; Website-to-IP uses Cloudflare DoH directly -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/domain-checker" class="hub-link">Domain Name Availability</a>
+        </li>
+        <!-- DNS-only check via https://cloudflare-dns.com/dns-query — not a definitive registrar check -->
 
         <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
 
@@ -195,7 +216,7 @@
 
         <li class="hub-item" data-needs-backend="true">
           <a href="/tools/internet/http-headers" class="hub-link">
-            HTTP Headers Check<span class="backend-dot"></span>
+            HTTP Headers &amp; Server OS<span class="backend-dot"></span>
           </a>
         </li>
 
@@ -211,6 +232,13 @@
           </a>
         </li>
 
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/link-analyzer" class="hub-link">
+            Website Link Analyzer &amp; Sitemap<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend POST /api/link-analyzer — extracts all links, generates sitemap XML; uses stdlib html.parser -->
+
       </ul>
     </section>
 
@@ -219,7 +247,7 @@
       <h2 class="hub-category-title">🔧 Other Tools</h2>
       <ul class="hub-list">
 
-        <li class="hub-item"><a href="/tools/internet/password-gen" class="hub-link">Password Generator</a></li>
+        <li class="hub-item"><a href="/tools/other-tools/password-gen" class="hub-link">Password Generator</a></li>
         <!-- pure JS — Web Crypto API, no external requests -->
 
         <li class="hub-item"><a href="/tools/other-tools/credit-card" class="hub-link">Credit Card Checker</a></li>
@@ -240,7 +268,7 @@
   </nav>
 
   <footer class="hub-footer">
-    <p class="hub-footer-text">&copy; 2024–
+    <p class="hub-footer-text">&copy; 2024 –
       <script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com"
         target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.
     </p>

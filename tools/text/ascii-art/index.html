@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/ascii-art.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">ASCII Art Generator</h1>
+        <p class="tool-subtitle">Convert text to large ASCII art letters</p>
+    </header>
+    <main class="tool-main aa-main">
+
+        <div class="aa-controls">
+            <div class="aa-control-row">
+                <div class="aa-control-group aa-input-group">
+                    <label class="tool-label" for="textInput">Text</label>
+                    <input
+                        type="text"
+                        id="textInput"
+                        class="tool-input"
+                        placeholder="Hello"
+                        maxlength="60"
+                        autocomplete="off"
+                        spellcheck="false"
+                        value="Hello"
+                    />
+                    <span class="aa-char-count"><span id="charCount">5</span>/60</span>
+                </div>
+            </div>
+
+            <div class="aa-control-row aa-options-row">
+                <div class="aa-control-group">
+                    <label class="tool-label" for="fontSelect">Font</label>
+                    <select id="fontSelect" class="tool-select aa-select">
+                        <option value="standard">Standard</option>
+                        <option value="banner">Banner</option>
+                        <option value="block">Block</option>
+                        <option value="small">Small</option>
+                        <option value="shadow">Shadow</option>
+                        <option value="slant">Slant</option>
+                    </select>
+                </div>
+
+                <div class="aa-control-group">
+                    <label class="tool-label" for="sizeSelect">Size</label>
+                    <select id="sizeSelect" class="tool-select aa-select">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="aa-preview-card">
+            <div class="aa-preview-header">
+                <span class="aa-preview-label">Preview</span>
+                <button id="copyBtn" class="aa-copy-btn">Copy</button>
+            </div>
+            <pre id="artOutput" class="aa-output"></pre>
+        </div>
+
+    </main>
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+    <script src="js/ascii-art.js"></script>
+</body>
+</html>

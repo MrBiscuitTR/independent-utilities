@@ -85,4 +85,109 @@
     font-size: 0.9rem;
 }
 
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
+.hh-tabs {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.hhtab {
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-family: var(--font-main);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.hhtab.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+.hhtab:not(.active):hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.hh-panel { display: none; }
+.hh-panel.active { display: block; }
+
+.hh-tab-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+/* ── OS result card ────────────────────────────────────────────────────────── */
+.os-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.os-card-header {
+    padding: 0.65rem 1rem;
+    background: #f0f4fa;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.os-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.os-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: #e8f4fd;
+    color: #1a5a8a;
+    border: 1px solid #90c4f0;
+}
+
+.os-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+.os-table td {
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+.os-table tr:last-child td { border-bottom: none; }
+.os-table td:first-child {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: #1a4a8a;
+    white-space: nowrap;
+    width: 40%;
+}
+
+.os-warn {
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1rem;
+    color: #7a5000;
+    font-size: 0.88rem;
+}
+
 @media (max-width: 480px) { .input-row { flex-direction: column; } }

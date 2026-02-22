@@ -21,7 +21,9 @@ import subprocess
 import sys
 import urllib.request
 import urllib.error
+import urllib.parse
 import concurrent.futures
+from html.parser import HTMLParser
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -361,6 +363,151 @@ def api_hostname():
         return jsonify({"error": str(e)}), 502
 
     return jsonify({"ip": ip, "hostname": hostname})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# /api/link-analyzer  POST
+# { "url": "https://example.com", "max_links": 100 }
+# Fetches the page, extracts all <a href> links, classifies internal/external,
+# and generates a basic XML sitemap for internal links.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class _LinkParser(HTMLParser):
+    """Minimal HTML parser — collects <a href> and <title> text."""
+
+    def __init__(self):
+        super().__init__()
+        self.links       = []   # list of (href, text)
+        self.title       = ""
+        self._in_title   = False
+        self._in_a       = False
+        self._cur_href   = None
+        self._cur_chunks = []
+
+    def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
+        if tag == "title":
+            self._in_title = True
+        elif tag == "a":
+            attr_dict = {k.lower(): v for k, v in attrs}
+            href = (attr_dict.get("href") or "").strip()
+            if href and not href.startswith(("#", "javascript:", "mailto:", "tel:")):
+                self._in_a       = True
+                self._cur_href   = href
+                self._cur_chunks = []
+
+    def handle_endtag(self, tag):
+        tag = tag.lower()
+        if tag == "title":
+            self._in_title = False
+        elif tag == "a" and self._in_a:
+            text = " ".join("".join(self._cur_chunks).split())[:120]
+            self.links.append((self._cur_href, text))
+            self._in_a     = False
+            self._cur_href = None
+
+    def handle_data(self, data):
+        if self._in_title:
+            self.title += data
+        if self._in_a:
+            self._cur_chunks.append(data)
+
+
+@app.route("/api/link-analyzer", methods=["POST"])
+def api_link_analyzer():
+    body      = request.get_json(force=True, silent=True) or {}
+    url       = (body.get("url") or "").strip()
+    max_links = min(int(body.get("max_links") or 100), 200)
+
+    if not url:
+        return jsonify({"error": "url is required"}), 400
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+
+    # SSRF protection — extract host from URL
+    try:
+        parsed_base = urllib.parse.urlparse(url)
+        host = parsed_base.hostname or ""
+    except Exception:
+        return jsonify({"error": "Invalid URL"}), 400
+
+    if not host or not _is_valid_host(host):
+        return jsonify({"error": "Invalid or private host"}), 400
+
+    # Fetch page HTML
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "utilities-hub/1.0"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            final_url = resp.url
+            charset   = resp.headers.get_content_charset("utf-8") or "utf-8"
+            html      = resp.read().decode(charset, errors="replace")
+    except urllib.error.HTTPError as e:
+        return jsonify({"error": f"HTTP {e.code} fetching page"}), 502
+    except urllib.error.URLError as e:
+        return jsonify({"error": f"URL error: {e.reason}"}), 502
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
+
+    # Parse links
+    parser = _LinkParser()
+    try:
+        parser.feed(html)
+    except Exception:
+        pass  # best-effort
+
+    page_title  = " ".join(parser.title.split())[:200]
+    base        = urllib.parse.urlparse(final_url)
+    base_origin = f"{base.scheme}://{base.netloc}"
+
+    seen  = set()
+    links = []
+    for href, text in parser.links:
+        if len(links) >= max_links:
+            break
+        # Resolve relative URLs
+        try:
+            abs_href = urllib.parse.urljoin(final_url, href)
+        except Exception:
+            continue
+        # Keep only http/https
+        if not abs_href.startswith(("http://", "https://")):
+            continue
+        # Dedup
+        if abs_href in seen:
+            continue
+        seen.add(abs_href)
+
+        parsed_link = urllib.parse.urlparse(abs_href)
+        link_origin = f"{parsed_link.scheme}://{parsed_link.netloc}"
+        link_type   = "internal" if link_origin == base_origin else "external"
+
+        links.append({
+            "href":   abs_href,
+            "text":   text,
+            "type":   link_type,
+            "status": None,
+        })
+
+    # Generate sitemap XML (internal links only)
+    internal_hrefs = [lnk["href"] for lnk in links if lnk["type"] == "internal"]
+    sitemap_lines  = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for href in internal_hrefs:
+        sitemap_lines.append(f"  <url>\n    <loc>{href}</loc>\n  </url>")
+    sitemap_lines.append("</urlset>")
+    sitemap_xml = "\n".join(sitemap_lines)
+
+    return jsonify({
+        "url":         final_url,
+        "title":       page_title,
+        "links":       links,
+        "sitemap_xml": sitemap_xml,
+    })
 
 
 # ─────────────────────────────────────────────────────────────────────────────

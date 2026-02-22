@@ -23,6 +23,9 @@
             <button class="ttab" data-tool="v4-v6">IPv4 ↔ IPv6</button>
             <button class="ttab" data-tool="v6-compress">IPv6 Compress / Expand</button>
             <button class="ttab" data-tool="cidr-range">IPv6 CIDR ↔ Range</button>
+            <button class="ttab" data-tool="v6-compat">IPv6 Compatibility</button>
+            <button class="ttab" data-tool="v6-gen">Local IPv6 Generator</button>
+            <button class="ttab" data-tool="mac-gen">MAC Generator</button>
         </div>
 
         <!-- ── IP ↔ Decimal ─────────────────────────────────────────────── -->
@@ -139,10 +142,83 @@
             </div>
         </div>
 
+
+        <!-- ── IPv6 Compatibility Checker ─────────────────────────── -->
+        <div class="tool-panel" id="panel-v6-compat">
+            <p class="panel-desc">Check if a domain has AAAA records (supports IPv6). Resolves via DNS-over-HTTPS.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">Domain</label>
+                    <input type="text" id="v6compatDomain" class="tool-input mono" placeholder="example.com">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v6compatBtn">Check IPv6 Support</button>
+                <button class="tool-button secondary-btn" id="v6compatClear">Clear</button>
+            </div>
+            <div id="v6compatError" class="conv-error hidden"></div>
+            <div id="v6compatResult" class="result-block hidden"></div>
+        </div>
+
+        <!-- ── Local IPv6 Generator ───────────────────────────────── -->
+        <div class="tool-panel" id="panel-v6-gen">
+            <p class="panel-desc">Generate ULA (Unique Local Address, fc00::/7) IPv6 addresses for private/local networks. Compliant with RFC 4193.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">Prefix type</label>
+                    <select id="v6genType" class="tool-select">
+                        <option value="ula">ULA — Unique Local (fc00::/7)</option>
+                        <option value="link">Link-Local (fe80::/10)</option>
+                    </select>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Subnet ID (0–FFFF)</label>
+                    <input type="text" id="v6genSubnet" class="tool-input mono" placeholder="auto-random">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v6genBtn">Generate</button>
+                <button class="tool-button secondary-btn" id="v6genClear">Clear</button>
+            </div>
+            <div id="v6genError" class="conv-error hidden"></div>
+            <div id="v6genResult" class="result-block hidden"></div>
+        </div>
+
+        <!-- ── MAC Address Generator ──────────────────────────────── -->
+        <div class="tool-panel" id="panel-mac-gen">
+            <p class="panel-desc">Generate random MAC addresses. Optionally specify an OUI prefix. Supports colon, dash, and dot notation.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">OUI prefix (optional, e.g. AC:DE:48)</label>
+                    <input type="text" id="macOui" class="tool-input mono" placeholder="Random" maxlength="8">
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Format</label>
+                    <select id="macFormat" class="tool-select">
+                        <option value="colon">Colon (AA:BB:CC:DD:EE:FF)</option>
+                        <option value="dash">Dash (AA-BB-CC-DD-EE-FF)</option>
+                        <option value="dot">Dot (AABB.CCDD.EEFF)</option>
+                        <option value="plain">Plain (AABBCCDDEEFF)</option>
+                    </select>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Count</label>
+                    <input type="number" id="macCount" class="tool-input" value="1" min="1" max="50">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="macGenBtn">Generate</button>
+                <button class="tool-button secondary-btn" id="macCopyBtn">Copy All</button>
+                <button class="tool-button secondary-btn" id="macClearBtn">Clear</button>
+            </div>
+            <div id="macGenError" class="conv-error hidden"></div>
+            <div id="macGenResult" class="result-block hidden"></div>
+        </div>
+
     </main>
 
     <footer class="tool-footer">
-        <p class="tool-footer-text">&copy; 2024–<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
     </footer>
 
     <script src="js/ip-tools.js"></script>

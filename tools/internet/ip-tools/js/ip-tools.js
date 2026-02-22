@@ -265,7 +265,7 @@ document.getElementById("rangeToCidr").addEventListener("click", () => {
 
         const first = ipv6ToBigInt(f);
         const last  = ipv6ToBigInt(l);
-        if (first > last) throw new Error("First address must be ≤ last address.");
+        if (first > last) throw new Error("First address must be \u2264 last address.");
 
         const cidrs = rangeToCidrs(first, last);
         document.getElementById("rangeCidrList").innerHTML = cidrs.map(c => `<div>${c}</div>`).join("");
@@ -273,4 +273,233 @@ document.getElementById("rangeToCidr").addEventListener("click", () => {
     } catch (e) {
         showError("rangeCidrError", e.message);
     }
+});
+
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Panel 5: IPv6 Compatibility Checker
+// Uses DNS-over-HTTPS to check for AAAA records
+// External API: Cloudflare DoH https://cloudflare-dns.com/dns-query
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const DOH_V6COMPAT = "https://cloudflare-dns.com/dns-query";
+
+document.getElementById("v6compatBtn").addEventListener("click", async () => {
+    clearError("v6compatError");
+    hideBlock("v6compatResult");
+    const domain = document.getElementById("v6compatDomain").value.trim().replace(/^https?:\/\//i,"").split("/")[0];
+    if (!domain) { showError("v6compatError", "Enter a domain name."); return; }
+
+    const btn = document.getElementById("v6compatBtn");
+    btn.disabled = true;
+    btn.textContent = "Checking\u2026";
+    try {
+        // Query both A and AAAA in parallel
+        const [aResp, aaaaResp] = await Promise.all([
+            fetch(`${DOH_V6COMPAT}?name=${encodeURIComponent(domain)}&type=A`,
+                { headers: { Accept: "application/dns-json" }, signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+            fetch(`${DOH_V6COMPAT}?name=${encodeURIComponent(domain)}&type=AAAA`,
+                { headers: { Accept: "application/dns-json" }, signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+        ]);
+
+        const aRecords    = (aResp.Answer    || []).filter(r => r.type === 1).map(r => r.data);
+        const aaaaRecords = (aaaaResp.Answer || []).filter(r => r.type === 28).map(r => r.data);
+        const ipv6Support = aaaaRecords.length > 0;
+
+        const icon = ipv6Support ? "\u2705" : "\u274c";
+        const statusText = ipv6Support
+            ? `<strong style="color:#155724">${icon} IPv6 supported</strong> \u2014 ${aaaaRecords.length} AAAA record(s) found`
+            : `<strong style="color:#721c24">${icon} No IPv6 support</strong> \u2014 no AAAA records found`;
+
+        const aHtml = aRecords.length
+            ? aRecords.map(ip => `<div class="result-field-row"><span class="rf-key">A</span><span class="rf-val mono">${ip}</span></div>`).join("")
+            : '<div class="result-field-row"><span class="rf-key">A</span><span class="rf-val" style="color:var(--color-text-muted)">No A records</span></div>';
+
+        const aaaaHtml = aaaaRecords.length
+            ? aaaaRecords.map(ip => `<div class="result-field-row"><span class="rf-key">AAAA</span><span class="rf-val mono">${ip}</span></div>`).join("")
+            : '<div class="result-field-row"><span class="rf-key">AAAA</span><span class="rf-val" style="color:var(--color-text-muted)">No AAAA records</span></div>';
+
+        document.getElementById("v6compatResult").innerHTML = `
+            <div style="margin-bottom:0.6rem;font-size:0.95rem">${statusText}</div>
+            ${aHtml}${aaaaHtml}`;
+        showBlock("v6compatResult");
+    } catch(e) {
+        showError("v6compatError", "Lookup failed: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Check IPv6 Support";
+    }
+});
+
+document.getElementById("v6compatClear").addEventListener("click", () => {
+    document.getElementById("v6compatDomain").value = "";
+    clearError("v6compatError");
+    hideBlock("v6compatResult");
+});
+
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Panel 6: Local IPv6 Generator (ULA / Link-Local) — RFC 4193
+// Pure JS, no external APIs
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+function randHex(bytes) {
+    const arr = new Uint8Array(bytes);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+function formatIPv6Groups(groups) {
+    return compressIPv6(groups.join(":"));
+}
+
+document.getElementById("v6genBtn").addEventListener("click", () => {
+    clearError("v6genError");
+    hideBlock("v6genResult");
+    const type   = document.getElementById("v6genType").value;
+    const subnet = document.getElementById("v6genSubnet").value.trim();
+
+    try {
+        if (type === "link") {
+            // fe80::/10 — interface identifier is 64-bit random (EUI-64 style but fully random)
+            const iid = randHex(8);
+            // fe80:: + 48 bits zero + 64 bit IID
+            const full = `fe80:0000:0000:0000:${iid.slice(0,4)}:${iid.slice(4,8)}:${iid.slice(8,12)}:${iid.slice(12,16)}`;
+            const compressed = compressIPv6(full);
+            document.getElementById("v6genResult").innerHTML = `
+                <div class="result-field-row"><span class="rf-key">Link-Local</span><span class="rf-val mono">${compressed}</span></div>
+                <div class="result-field-row"><span class="rf-key">Expanded</span><span class="rf-val mono">${full.toUpperCase()}</span></div>
+                <div class="result-field-row"><span class="rf-key">Prefix</span><span class="rf-val mono">fe80::/10</span></div>`;
+        } else {
+            // ULA: fd00::/8 — fc + 40-bit global ID + 16-bit subnet + 64-bit interface ID
+            const globalId = randHex(5); // 40-bit
+            let subnetId;
+            if (subnet) {
+                const s = parseInt(subnet, 16);
+                if (isNaN(s) || s < 0 || s > 0xffff) throw new Error("Subnet ID must be hex 0\u2013FFFF.");
+                subnetId = s.toString(16).padStart(4, "0");
+            } else {
+                subnetId = randHex(2);
+            }
+            const iid = randHex(8);
+            // fd + globalId (5B) = first 6B of first 2 groups
+            const g1 = "fd" + globalId.slice(0,2);
+            const g2 = globalId.slice(2,6);
+            const g3 = globalId.slice(6,8) + "00"; // last byte of globalId + 0 (subnet high)
+            // Actually standard ULA: fd{globalId}/{subnet}/{iid}
+            // Format: fdXX:XXXX:XXXX:SSSS:{iid}
+            const gid1 = "fd" + globalId.slice(0,2);
+            const gid2 = globalId.slice(2,6);
+            const gid3 = globalId.slice(6) + "00"; // last octet of globalId
+            // Correct: fd + 40bit = fd followed by 5 octets = 3 groups of 4+4+2 hex
+            // fd = 0xfd, then 5 octets = 10 hex chars
+            // Groups: fd<2> | <4> | <4> | <subnet 4> | iid(4) | iid(4) | iid(4) | iid(4)
+            const hex10 = "fd" + globalId; // 12 hex chars = 3 groups of 4
+            const grp1 = hex10.slice(0,4);
+            const grp2 = hex10.slice(4,8);
+            const grp3 = hex10.slice(8,12);
+            const full  = `${grp1}:${grp2}:${grp3}:${subnetId}:${iid.slice(0,4)}:${iid.slice(4,8)}:${iid.slice(8,12)}:${iid.slice(12,16)}`;
+            const compressed = compressIPv6(full);
+            const network   = `${compressIPv6(`${grp1}:${grp2}:${grp3}:${subnetId}:0000:0000:0000:0000`)}/${48}`;
+
+            document.getElementById("v6genResult").innerHTML = `
+                <div class="result-field-row"><span class="rf-key">Address</span><span class="rf-val mono">${compressed}</span></div>
+                <div class="result-field-row"><span class="rf-key">Expanded</span><span class="rf-val mono">${full.toUpperCase()}</span></div>
+                <div class="result-field-row"><span class="rf-key">Network /48</span><span class="rf-val mono">${network}</span></div>
+                <div class="result-field-row"><span class="rf-key">Subnet ID</span><span class="rf-val mono">${subnetId.toUpperCase()}</span></div>
+                <div class="result-field-row"><span class="rf-key">Global ID</span><span class="rf-val mono">${globalId.toUpperCase()}</span></div>
+                <div class="result-field-row"><span class="rf-key">IID</span><span class="rf-val mono">${iid.toUpperCase()}</span></div>
+                <div class="result-field-row"><span class="rf-key">Type</span><span class="rf-val">ULA (Unique Local Address, RFC 4193)</span></div>`;
+        }
+        showBlock("v6genResult");
+    } catch(e) {
+        showError("v6genError", e.message);
+    }
+});
+
+document.getElementById("v6genClear").addEventListener("click", () => {
+    document.getElementById("v6genSubnet").value = "";
+    clearError("v6genError");
+    hideBlock("v6genResult");
+});
+
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Panel 7: MAC Address Generator — pure JS, Web Crypto API, no external APIs
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+function generateMAC(ouiHex) {
+    const bytes = new Uint8Array(6);
+    crypto.getRandomValues(bytes);
+    if (ouiHex && ouiHex.length >= 6) {
+        // Parse OUI (first 3 octets)
+        const oui = ouiHex.replace(/[^0-9a-f]/gi, "").slice(0, 6);
+        bytes[0] = parseInt(oui.slice(0,2), 16);
+        bytes[1] = parseInt(oui.slice(2,4), 16);
+        bytes[2] = parseInt(oui.slice(4,6), 16);
+    } else {
+        // Make locally administered, unicast (bit 1 = 1, bit 0 = 0 in first octet)
+        bytes[0] = (bytes[0] & 0xfe) | 0x02;
+    }
+    return Array.from(bytes);
+}
+
+function formatMAC(bytes, fmt) {
+    const hex = bytes.map(b => b.toString(16).padStart(2,"0").toUpperCase());
+    switch(fmt) {
+        case "dash":  return hex.join("-");
+        case "dot":   return `${hex[0]}${hex[1]}.${hex[2]}${hex[3]}.${hex[4]}${hex[5]}`;
+        case "plain": return hex.join("");
+        default:      return hex.join(":");
+    }
+}
+
+let lastGeneratedMACs = [];
+
+document.getElementById("macGenBtn").addEventListener("click", () => {
+    clearError("macGenError");
+    const ouiRaw = document.getElementById("macOui").value.trim();
+    const fmt    = document.getElementById("macFormat").value;
+    const count  = Math.min(Math.max(parseInt(document.getElementById("macCount").value, 10) || 1, 1), 50);
+
+    const ouiHex = ouiRaw.replace(/[^0-9a-f]/gi,"");
+    if (ouiRaw && ouiHex.length < 6) {
+        showError("macGenError", "OUI prefix must be at least 3 octets (6 hex characters).");
+        return;
+    }
+
+    lastGeneratedMACs = [];
+    for (let i = 0; i < count; i++) {
+        const bytes = generateMAC(ouiHex);
+        lastGeneratedMACs.push(formatMAC(bytes, fmt));
+    }
+
+    const result = document.getElementById("macGenResult");
+    result.innerHTML = lastGeneratedMACs
+        .map(m => `<div class="result-field-row"><span class="rf-val mono">${m}</span></div>`)
+        .join("");
+    showBlock("macGenResult");
+});
+
+document.getElementById("macCopyBtn").addEventListener("click", () => {
+    if (!lastGeneratedMACs.length) return;
+    const text = lastGeneratedMACs.join("\n");
+    const doFallback = () => {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;top:0;left:0;width:2px;height:2px;opacity:0";
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+    };
+    const btn = document.getElementById("macCopyBtn");
+    const done = () => { btn.textContent = "Copied!"; setTimeout(() => btn.textContent = "Copy All", 1500); };
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(doFallback);
+    } else { doFallback(); done(); }
+});
+
+document.getElementById("macClearBtn").addEventListener("click", () => {
+    document.getElementById("macOui").value = "";
+    document.getElementById("macCount").value = "1";
+    clearError("macGenError");
+    hideBlock("macGenResult");
+    lastGeneratedMACs = [];
 });

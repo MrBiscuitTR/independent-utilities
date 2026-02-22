@@ -1,67 +1,29 @@
-## ADD TO "qol" folder and "quality of life" section in the hub: Task Organizer Drag and Drop. temporarily save to local storage in a lightweight manner and add option to download as JSON. (if user doesnt open this tool's page for more than one month, clear localstorage. also add a red button to clear localstorage manually (also clears the entiretodo list(s))) add json importing to get the same organization table back. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe. give option to save all this as json and reimport it to edit and redownload it etc.
+# Tool categories as folders: image, internet, other-tools, qol, text. All tools should be properly categorized and merged if necessary, to avoid confusion and unnecessary bloating. after finishing every file of a tool, add it immediately to hub index.html to the category it belongs to, with the dependency comment as usual.
 
+## ufw rules and command (default etc) generator: take user's all possible preferences and exceptions and forward rules etc, and generate commands to achieve those ufw settings. also give the config file contents and the general file location. also add a general up to date ufw guide (not a man page, but a guide with useful commands and when to run them, human language) at the bottom of the page, make it expandable, colllapsed by default. for preferences such as forwarding, allowing denying etc, add an info icon which will tell user what it means and what it does, and when to use it. works on hover on pc, click on mobile devices. bsaicall a ufw configurator tool for dummies to be able do anything they want without knowing much networking. 
+## same kind of tool, but for vpn configurations. include wireguard (wg/wg-quick), openvpn, and other very common vpns. include forward options, ips, ports, peers, keys, keepalive and other optionel parameters, masquerade options etc too.
+## nftables and iptables rule generator, similar to ufw rules/command generator, but adapt it.
+
+-## (this part is now successfully done. proceed later.) ADD TO "qol" folder and "quality of life" section in the hub: Task Organizer Drag and Drop. temporarily save to local storage in a lightweight manner and add option to download as JSON. (if user doesnt open this tool's page for more than one month, clear localstorage. also add a red button to clear localstorage manually (also clears the entiretodo list(s))) add json importing to get the same organization table back. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe. give option to save all this as json and reimport it to edit and redownload it etc.
 --not yet-- add option to save to mongodb (in the database 'utilities_hub' and collection 'task_organizer' with a simple schema, maybe just a json field for the whole table and a timestamp field for sorting, and an optional title field for the user to add titles to their saved tables. implement backend with python flask if necessary but try to use js in browser directly.), create .env in project root for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe (use a free no-key api to autocomplete, note it down as a dependency if you implement this.) for tasks. 
 
 DNS Tools
-Are you a webmaster or programmer and searching for a DNS toolbox? The online DNS tools by DNS Checker help solve DNS problems and resolve issues regarding a website's DNS (Domain Name System) Records. The DNS records help to entertain incoming requests and point them to the correct server, which helps the server receive those requests and respond accordingly.
-
-SPF Record Checker: Lookup and Validate SPF Record of Domain
-## Domain DNS Validation: Validate Your DNS Records
-## Reverse IP Lookup: Resolve IP to Hostname
-## A records lookup (if possible) + CNAME Lookup: CNAME Records of a Domain + NS Lookup: See NS Records of a Domain + MX Lookup: See Mail Records of a Domain
-
-## DMARC Validation Tool: DMARC Lookup & Validation
-## Domain DNS Health Checker: Get Complete DNS Health Report
-## DMARC Record Generator: Generate DMARC Record for any domain
-## DNSKEY Lookup: Lookup DNSKEY record of any domain
-## DS Lookup: Lookup DS record of any domain
-DKIM Checker: Check DKIM (Domain Key) Records
+## SPF Record Checker: Lookup and Validate SPF Record of Domain
+## DKIM Checker: Check DKIM (Domain Key) Records
 
 ## (merge all possible domain record lookups in one page. dont make seperate tools. list all detected records in the same page. allow user to pick which records to include, by default all of them.) ALSO merge all DNS tools in one page. theres currently a DNS Lookup tool, maybe rename it to DNS Tools, and all all others in it. you can make tabs in it or just stack all tools on top of each other, whichever works best. this is to avoid having many tools and getting confused. just group all similar ones, like DNS record checking ones, in a single tool folder, in a single html. you can use different js's.
 
 
 IP Tools
 IP tools solve your online IP-related problems. Whether it's online What is my IP, IP Location Finder, IP WHOIS lookup, or an IPv6 WHOIS lookup, all IP-related tools are here. Our IP tools tell you your IP address. You can also find the IP location of any IPs and track the location of those IP addresses with our integrated geo IP services. Our tools also check any entered IP for IP blacklist check in anti-spam databases, which tells whether your IP or server IP is under a ban from different services or not.
-
-Trace Email (Header Analyzer): Track the Location of Email Sender
-IP Blacklist Checker: Check an IP in multiple known public Blacklist Databases, include anti telemetry/anti malware/anti ad etc. show which one it belongs to.
-## Resolve IP to Hostname: Check Hostname Behind an IP (do in the same page as reverse ip lookup)
-## IP WHOIS Lookup: Check who Owns an IP Address.
-IPv6 WHOIS Lookup: Check who Owns an IPv6 Address.
-Local IPv6 Address Generator: Generate IPv6 Address for Local Usage
-IPv6 Compatibility Checker: Check if a Domain Supports IPv6
-## Website to IP lookup: Find IP Address of a Domain, Server or Website (do in the same page as reverse ip lookup)
-
+## Trace Email (Header Analyzer): Track the Location of Email Sender
+## IP Blacklist Checker: Check an IP in multiple known public Blacklist Databases/sites, include anti telemetry/anti malware/anti ad etc. show which one it belongs to. do NOT use any apis that require keys. note all api urls at the top of the js and in hub index.html as a dependency below the tool as usual.
 
 Dev Tools
 Dev or Developer tools are built especially for website developers (working on website projects) to make their daily tasks easy and avoid the hassle of installing various software on the computer to perform minor tasks possible without installing software and wasting time setting them up. Whether it's generating random passwords or checking website HTTP headers, or the operating system of the website's backend server, all is here to meet your needs.
 
-Check Website Operating System: Website's Backend Server OS
-SMTP Test: Email SMTP test tool
-htaccess Redirect Generator: Redirect HTACCESS tool
-URL Rewrite Generator: Rewrite SEO friendly URL ( also works with main url, finds hrefs and navs, suggests fixes.)
-Broken Links Checker: Find and Fix Dead Links.
-
-
-
-
-Webmasters Tools
-Tools for webmasters help website owners and developers to analyze their website performance regarding various analytics, such as checking online metrics related to any domain.
-
-## Website Link Analyzer: Internal & External Links Checker + together with (same page) Sitemap generator: generates sitemap using href, nav, header, footer links on a given url.
-
-Network Tools
-Network tools provide network-related services, and these services may include checking open ports, i.e., TCP & UDP ports scanning and OUI lookup, i.e., checking vendors of any device using its MAC address or an AS Number lookup, which tells you complete info about any ASN number, and many more tools regarding networking and networking parameters.
-
-## MAC Address Generator: Generate Random MAC Address (add to random ip generator tool page)
-## ASN WHOIS Lookup: Locate who owns an ASN (add to whois lookup tool)
-
-
-Productivity Tools
-Productivity tools are for people who want to simplify their tasks or streamline their workflow. Whether you want to generate or scan a QR code, want to create dummy data, or want to validate a credit card number. Want to go for a reverse image search, image to text, or have to create a puzzle using the rot 13 decoder? DNS Checker offers a free list of tools to simplify all your tasks.
-
-## (only do if possible and doable all locally) ASCII art generator (would be cool) -- scale given dimensions. works for texts and maybe images too, if possible.
-## Domain Name Search : Domain Name Availability Checker. also shows ip and whatever other info it can show without relying on api keys.
+## SMTP Test: Email SMTP test tool
+## htaccess Redirect Generator: Redirect HTACCESS tool
 
 ## As always dont forget to add any external api/website dependencies (if any, also always keep them minimal to none, as the purpose of this project is to REDUCE external dependencies, or at least use VERY reliable, secure, and privacy respecting ones) as comments below its respective tool in the hub index.html, and add it to the backend requirers section if it does. this documentation step in hub index.html is crucial for me to be able to check their external dependencies and replace them when necessary.
 

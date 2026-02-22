@@ -15,22 +15,25 @@ const DOH_PROVIDERS = {
     google:     "https://dns.google/resolve",
 };
 
-// Record type numbers (for Cloudflare wire-format DoH)
-const TYPE_MAP = { A:1, AAAA:28, MX:15, NS:2, TXT:16, CNAME:5, SOA:6, PTR:12 };
-const ALL_TYPES = ["A", "AAAA", "MX", "NS", "TXT", "CNAME", "SOA"];
+// Record type numbers (RFC standard)
+const TYPE_NUM = { A:1, AAAA:28, MX:15, NS:2, TXT:16, CNAME:5, SOA:6, PTR:12, CAA:257, SRV:33, DNSKEY:48, DS:43 };
+const ALL_TYPES = ["A", "AAAA", "MX", "NS", "TXT", "CNAME", "SOA", "CAA"];
 
-// ── DOM ─────────────────────────────────────────────────────────────────────
-const domainInput = document.getElementById("domainInput");
-const typeSelect  = document.getElementById("typeSelect");
-const lookupBtn   = document.getElementById("lookupBtn");
-const resultArea  = document.getElementById("resultArea");
+// ── Tab switching ─────────────────────────────────────────────────────────────
+document.getElementById("dnsTabs").addEventListener("click", e => {
+    const btn = e.target.closest(".dtab");
+    if (!btn) return;
+    document.querySelectorAll(".dtab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".dns-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+});
 
-// ── DoH query ────────────────────────────────────────────────────────────────
-async function dohQuery(domain, type) {
+// ── DoH helper ────────────────────────────────────────────────────────────────
+async function dohQuery(name, type) {
     const provider = document.querySelector('input[name="doh"]:checked').value;
     const base = DOH_PROVIDERS[provider];
-    const url  = `${base}?name=${encodeURIComponent(domain)}&type=${type}`;
-
+    const url  = `${base}?name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}`;
     const resp = await fetch(url, {
         headers: { Accept: "application/dns-json" },
         signal: AbortSignal.timeout(8000),
@@ -39,81 +42,108 @@ async function dohQuery(domain, type) {
     return resp.json();
 }
 
-// ── Parse answers ────────────────────────────────────────────────────────────
-function parseAnswers(data, type) {
+function getAnswers(data, typeStr) {
     if (!data.Answer) return [];
-    return data.Answer
-        .filter(r => r.type === TYPE_MAP[type])
-        .map(r => ({ ttl: r.TTL, data: r.data }));
+    const num = TYPE_NUM[typeStr];
+    return data.Answer.filter(r => !num || r.type === num).map(r => ({ ttl: r.TTL, data: r.data }));
 }
 
-// ── Render one record section ────────────────────────────────────────────────
+// ── Shared render helpers ─────────────────────────────────────────────────────
+function loading(el) {
+    el.innerHTML = `<p class="dns-loading">Querying DNS&#x2026;</p>`;
+}
+
 function renderSection(type, records) {
     const count = records.length;
-    let rows = "";
+    let inner = "";
     if (count === 0) {
-        rows = `<div class="dns-no-records">No ${type} records found.</div>`;
+        inner = `<div class="dns-no-records">No ${type} records found.</div>`;
     } else {
         let cols = "";
         if (type === "MX") {
-            cols = "<th>Priority</th><th>Mail server</th><th>TTL</th>";
-            rows = records.map(r => {
-                const parts = r.data.trim().split(/\s+/);
-                const prio  = parts[0] ?? "";
-                const host  = parts[1] ?? r.data;
-                return `<tr><td>${prio}</td><td>${host}</td><td>${r.ttl}s</td></tr>`;
+            cols = "<th>Priority</th><th>Mail Server</th><th>TTL</th>";
+            inner = records.map(r => {
+                const p = r.data.trim().split(/\s+/);
+                return `<tr><td>${p[0]??""}</td><td>${p[1]??r.data}</td><td>${r.ttl}s</td></tr>`;
             }).join("");
+        } else if (type === "SOA") {
+            cols = "<th>Value</th><th>TTL</th>";
+            inner = records.map(r => `<tr><td style="word-break:break-all">${r.data}</td><td>${r.ttl}s</td></tr>`).join("");
         } else {
             cols = "<th>Value</th><th>TTL</th>";
-            rows = records.map(r => `<tr><td>${r.data}</td><td>${r.ttl}s</td></tr>`).join("");
+            inner = records.map(r => `<tr><td>${r.data}</td><td>${r.ttl}s</td></tr>`).join("");
         }
-        rows = `<table class="dns-table"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>`;
+        inner = `<table class="dns-table"><thead><tr>${cols}</tr></thead><tbody>${inner}</tbody></table>`;
     }
-
-    return `
-        <div class="dns-section">
-            <div class="dns-section-title">
-                ${type}
-                <span class="dns-count">${count}</span>
-            </div>
-            ${rows}
-        </div>`;
+    return `<div class="dns-section">
+        <div class="dns-section-title">${type} <span class="dns-count">${count}</span></div>
+        ${inner}
+    </div>`;
 }
 
-// ── Main lookup ───────────────────────────────────────────────────────────────
+function renderError(msg) {
+    return `<div class="dns-error">${escHtml(msg)}</div>`;
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB 1 — DNS Records
+// ════════════════════════════════════════════════════════════════════════════
+const domainInput = document.getElementById("domainInput");
+const typeSelect  = document.getElementById("typeSelect");
+const lookupBtn   = document.getElementById("lookupBtn");
+const resultArea  = document.getElementById("resultArea");
+const dkimRow     = document.getElementById("dkimRow");
+const dkimSel     = document.getElementById("dkimSelector");
+
+typeSelect.addEventListener("change", () => {
+    dkimRow.classList.toggle("hidden", typeSelect.value !== "DKIM");
+});
+
 async function doLookup() {
-    const domain = domainInput.value.trim();
+    const domain = domainInput.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
     if (!domain) { domainInput.focus(); return; }
 
-    const selectedType = typeSelect.value;
-    const types = selectedType === "ALL" ? ALL_TYPES : [selectedType];
-
-    resultArea.innerHTML = `<p style="color:var(--color-text-muted);font-size:0.9rem">Querying DNS…</p>`;
+    loading(resultArea);
     lookupBtn.disabled = true;
 
     try {
-        const queries = types.map(t => dohQuery(domain, t).then(d => ({ type: t, data: d })).catch(() => ({ type: t, data: {} })));
+        let selectedType = typeSelect.value;
+
+        if (selectedType === "DKIM") {
+            // DKIM = TXT at <selector>._domainkey.<domain>
+            const selector = dkimSel.value.trim() || "default";
+            const dkimName = `${selector}._domainkey.${domain}`;
+            const data = await dohQuery(dkimName, "TXT");
+            const records = getAnswers(data, "TXT");
+            resultArea.innerHTML = renderSection(`DKIM (${selector}._domainkey.${domain})`, records);
+            return;
+        }
+
+        const types = selectedType === "ALL" ? ALL_TYPES : [selectedType];
+        const queries = types.map(t =>
+            dohQuery(domain, t).then(d => ({ type: t, data: d })).catch(() => ({ type: t, data: {} }))
+        );
         const results = await Promise.all(queries);
 
         let html = "";
         for (const { type, data } of results) {
-            const records = parseAnswers(data, type);
-            html += renderSection(type, records);
+            html += renderSection(type, getAnswers(data, type));
         }
 
-        // Show NXDOMAIN / SERVFAIL if every type returned nothing
+        // NXDOMAIN / SERVFAIL check
         if (results.every(r => !r.data.Answer || r.data.Answer.length === 0)) {
             const status = results[0]?.data?.Status;
-            if (status === 3) {
-                html = `<div class="dns-error">NXDOMAIN — domain does not exist.</div>`;
-            } else if (status === 2) {
-                html = `<div class="dns-error">SERVFAIL — DNS server error.</div>`;
-            }
+            if (status === 3) html = renderError("NXDOMAIN — domain does not exist.");
+            else if (status === 2) html = renderError("SERVFAIL — DNS server error.");
         }
 
         resultArea.innerHTML = html || `<p style="color:var(--color-text-muted)">No records found.</p>`;
-    } catch (e) {
-        resultArea.innerHTML = `<div class="dns-error">Error: ${e.message}</div>`;
+    } catch(e) {
+        resultArea.innerHTML = renderError(e.message);
     } finally {
         lookupBtn.disabled = false;
     }
@@ -121,3 +151,206 @@ async function doLookup() {
 
 lookupBtn.addEventListener("click", doLookup);
 domainInput.addEventListener("keydown", e => { if (e.key === "Enter") doLookup(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB 2 — DMARC
+// ════════════════════════════════════════════════════════════════════════════
+const dmarcDomain = document.getElementById("dmarcDomain");
+const dmarcBtn    = document.getElementById("dmarcBtn");
+const dmarcResult = document.getElementById("dmarcResult");
+
+function parseDmarc(raw) {
+    // raw TXT record content, e.g. v=DMARC1; p=reject; ...
+    const tags = {};
+    raw.replace(/^"|"$/g, "").split(/\s*;\s*/).forEach(part => {
+        const eq = part.indexOf("=");
+        if (eq > 0) tags[part.slice(0, eq).trim().toLowerCase()] = part.slice(eq + 1).trim();
+    });
+    return tags;
+}
+
+const DMARC_LABELS = {
+    v: "Version", p: "Policy", sp: "Sub-domain Policy", pct: "Percentage",
+    rua: "Aggregate Report URI", ruf: "Forensic Report URI",
+    adkim: "DKIM Alignment", aspf: "SPF Alignment", fo: "Failure Options",
+};
+
+const DMARC_POLICY_BADGE = { none: "dns-badge-warn", quarantine: "dns-badge-info", reject: "dns-badge-ok" };
+
+async function doDmarc() {
+    const domain = dmarcDomain.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+    if (!domain) { dmarcDomain.focus(); return; }
+
+    loading(dmarcResult);
+    dmarcBtn.disabled = true;
+
+    try {
+        const data = await dohQuery(`_dmarc.${domain}`, "TXT");
+        const records = getAnswers(data, "TXT");
+        const dmarcRec = records.find(r => r.data.includes("v=DMARC1"));
+
+        if (!dmarcRec) {
+            dmarcResult.innerHTML = `<div class="dns-warn-box">No DMARC record found at <code>_dmarc.${escHtml(domain)}</code>. Email is not protected by DMARC.</div>`;
+            return;
+        }
+
+        const tags = parseDmarc(dmarcRec.data);
+        const policy = tags.p || "none";
+        const badgeClass = DMARC_POLICY_BADGE[policy] || "dns-badge-info";
+
+        let rows = Object.entries(DMARC_LABELS)
+            .filter(([k]) => tags[k])
+            .map(([k, label]) => {
+                let val = escHtml(tags[k]);
+                if (k === "p" || k === "sp") {
+                    val = `<span class="dns-badge ${DMARC_POLICY_BADGE[tags[k]] || "dns-badge-info"}">${val}</span>`;
+                }
+                return `<tr><td class="dns-kv-key">${label}</td><td>${val}</td></tr>`;
+            }).join("");
+
+        dmarcResult.innerHTML = `
+            <div class="dns-kv-box">
+                <div class="dns-kv-header">
+                    DMARC Record <span class="dns-badge ${badgeClass}">${escHtml(policy)}</span>
+                </div>
+                <div class="dns-raw-record">${escHtml(dmarcRec.data)}</div>
+                <table class="dns-kv-table"><tbody>${rows}</tbody></table>
+            </div>`;
+    } catch(e) {
+        dmarcResult.innerHTML = renderError(e.message);
+    } finally {
+        dmarcBtn.disabled = false;
+    }
+}
+
+dmarcBtn.addEventListener("click", doDmarc);
+dmarcDomain.addEventListener("keydown", e => { if (e.key === "Enter") doDmarc(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB 3 — DNSKEY / DS
+// ════════════════════════════════════════════════════════════════════════════
+const dnskeyDomain = document.getElementById("dnskeyDomain");
+const dnskeyBtn    = document.getElementById("dnskeyBtn");
+const dsBtn        = document.getElementById("dsBtn");
+const dnskeyResult = document.getElementById("dnskeyResult");
+
+async function doDnskeyLookup(type) {
+    const domain = dnskeyDomain.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+    if (!domain) { dnskeyDomain.focus(); return; }
+
+    loading(dnskeyResult);
+    dnskeyBtn.disabled = true;
+    dsBtn.disabled = true;
+
+    try {
+        const data = await dohQuery(domain, type);
+        const records = getAnswers(data, type);
+
+        if (records.length === 0) {
+            dnskeyResult.innerHTML = `<div class="dns-warn-box">No ${type} records found for <strong>${escHtml(domain)}</strong>. DNSSEC may not be configured.</div>`;
+            return;
+        }
+
+        dnskeyResult.innerHTML = renderSection(type, records);
+    } catch(e) {
+        dnskeyResult.innerHTML = renderError(e.message);
+    } finally {
+        dnskeyBtn.disabled = false;
+        dsBtn.disabled = false;
+    }
+}
+
+dnskeyBtn.addEventListener("click", () => doDnskeyLookup("DNSKEY"));
+dsBtn.addEventListener("click", () => doDnskeyLookup("DS"));
+dnskeyDomain.addEventListener("keydown", e => { if (e.key === "Enter") doDnskeyLookup("DNSKEY"); });
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB 4 — DNS Health Check
+// ════════════════════════════════════════════════════════════════════════════
+const healthDomain = document.getElementById("healthDomain");
+const healthBtn    = document.getElementById("healthBtn");
+const healthResult = document.getElementById("healthResult");
+
+async function doHealthCheck() {
+    const domain = healthDomain.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+    if (!domain) { healthDomain.focus(); return; }
+
+    healthResult.innerHTML = `<p class="dns-loading">Running health checks&#x2026;</p>`;
+    healthBtn.disabled = true;
+
+    try {
+        // Run all checks in parallel
+        const [aRes, aaaaRes, mxRes, nsRes, soaRes, txtRes, dnskeyRes, dmarcRes, caaRes] = await Promise.all([
+            dohQuery(domain, "A").catch(() => ({})),
+            dohQuery(domain, "AAAA").catch(() => ({})),
+            dohQuery(domain, "MX").catch(() => ({})),
+            dohQuery(domain, "NS").catch(() => ({})),
+            dohQuery(domain, "SOA").catch(() => ({})),
+            dohQuery(domain, "TXT").catch(() => ({})),
+            dohQuery(domain, "DNSKEY").catch(() => ({})),
+            dohQuery(`_dmarc.${domain}`, "TXT").catch(() => ({})),
+            dohQuery(domain, "CAA").catch(() => ({})),
+        ]);
+
+        const a    = getAnswers(aRes, "A");
+        const aaaa = getAnswers(aaaaRes, "AAAA");
+        const mx   = getAnswers(mxRes, "MX");
+        const ns   = getAnswers(nsRes, "NS");
+        const soa  = getAnswers(soaRes, "SOA");
+        const txt  = getAnswers(txtRes, "TXT");
+        const dnskey = getAnswers(dnskeyRes, "DNSKEY");
+        const dmarcTxt = getAnswers(dmarcRes, "TXT").filter(r => r.data.includes("v=DMARC1"));
+        const caa  = getAnswers(caaRes, "CAA");
+
+        // SPF = TXT starting with v=spf1
+        const spf = txt.filter(r => r.data.startsWith("v=spf1") || r.data.includes('"v=spf1'));
+
+        // DNSKEY check is done via presence
+        const dnssec = dnskey.length > 0;
+
+        function check(ok, label, detail) {
+            const icon = ok ? "&#x2705;" : "&#x26A0;&#xFE0F;";
+            const cls  = ok ? "health-ok" : "health-warn";
+            return `<div class="health-row ${cls}">
+                <span class="health-icon">${icon}</span>
+                <div class="health-info">
+                    <span class="health-label">${label}</span>
+                    ${detail ? `<span class="health-detail">${detail}</span>` : ""}
+                </div>
+            </div>`;
+        }
+
+        const aIps    = a.map(r => r.data).join(", ") || "—";
+        const aaaaIps = aaaa.map(r => r.data).join(", ") || "—";
+        const mxHosts = mx.map(r => { const p = r.data.split(/\s+/); return (p[1]||r.data) + ` (${p[0]||""} priority)`; }).join("; ") || "—";
+        const nsHosts = ns.map(r => r.data).join(", ") || "—";
+        const soaVal  = soa[0]?.data || "—";
+        const dmarcPolicy = dmarcTxt.length ? (parseDmarc(dmarcTxt[0].data).p || "none") : null;
+        const spfRecord = spf[0]?.data || null;
+
+        let html = `<div class="health-card">
+            <div class="health-card-title">DNS Health: <strong>${escHtml(domain)}</strong></div>
+            ${check(a.length > 0, "A record (IPv4)", `${a.length} record(s): ${aIps}`)}
+            ${check(aaaa.length > 0, "AAAA record (IPv6)", aaaa.length > 0 ? `${aaaa.length} record(s): ${aaaaIps}` : "No IPv6 address configured")}
+            ${check(ns.length > 0, "NS records", `Nameservers: ${nsHosts}`)}
+            ${check(soa.length > 0, "SOA record", soaVal.length > 60 ? soaVal.slice(0,60)+"…" : soaVal)}
+            ${check(mx.length > 0, "MX records (email delivery)", mx.length > 0 ? `${mx.length} mail server(s): ${mxHosts}` : "No MX records — domain cannot receive email")}
+            ${check(spfRecord !== null, "SPF record (email authentication)", spfRecord ? escHtml(spfRecord.slice(0,80)) : "No SPF TXT record found")}
+            ${check(dmarcPolicy !== null && dmarcPolicy !== "none", "DMARC record (email policy)",
+                dmarcPolicy === null ? "No DMARC record found at _dmarc." + escHtml(domain) :
+                dmarcPolicy === "none" ? "DMARC found but policy=none (monitoring only)" :
+                `Policy: ${escHtml(dmarcPolicy)}`)}
+            ${check(caa.length > 0, "CAA record (cert authority control)", caa.length > 0 ? caa.map(r=>r.data).join("; ") : "No CAA record — any CA can issue certificates")}
+            ${check(dnssec, "DNSSEC", dnssec ? `${dnskey.length} DNSKEY record(s) found` : "No DNSKEY record — DNSSEC not configured")}
+        </div>`;
+
+        healthResult.innerHTML = html;
+    } catch(e) {
+        healthResult.innerHTML = renderError(e.message);
+    } finally {
+        healthBtn.disabled = false;
+    }
+}
+
+healthBtn.addEventListener("click", doHealthCheck);
+healthDomain.addEventListener("keydown", e => { if (e.key === "Enter") doHealthCheck(); });
