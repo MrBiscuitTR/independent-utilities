@@ -12,11 +12,10 @@
 "use strict";
 
 // ── External API endpoints ──────────────────────────────────────────────────
-const API_BASE    = "http://localhost:5501";
-const API_MY_IP   = `${API_BASE}/api/my-ip`;
-const API_IP_LOC  = `${API_BASE}/api/ip-location`;
-const CF_TRACE    = "https://cloudflare.com/cdn-cgi/trace"; // CORS: Access-Control-Allow-Origin: *
-const ICANHAZIP   = "https://icanhazip.com";               // Cloudflare-operated plain-text echo
+const API_BASE  = "http://localhost:5501";
+const API_MY_IP = `${API_BASE}/api/my-ip`;
+const CF_TRACE  = "https://cloudflare.com/cdn-cgi/trace"; // CORS: Access-Control-Allow-Origin: *
+const ICANHAZIP = "https://icanhazip.com";               // Cloudflare-operated plain-text echo
 
 // ── DOM refs ────────────────────────────────────────────────────────────────
 const ipv4Val        = document.getElementById("ipv4Val");
@@ -121,7 +120,17 @@ document.querySelectorAll(".copy-btn").forEach(btn => {
     });
 });
 
-// ── Location lookup ──────────────────────────────────────────────────────────
+// ── Country flag emoji ────────────────────────────────────────────────────────
+function flagEmoji(cc) {
+    if (!cc || cc.length !== 2) return "";
+    // Regional indicator letters: 'A'=U+1F1E6 … 'Z'=U+1F1FF
+    return [...cc.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))).join("");
+}
+
+// ── Location lookup ───────────────────────────────────────────────────────────
+// Calls ip-api.com directly — no backend needed (CORS-enabled, free, no key)
+const IP_API_LOC = "http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query";
+
 lookupBtn.addEventListener("click", async () => {
     if (!currentIp) { alert("No IP address available to look up."); return; }
 
@@ -129,21 +138,22 @@ lookupBtn.addEventListener("click", async () => {
     locationResult.innerHTML = "<p style='color:var(--color-text-muted)'>Looking up location…</p>";
 
     try {
-        const resp = await fetch(`${API_IP_LOC}?ip=${encodeURIComponent(currentIp)}`, {
-            signal: AbortSignal.timeout(8000)
-        });
+        const url  = IP_API_LOC.replace("{ip}", encodeURIComponent(currentIp));
+        const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
-        if (data.error) throw new Error(data.error);
+        if (data.status === "fail") throw new Error(data.message || "Lookup failed");
         renderLocation(data);
     } catch (e) {
-        locationResult.innerHTML = `<p class="loc-error">Location lookup failed: ${e.message}. Is <code> python app.py </code> running?</p>`;
+        locationResult.innerHTML = `<p class="loc-error">Location lookup failed: ${e.message}</p>`;
     }
 });
 
 function renderLocation(d) {
+    const flag = flagEmoji(d.countryCode);
     const rows = [
         ["IP",       d.query],
-        ["Country",  `${d.country} (${d.countryCode})`],
+        ["Country",  `${flag} ${d.country} (${d.countryCode})`],
         ["Region",   d.regionName],
         ["City",     d.city],
         ["ZIP",      d.zip],

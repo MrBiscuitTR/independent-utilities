@@ -3,10 +3,13 @@ Flask backend for internet tools — port 5501.
 All endpoints live here; ip-tools.py provides helper functions.
 
 External dependencies (none require API keys):
-  - ip-api.com          : /api/ip-location   (free, no key, rate-limited to 45 req/min)
   - maclookup.app       : /api/mac-lookup     (free, no key)
   - Cloudflare DoH      : DNS queries via fetch in JS (no server call needed)
   - All other endpoints : pure Python / socket / ssl
+
+Note: /api/ip-location was removed — ip-api.com has CORS headers so the browser
+      calls it directly now. /api/my-ip is still used by what-is-my-ip (backend-on
+      path, returns both IPv4 + IPv6 via forced-stack connections).
 """
 
 import ipaddress
@@ -31,8 +34,7 @@ CORS(app, origins=["http://localhost:*", "http://127.0.0.1:*", "null"])
 # ─────────────────────────────────────────────────────────────────────────────
 # External API endpoints — stored here for easy auditing
 # ─────────────────────────────────────────────────────────────────────────────
-_API_IP_LOCATION = "http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query"
-_API_MAC_LOOKUP  = "https://api.maclookup.app/v2/macs/{mac}"
+_API_MAC_LOOKUP = "https://api.maclookup.app/v2/macs/{mac}"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -71,31 +73,6 @@ def api_my_ip():
     ipv4 = get_public_ipv4()
     ipv6 = get_public_ipv6()
     return jsonify({"ipv4": ipv4, "ipv6": ipv6})
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# /api/ip-location?ip=<address>
-# Uses ip-api.com (free, no key, ≤45 req/min)
-# ─────────────────────────────────────────────────────────────────────────────
-@app.route("/api/ip-location")
-def api_ip_location():
-    ip = request.args.get("ip", "").strip()
-    if not ip:
-        return jsonify({"error": "ip parameter required"}), 400
-    try:
-        ipaddress.ip_address(ip)
-    except ValueError:
-        return jsonify({"error": "Invalid IP address"}), 400
-
-    url = _API_IP_LOCATION.format(ip=ip)
-    try:
-        data = _fetch_json(url)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 502
-
-    if data.get("status") == "fail":
-        return jsonify({"error": data.get("message", "Lookup failed")}), 404
-    return jsonify(data)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

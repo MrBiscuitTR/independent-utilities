@@ -4,13 +4,14 @@
 // ── Data ──────────────────────────────────────────────────────────────────────
 // Format: { name, art, tags (optional), cat }
 const ART_DATA = [
+    //EDIT THIS TO ADD/removE/CHANGE ART — just add new objects to the list. Try to keep it sorted by category, then name. Tags are optional but help searchability (e.g. "happy" or "sad" for smileys, "cat" or "dog" for animals, etc). Categories are auto-generated from the data, so just use whatever categories you want!
     // ── Smileys & Emotions ───────────────────────────────────────────────────
     { cat:"Smileys", name:"Shrug",           art:"¯\\_(ツ)_/¯",  tags:["dunno","idk"] },
     { cat:"Smileys", name:"Lenny Face",      art:"( ͡° ͜ʖ ͡°)",   tags:["lenny"] },
     { cat:"Smileys", name:"Tableflip",       art:"(╯°□°）╯︵ ┻━┻", tags:["flip","rage","angry"] },
     { cat:"Smileys", name:"Put table back",  art:"┬─┬ ノ( ゜-゜ノ)", tags:["table"] },
     { cat:"Smileys", name:"Disapproval",     art:"ಠ_ಠ",          tags:["stare","unimpressed"] },
-    { cat:"Smileys", name:"Bear",            art:"ʕ•ᴥ•ʔ",        tags:["bear","animal"] },
+    { cat:"Smileys", name:"Bear",            art:"ʕ•ᴥ•ʔ",        tags:["bear","panda","animal"] },
     { cat:"Smileys", name:"Cat",             art:"=^.^=",        tags:["cat","animal","kitty"] },
     { cat:"Smileys", name:"Kirby",           art:"(>'-')>",       tags:["kirby","game"] },
     { cat:"Smileys", name:"Kirby dance",     art:"<(^.^)>",       tags:["kirby","dance"] },

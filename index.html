@@ -72,11 +72,9 @@
       <h2 class="hub-category-title">📝 Text Tools</h2>
       <!--
           5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download
-          as JSON. add json importing to get the same organization table back. add option to save to mongodb,
-          create .env for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits
-          for tasks, colors for tasks, descriptions, locations, and labels (once a label has been created, add option to add
-          that label to other tasks as well, with one click.)
-
+          as JSON. add json importing to get the same organization table back. add option to save to mongodb (in the database 'utilities_hub' and collection 'task_organizer' with a simple schema, maybe just a json field for the whole table and a timestamp field for sorting, and an optional title field for the user to add titles to their saved tables. implement backend with python flask if necessary but try to use js in browser directly.),
+          create .env in project root for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe (use a free no-key api to autocomplete, note it down as a dependency if you implement this.) for tasks. 
+          
           8 - publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated (double, both cloudflare and another), anti bot and anti bruteforce for security. important because POTATO uses my computer's resources. it should be secure otherwise.
 
           9 - [BIG PROJECT, SEPERATE REPO] Public instance -- Hostable by everyone, open source.
@@ -174,14 +172,13 @@
           <a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a>
         </li>
 
-        <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
-
-        <li class="hub-item" data-needs-backend="true">
-          <a href="/tools/internet/ip-location" class="hub-link">
-            IP Location Lookup<span class="backend-dot"></span>
-          </a>
+        <li class="hub-item">
+          <a href="/tools/internet/ip-location" class="hub-link">IP Location Lookup</a>
         </li>
-        <!-- backend proxies to http://ip-api.com/json/{ip} (ip-api.com, free, no key, ≤45 req/min) -->
+        <!-- calls ip-api.com/json/{ip} directly from browser (free, no key, CORS-enabled, ≤45 req/min) 
+         + Same dependencies as what is my ip tool, for detecting current ip when left empty. -->
+
+        <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
 
         <li class="hub-item" data-needs-backend="true">
           <a href="/tools/internet/mac-lookup" class="hub-link">
