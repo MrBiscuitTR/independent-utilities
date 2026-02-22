@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Notepad</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/notepad.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Online Notepad</h1>
+        <p class="tool-subtitle">Plain text editor with multiple tabs, open &amp; save files — runs fully locally.</p>
+    </header>
+
+    <main class="tool-main notepad-main">
+
+        <!-- Tab bar -->
+        <div class="tab-bar" id="tabBar">
+            <!-- tabs injected by JS -->
+            <button class="new-tab-btn" id="newTabBtn" title="New tab">+</button>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="notepad-toolbar">
+            <div class="toolbar-left">
+                <button class="tb-btn" id="openFileBtn" title="Open file(s)">Open</button>
+                <input type="file" id="fileInput" multiple accept="text/*,.txt,.md,.json,.js,.ts,.py,.html,.css,.csv,.xml,.yaml,.yml,.toml,.sh,.bat,.cpp,.c,.h,.java,.rs,.go,.rb,.php,.sql" style="display:none">
+                <button class="tb-btn" id="saveBtn" title="Download current tab">Save</button>
+                <button class="tb-btn" id="saveAllBtn" title="Download all tabs as ZIP">Save All (ZIP)</button>
+            </div>
+            <div class="toolbar-right">
+                <span id="charCountInfo" class="char-count"></span>
+            </div>
+        </div>
+
+        <!-- Editor area -->
+        <textarea id="editor" class="notepad-editor" placeholder="Start typing…" spellcheck="false"></textarea>
+
+        <!-- Tab rename input (hidden) -->
+        <input type="text" id="renameInput" class="rename-input hidden" spellcheck="false">
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <!-- JSZip for "Save All" — CDN, download and host locally if needed -->
+    <!-- No API dependency: all operations are local -->
+    <script src="js/jszip.min.js"></script>
+    <script src="js/notepad.js"></script>
+</body>
+</html>

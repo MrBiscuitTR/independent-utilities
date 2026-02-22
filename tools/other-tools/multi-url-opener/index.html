@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi URL Opener</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/multi-url-opener.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Multi URL Opener</h1>
+        <p class="tool-subtitle">Open multiple URLs at once, each in a new tab.</p>
+    </header>
+
+    <main class="tool-main muo-main">
+
+        <div class="form-group">
+            <label class="tool-label" for="urlsInput">URLs <span style="font-weight:400;color:var(--color-text-muted)">(comma, space, or newline separated)</span></label>
+            <textarea id="urlsInput" class="tool-textarea mono" rows="10"
+                placeholder="https://example.com&#10;https://github.com&#10;https://wikipedia.org"
+                spellcheck="false"></textarea>
+        </div>
+
+        <div class="muo-controls">
+            <div class="muo-info" id="urlCount">0 URLs detected</div>
+            <div class="muo-actions">
+                <button class="tool-button secondary-btn" id="clearBtn">Clear</button>
+                <button class="tool-button" id="openBtn">Open All Tabs</button>
+            </div>
+        </div>
+
+        <div id="popupNotice" class="popup-notice hidden">
+            ⚠️ Popups may be blocked by your browser. Allow popups for this site to open all tabs.
+        </div>
+
+        <div id="urlList" class="url-list"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/multi-url-opener.js"></script>
+</body>
+</html>

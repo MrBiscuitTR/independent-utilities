@@ -1,0 +1,99 @@
+/* subnet-calc.css */
+
+.subnet-main { max-width: 680px; }
+
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+}
+.input-row .tool-input { flex: 1; min-width: 200px; }
+
+.hint-text {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 0 0 1.2rem;
+}
+
+.result-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.result-card-title {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-family: var(--font-mono);
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.result-field {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+}
+
+.result-field:nth-child(even) { border-right: none; }
+
+.result-field-key {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+}
+
+.result-field-val {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.result-field-val.val-ok  { color: #1a7d44; }
+.result-field-val.val-big { color: var(--color-primary); }
+
+/* Usable hosts table */
+.hosts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+}
+.hosts-table th {
+    background: #f0f4fa;
+    padding: 0.35rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-main);
+    border-bottom: 1px solid var(--color-border);
+}
+.hosts-table td { padding: 0.45rem 1rem; border-bottom: 1px solid #f0f0f0; }
+.hosts-table tr:last-child td { border-bottom: none; }
+
+.subnet-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .input-row   { flex-direction: column; }
+    .result-grid { grid-template-columns: 1fr; }
+    .result-field { border-right: none; }
+}

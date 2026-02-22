@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse IP &amp; Website to IP</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/reverse-ip.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Reverse IP &amp; Website to IP</h1>
+        <p class="tool-subtitle">IP &#x2192; hostname (reverse DNS) and domain &#x2192; IP address lookup.</p>
+    </header>
+
+    <main class="tool-main rip-main">
+
+        <!-- DoH provider selector (used by Website to IP) -->
+        <div class="doh-row">
+            <span class="doh-label">DoH resolver:</span>
+            <label><input type="radio" name="doh" value="cloudflare" checked> Cloudflare</label>
+            <label><input type="radio" name="doh" value="google"> Google</label>
+        </div>
+
+        <!-- Section 1: Reverse IP -->
+        <section class="rip-section">
+            <h2 class="rip-section-title">&#x21BA; Reverse IP Lookup <span class="rip-backend-badge" title="Requires local backend">&#x25CF; backend</span></h2>
+            <p class="rip-desc">Enter an IP address to find its hostname (PTR record via reverse DNS).</p>
+            <div class="input-row">
+                <input type="text" id="ripInput" class="tool-input" placeholder="8.8.8.8 or 2001:4860:4860::8888" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="ripBtn">Lookup</button>
+            </div>
+            <div id="ripError" class="rip-error-inline hidden"></div>
+            <div id="ripResult" class="hidden"></div>
+        </section>
+
+        <!-- Section 2: Website to IP -->
+        <section class="rip-section">
+            <h2 class="rip-section-title">&#x1F310; Website to IP</h2>
+            <p class="rip-desc">Enter a domain or URL to find its IP address(es) via DNS-over-HTTPS &#x2014; no backend required.</p>
+            <div class="input-row">
+                <input type="text" id="w2ipInput" class="tool-input" placeholder="example.com or https://example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="w2ipBtn">Lookup</button>
+            </div>
+            <div id="w2ipError" class="rip-error-inline hidden"></div>
+            <div id="w2ipResult" class="hidden"></div>
+        </section>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/reverse-ip.js"></script>
+</body>
+</html>

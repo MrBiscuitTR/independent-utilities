@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHOIS Lookup</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/whois-lookup.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">WHOIS Lookup</h1>
+        <p class="tool-subtitle">IP, IPv6, and ASN ownership via RDAP &#x2014; no API key, no backend required.</p>
+    </header>
+
+    <main class="tool-main whois-main">
+
+        <div class="input-row">
+            <input type="text" id="whoisInput" class="tool-input" placeholder="Domain, IP, IPv6, or ASN (e.g. google.com / 8.8.8.8 / AS15169)" autocomplete="off" spellcheck="false">
+            <button class="tool-button" id="whoisBtn">Lookup</button>
+        </div>
+
+        <p class="whois-hint">Enter a domain name, IPv4/IPv6 address, or ASN. Domains are resolved to IPs first. Uses <a href="https://rdap.arin.net/" target="_blank" rel="noopener">RDAP</a> (ARIN, RIPE, APNIC, LACNIC, AFRINIC).</p>
+
+        <div id="whoisResult"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/whois-lookup.js"></script>
+</body>
+</html>

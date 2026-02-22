@@ -1,0 +1,201 @@
+/* notepad.css */
+
+/* Full-height layout — make the editor fill the viewport */
+html, body.tool-body {
+    height: 100%;
+}
+body.tool-body {
+    min-height: unset;
+}
+
+.notepad-main {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* allow flex shrink */
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────────────────── */
+.tab-bar {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    background: #e9ecef;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 0.25rem;
+    gap: 0;
+    scrollbar-width: thin;
+    min-height: 38px;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0 0.75rem;
+    height: 38px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+    position: relative;
+}
+.tab:hover { background: #dee2e6; color: var(--color-text); }
+.tab.active {
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.tab-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.tab-close {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.tab-close:hover { background: #dc3545; color: #fff; }
+
+.tab.unsaved .tab-name::after {
+    content: "●";
+    font-size: 0.55rem;
+    color: var(--color-primary);
+    margin-left: 4px;
+    vertical-align: super;
+}
+
+.new-tab-btn {
+    padding: 0 0.85rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    height: 38px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+.new-tab-btn:hover { color: var(--color-primary); }
+
+/* ── Toolbar ───────────────────────────────────────────────────────────────── */
+.notepad-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.toolbar-left {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.tb-btn {
+    padding: 0.3rem 0.7rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-weight: 500;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+.tb-btn:hover { background: var(--color-primary-dk); }
+.tb-btn.secondary { background: #6c757d; }
+.tb-btn.secondary:hover { background: #545b62; }
+
+.char-count {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* ── Editor ────────────────────────────────────────────────────────────────── */
+.notepad-editor {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    resize: none;
+    border: none;
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 26px; /* explicit px so gradient can match exactly */
+    padding: 1rem 1.2rem;
+    background: #fff;
+    color: var(--color-text);
+    tab-size: 4;
+    /* lined background — one rule line per text line.
+       Gradient repeats every 26px (= line-height).
+       background-position offsets it down by padding-top (1rem = 16px). */
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 25px,
+        #dde3ec 25px,
+        #dde3ec 26px
+    );
+    background-attachment: local;
+    background-position: 0 1rem;
+}
+.notepad-editor:focus { outline: none; }
+
+/* ── Rename input ─────────────────────────────────────────────────────────── */
+.rename-input {
+    position: fixed;
+    z-index: 999;
+    background: var(--color-surface);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.5rem;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    min-width: 140px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.rename-input.hidden { display: none; }
+
+@media (max-width: 480px) {
+    .tb-btn { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    .notepad-editor { font-size: 0.85rem; }
+}

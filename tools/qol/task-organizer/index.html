@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Organizer</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/task-organizer.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Task Organizer</h1>
+        <p class="tool-subtitle">Drag-and-drop task board — saved locally, works offline.</p>
+    </header>
+
+    <main class="tool-main to-main">
+
+        <!-- ── Toolbar ─────────────────────────────────────────────────────── -->
+        <div class="to-toolbar">
+            <div class="to-toolbar-left">
+                <button class="tool-button" id="addTaskBtn">+ Add Task</button>
+                <button class="tool-button" id="addColumnBtn" style="background:#6c757d">+ Column</button>
+            </div>
+            <div class="to-toolbar-right">
+                <button class="tool-button to-btn-sm" id="exportBtn" title="Export board as JSON">Export JSON</button>
+                <label class="tool-button to-btn-sm to-import-label" title="Import board from JSON">
+                    Import JSON
+                    <input type="file" id="importFile" accept=".json" style="display:none">
+                </label>
+                <button class="tool-button to-btn-sm to-btn-danger" id="clearBtn" title="Clear all data from local storage">Clear All</button>
+            </div>
+        </div>
+
+        <!-- ── Label Manager ──────────────────────────────────────────────── -->
+        <div class="to-label-bar">
+            <span class="to-label-bar-title">Labels:</span>
+            <div class="to-label-chips" id="labelChips"></div>
+            <button class="to-label-add-btn" id="addLabelBtn">+ New Label</button>
+        </div>
+
+        <!-- ── Board ─────────────────────────────────────────────────────── -->
+        <div class="to-board" id="board"></div>
+
+        <!-- ── Storage notice ─────────────────────────────────────────────── -->
+        <p class="to-storage-note" id="storageNote">
+            Data auto-saved to local storage. Inactive for 30+ days? It will be cleared automatically.
+        </p>
+
+    </main>
+
+    <!-- ── Task Modal ─────────────────────────────────────────────────────── -->
+    <div class="to-modal-overlay hidden" id="taskModal">
+        <div class="to-modal" role="dialog" aria-labelledby="modalTitle">
+            <div class="to-modal-header">
+                <h2 id="modalTitle">Add Task</h2>
+                <button class="to-modal-close" id="modalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="to-modal-body">
+                <div class="to-field-row">
+                    <label class="to-field-label" for="taskTitle">Title <span class="to-required">*</span></label>
+                    <input type="text" id="taskTitle" class="tool-input" placeholder="Task title…" maxlength="200">
+                </div>
+                <div class="to-field-row">
+                    <label class="to-field-label" for="taskDesc">Description / Notes</label>
+                    <textarea id="taskDesc" class="tool-textarea" placeholder="Notes, details…" rows="3"></textarea>
+                </div>
+                <div class="to-field-grid">
+                    <div class="to-field-row">
+                        <label class="to-field-label" for="taskDue">Due Date</label>
+                        <input type="date" id="taskDue" class="tool-input">
+                    </div>
+                    <div class="to-field-row">
+                        <label class="to-field-label" for="taskPriority">Priority</label>
+                        <select id="taskPriority" class="tool-select">
+                            <option value="">— None —</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="to-field-row">
+                        <label class="to-field-label" for="taskColor">Card Color</label>
+                        <input type="color" id="taskColor" class="to-color-input" value="#ffffff">
+                    </div>
+                    <div class="to-field-row">
+                        <label class="to-field-label" for="taskTimeLimit">Time Limit (hrs)</label>
+                        <input type="number" id="taskTimeLimit" class="tool-input" min="0" step="0.5" placeholder="e.g. 2">
+                    </div>
+                </div>
+                <div class="to-field-row">
+                    <label class="to-field-label">Labels</label>
+                    <div class="to-label-selector" id="taskLabelSelector"></div>
+                </div>
+                <input type="hidden" id="taskColumnId">
+                <input type="hidden" id="editingTaskId">
+            </div>
+            <div class="to-modal-footer">
+                <button class="tool-button" id="saveTaskBtn">Save Task</button>
+                <button class="tool-button" id="deleteTaskBtn" style="background:#dc3545;display:none">Delete Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Column Rename Modal ─────────────────────────────────────────────── -->
+    <div class="to-modal-overlay hidden" id="colModal">
+        <div class="to-modal to-modal-sm" role="dialog">
+            <div class="to-modal-header">
+                <h2 id="colModalTitle">Add Column</h2>
+                <button class="to-modal-close" id="colModalClose">&times;</button>
+            </div>
+            <div class="to-modal-body">
+                <label class="to-field-label" for="colName">Column Name</label>
+                <input type="text" id="colName" class="tool-input" placeholder="e.g. In Progress" maxlength="60">
+                <input type="hidden" id="editingColId">
+            </div>
+            <div class="to-modal-footer">
+                <button class="tool-button" id="saveColBtn">Save</button>
+                <button class="tool-button" id="deleteColBtn" style="background:#dc3545;display:none">Delete Column</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Label Modal ────────────────────────────────────────────────────── -->
+    <div class="to-modal-overlay hidden" id="labelModal">
+        <div class="to-modal to-modal-sm" role="dialog">
+            <div class="to-modal-header">
+                <h2>New Label</h2>
+                <button class="to-modal-close" id="labelModalClose">&times;</button>
+            </div>
+            <div class="to-modal-body">
+                <div class="to-field-row">
+                    <label class="to-field-label" for="labelName">Label Name</label>
+                    <input type="text" id="labelName" class="tool-input" placeholder="e.g. Bug" maxlength="40">
+                </div>
+                <div class="to-field-row">
+                    <label class="to-field-label" for="labelColor">Label Color</label>
+                    <input type="color" id="labelColor" class="to-color-input" value="#4a90e2">
+                </div>
+                <input type="hidden" id="editingLabelId">
+            </div>
+            <div class="to-modal-footer">
+                <button class="tool-button" id="saveLabelBtn">Save Label</button>
+                <button class="tool-button" id="deleteLabelBtn" style="background:#dc3545;display:none">Delete Label</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/task-organizer.js"></script>
+</body>
+</html>

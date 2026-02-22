@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Availability Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/domain-checker.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Domain Availability Checker</h1>
+        <p class="tool-subtitle">Check domain availability across multiple TLDs using DNS</p>
+    </header>
+    <main class="tool-main dc-main">
+
+        <div class="dc-disclaimer">
+            <strong>Note:</strong> Uses DNS-over-HTTPS (Cloudflare) to check for active DNS records.
+            NXDOMAIN suggests possible availability, but this is <em>not</em> a definitive registrar check.
+            Always verify with a domain registrar before purchasing.
+        </div>
+
+        <div class="dc-form-card">
+            <div class="dc-input-row">
+                <input
+                    type="text"
+                    id="domainInput"
+                    class="tool-input"
+                    placeholder="example  or  example.com"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button id="checkBtn" class="tool-button">Check</button>
+            </div>
+
+            <div class="dc-tld-section">
+                <div class="dc-tld-header">
+                    <span class="dc-tld-label">TLDs to check</span>
+                    <div class="dc-tld-actions">
+                        <button class="dc-link-btn" id="selectAllBtn">Select all</button>
+                        <span class="dc-tld-sep">|</span>
+                        <button class="dc-link-btn" id="clearAllBtn">Clear all</button>
+                    </div>
+                </div>
+                <div class="dc-tld-grid" id="tldGrid"></div>
+            </div>
+        </div>
+
+        <div id="errorBox" class="dc-error hidden"></div>
+
+        <div id="resultsArea" class="hidden">
+            <div class="dc-results-header">
+                <span class="dc-results-title" id="resultsTitle">Results</span>
+                <div class="dc-results-summary">
+                    <span class="dc-sum-item dc-sum-available"><span id="sumAvailable">0</span> likely available</span>
+                    <span class="dc-sum-item dc-sum-taken"><span id="sumTaken">0</span> taken</span>
+                    <span class="dc-sum-item dc-sum-unknown"><span id="sumUnknown">0</span> unknown</span>
+                </div>
+            </div>
+            <div class="dc-results-grid" id="resultsGrid"></div>
+        </div>
+
+    </main>
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+    <script src="js/domain-checker.js"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+/* dns-lookup.css */
+
+.dns-main { max-width: 800px; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
+.dns-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.dtab {
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-family: var(--font-main);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.dtab.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.dtab:not(.active):hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* ── Panels ────────────────────────────────────────────────────────────────── */
+.dns-panel { display: none; }
+.dns-panel.active { display: block; }
+
+.dns-tab-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+/* ── DoH row ───────────────────────────────────────────────────────────────── */
+.doh-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.doh-row label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+/* ── Input row ─────────────────────────────────────────────────────────────── */
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.input-row .tool-input { flex: 1; min-width: 180px; }
+
+.type-sel {
+    width: auto;
+    min-width: 140px;
+    padding: 0.75rem 0.6rem;
+}
+
+.dns-btn-sec {
+    background: #6c757d;
+}
+.dns-btn-sec:hover { background: #545b62; }
+
+/* ── DKIM row ──────────────────────────────────────────────────────────────── */
+.dkim-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.8rem;
+}
+.dkim-row.hidden { display: none; }
+
+/* ── Record sections ───────────────────────────────────────────────────────── */
+.dns-section {
+    margin-bottom: 1.2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.dns-section-title {
+    padding: 0.55rem 1rem;
+    background: #f0f4fa;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dns-count {
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    padding: 0.05rem 0.5rem;
+}
+
+.dns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    font-family: var(--font-mono);
+}
+
+.dns-table th {
+    background: #f8fafd;
+    padding: 0.35rem 0.8rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-main);
+    font-weight: 600;
+}
+
+.dns-table td {
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+    word-break: break-all;
+}
+
+.dns-table tr:last-child td { border-bottom: none; }
+
+.dns-no-records {
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.dns-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+}
+
+.dns-warn-box {
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #7a5000;
+    font-size: 0.9rem;
+}
+
+.dns-loading {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ── DMARC key-value box ───────────────────────────────────────────────────── */
+.dns-kv-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.dns-kv-header {
+    padding: 0.6rem 1rem;
+    background: #f0f4fa;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dns-raw-record {
+    padding: 0.55rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    background: #fafbfd;
+    border-bottom: 1px solid var(--color-border);
+    word-break: break-all;
+}
+
+.dns-kv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.dns-kv-table td {
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+.dns-kv-table tr:last-child td { border-bottom: none; }
+
+.dns-kv-key {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    width: 40%;
+}
+
+/* ── Badges ────────────────────────────────────────────────────────────────── */
+.dns-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+}
+.dns-badge-ok   { background: #d4edda; color: #155724; }
+.dns-badge-warn { background: #fff3cd; color: #856404; }
+.dns-badge-info { background: #cff4fc; color: #0c5460; }
+
+/* ── Health check ──────────────────────────────────────────────────────────── */
+.health-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.health-card-title {
+    padding: 0.65rem 1rem;
+    background: #f0f4fa;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.health-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #f3f3f3;
+    font-size: 0.88rem;
+}
+.health-row:last-child { border-bottom: none; }
+.health-row.health-warn { background: #fffdf0; }
+
+.health-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+.health-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.health-label { font-weight: 600; }
+
+.health-detail {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    word-break: break-all;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .input-row { flex-direction: column; }
+    .type-sel  { width: 100%; }
+    .dns-tabs  { gap: 0.3rem; }
+    .dtab      { font-size: 0.82rem; padding: 0.4rem 0.7rem; }
+    .dkim-row  { flex-direction: column; align-items: flex-start; }
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Tools</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/ip-tools.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">IP Tools</h1>
+        <p class="tool-subtitle">IP↔Decimal, IPv4↔IPv6, IPv6 compress/expand, CIDR↔range — all pure JS.</p>
+    </header>
+
+    <main class="tool-main ipt-main">
+
+        <!-- ── Tool selector ───────────────────────────────────────────── -->
+        <div class="tool-tabs" id="toolTabs">
+            <button class="ttab active" data-tool="ip-dec">IP ↔ Decimal</button>
+            <button class="ttab" data-tool="v4-v6">IPv4 ↔ IPv6</button>
+            <button class="ttab" data-tool="v6-compress">IPv6 Compress / Expand</button>
+            <button class="ttab" data-tool="cidr-range">IPv6 CIDR ↔ Range</button>
+            <button class="ttab" data-tool="v6-compat">IPv6 Compatibility</button>
+            <button class="ttab" data-tool="v6-gen">Local IPv6 Generator</button>
+            <button class="ttab" data-tool="mac-gen">MAC Generator</button>
+        </div>
+
+        <!-- ── IP ↔ Decimal ─────────────────────────────────────────────── -->
+        <div class="tool-panel active" id="panel-ip-dec">
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">IPv4 Address</label>
+                    <input type="text" id="ipv4Dec" class="tool-input mono" placeholder="192.168.1.1">
+                </div>
+                <div class="conv-arrows">⇄</div>
+                <div class="conv-col">
+                    <label class="tool-label">Decimal (32-bit)</label>
+                    <input type="text" id="decIp" class="tool-input mono" placeholder="3232235777">
+                </div>
+            </div>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">Binary</label>
+                    <input type="text" id="binIp" class="tool-input mono" placeholder="11000000.10101000.00000001.00000001" readonly>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Hexadecimal</label>
+                    <input type="text" id="hexIp" class="tool-input mono" placeholder="C0A80101" readonly>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="ipDecConv">Convert</button>
+                <button class="tool-button secondary-btn" id="ipDecClear">Clear</button>
+            </div>
+            <div id="ipDecError" class="conv-error hidden"></div>
+        </div>
+
+        <!-- ── IPv4 ↔ IPv6 ──────────────────────────────────────────────── -->
+        <div class="tool-panel" id="panel-v4-v6">
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">IPv4 Address</label>
+                    <input type="text" id="v4in" class="tool-input mono" placeholder="192.168.1.1">
+                </div>
+                <div class="conv-arrows">→</div>
+                <div class="conv-col">
+                    <label class="tool-label">IPv4-mapped IPv6</label>
+                    <input type="text" id="v6mapped" class="tool-input mono" readonly>
+                </div>
+            </div>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">IPv6 (mapped/compatible)</label>
+                    <input type="text" id="v6in" class="tool-input mono" placeholder="::ffff:192.168.1.1">
+                </div>
+                <div class="conv-arrows">→</div>
+                <div class="conv-col">
+                    <label class="tool-label">Extracted IPv4</label>
+                    <input type="text" id="v4out" class="tool-input mono" readonly>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v4v6Conv">Convert</button>
+                <button class="tool-button secondary-btn" id="v4v6Clear">Clear</button>
+            </div>
+            <div id="v4v6Error" class="conv-error hidden"></div>
+        </div>
+
+        <!-- ── IPv6 Compress / Expand ───────────────────────────────────── -->
+        <div class="tool-panel" id="panel-v6-compress">
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">IPv6 (any form)</label>
+                    <input type="text" id="v6raw" class="tool-input mono" placeholder="2001:0db8:0000:0000:0000:0000:0000:0001">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v6CompBtn">Convert</button>
+                <button class="tool-button secondary-btn" id="v6CompClear">Clear</button>
+            </div>
+            <div id="v6CompError" class="conv-error hidden"></div>
+            <div id="v6CompResult" class="result-block hidden">
+                <div class="result-field-row"><span class="rf-key">Compressed</span><span class="rf-val mono" id="v6Compressed"></span></div>
+                <div class="result-field-row"><span class="rf-key">Expanded</span><span class="rf-val mono" id="v6Expanded"></span></div>
+                <div class="result-field-row"><span class="rf-key">Full (no-compress)</span><span class="rf-val mono" id="v6Full"></span></div>
+            </div>
+        </div>
+
+        <!-- ── IPv6 CIDR ↔ Range ─────────────────────────────────────────── -->
+        <div class="tool-panel" id="panel-cidr-range">
+            <div class="panel-section">
+                <h3 class="section-heading">CIDR → Range</h3>
+                <div class="conv-row">
+                    <input type="text" id="cidrIn" class="tool-input mono" placeholder="2001:db8::/32">
+                    <button class="tool-button" id="cidrToRange">Convert</button>
+                </div>
+                <div id="cidrRangeResult" class="result-block hidden">
+                    <div class="result-field-row"><span class="rf-key">First address</span><span class="rf-val mono" id="cidrFirst"></span></div>
+                    <div class="result-field-row"><span class="rf-key">Last address</span><span class="rf-val mono" id="cidrLast"></span></div>
+                    <div class="result-field-row"><span class="rf-key">Total addresses</span><span class="rf-val mono" id="cidrTotal"></span></div>
+                </div>
+                <div id="cidrRangeError" class="conv-error hidden"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3 class="section-heading">Range → CIDR list</h3>
+                <div class="conv-col">
+                    <input type="text" id="rangeFirst" class="tool-input mono" placeholder="First: 2001:db8::" style="margin-bottom:0.4rem">
+                    <input type="text" id="rangeLast"  class="tool-input mono" placeholder="Last:  2001:db8::ffff">
+                </div>
+                <div class="btn-row" style="margin-top:0.6rem">
+                    <button class="tool-button" id="rangeToCidr">Convert</button>
+                </div>
+                <div id="rangeCidrResult" class="result-block hidden">
+                    <div class="rf-key" style="margin-bottom:0.3rem">CIDR blocks:</div>
+                    <div class="mono" id="rangeCidrList" style="font-size:0.88rem;line-height:1.8"></div>
+                </div>
+                <div id="rangeCidrError" class="conv-error hidden"></div>
+            </div>
+        </div>
+
+
+        <!-- ── IPv6 Compatibility Checker ─────────────────────────── -->
+        <div class="tool-panel" id="panel-v6-compat">
+            <p class="panel-desc">Check if a domain has AAAA records (supports IPv6). Resolves via DNS-over-HTTPS.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">Domain</label>
+                    <input type="text" id="v6compatDomain" class="tool-input mono" placeholder="example.com">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v6compatBtn">Check IPv6 Support</button>
+                <button class="tool-button secondary-btn" id="v6compatClear">Clear</button>
+            </div>
+            <div id="v6compatError" class="conv-error hidden"></div>
+            <div id="v6compatResult" class="result-block hidden"></div>
+        </div>
+
+        <!-- ── Local IPv6 Generator ───────────────────────────────── -->
+        <div class="tool-panel" id="panel-v6-gen">
+            <p class="panel-desc">Generate ULA (Unique Local Address, fc00::/7) IPv6 addresses for private/local networks. Compliant with RFC 4193.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">Prefix type</label>
+                    <select id="v6genType" class="tool-select">
+                        <option value="ula">ULA — Unique Local (fc00::/7)</option>
+                        <option value="link">Link-Local (fe80::/10)</option>
+                    </select>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Subnet ID (0–FFFF)</label>
+                    <input type="text" id="v6genSubnet" class="tool-input mono" placeholder="auto-random">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="v6genBtn">Generate</button>
+                <button class="tool-button secondary-btn" id="v6genClear">Clear</button>
+            </div>
+            <div id="v6genError" class="conv-error hidden"></div>
+            <div id="v6genResult" class="result-block hidden"></div>
+        </div>
+
+        <!-- ── MAC Address Generator ──────────────────────────────── -->
+        <div class="tool-panel" id="panel-mac-gen">
+            <p class="panel-desc">Generate random MAC addresses. Optionally specify an OUI prefix. Supports colon, dash, and dot notation.</p>
+            <div class="conv-row">
+                <div class="conv-col">
+                    <label class="tool-label">OUI prefix (optional, e.g. AC:DE:48)</label>
+                    <input type="text" id="macOui" class="tool-input mono" placeholder="Random" maxlength="8">
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Format</label>
+                    <select id="macFormat" class="tool-select">
+                        <option value="colon">Colon (AA:BB:CC:DD:EE:FF)</option>
+                        <option value="dash">Dash (AA-BB-CC-DD-EE-FF)</option>
+                        <option value="dot">Dot (AABB.CCDD.EEFF)</option>
+                        <option value="plain">Plain (AABBCCDDEEFF)</option>
+                    </select>
+                </div>
+                <div class="conv-col">
+                    <label class="tool-label">Count</label>
+                    <input type="number" id="macCount" class="tool-input" value="1" min="1" max="50">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="tool-button" id="macGenBtn">Generate</button>
+                <button class="tool-button secondary-btn" id="macCopyBtn">Copy All</button>
+                <button class="tool-button secondary-btn" id="macClearBtn">Clear</button>
+            </div>
+            <div id="macGenError" class="conv-error hidden"></div>
+            <div id="macGenResult" class="result-block hidden"></div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/ip-tools.js"></script>
+</body>
+</html>

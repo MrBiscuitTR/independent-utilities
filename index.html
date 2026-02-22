@@ -11,23 +11,60 @@
   <title>Utilities Hub</title>
   <link rel="stylesheet" href="/css/hub.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <style>
+    /* ── Hub search bar ───────────────────────────────────────────────────── */
+    .hub-search-wrap {
+      margin-bottom: 1.5rem;
+    }
+    .hub-search-input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hub-search-input:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    }
+    /* Hide categories with no visible items during search */
+    .hub-category.search-empty { display: none; }
+    /* Highlight matching text in search results */
+    .hub-item.search-hidden { display: none; }
+  </style>
 </head>
 
 <body class="hub-body">
   <header class="hub-header">
     <h1 class="hub-title">Utilities Hub</h1>
-    <p class="hub-subtitle">Independent tools, no third-party dependencies.</p>
+    <p class="hub-subtitle">Independent tools, no unreliable external dependencies.</p>
+    <p class="hub-desc">This is a collection of independent utilities that do not rely on third-party services or external APIs (except for a few that are necessary for specific functionality, such as DNS lookups or IP tracing, even then the dependencies are extremely secure and reliable for long term use).</p>
   </header>
 
   <nav class="hub-nav">
+
+    <!-- ── Search ────────────────────────────────────────────────────────── -->
+    <div class="hub-search-wrap">
+      <input type="text" id="hubSearch" class="hub-search-input"
+             placeholder="Search tools…" autocomplete="off" spellcheck="false">
+    </div>
 
     <!-- ── Image Tools ──────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🏞️ Image Tools</h2>
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/image/qr-generator" class="hub-link">QR Code Generator</a></li>
+        <!-- pure JS — uses locally bundled qrcode.min.js, no external requests -->
+        <li class="hub-item"><a href="/tools/image/qr-scanner" class="hub-link">QR Code Scanner</a></li>
+        <!-- pure JS — uses locally bundled jsQR.js, no external requests; webcam via browser MediaDevices API -->
         <li class="hub-item"><a href="/tools/image/resizer-ico-converter" class="hub-link">Image Resizer & ICO</a></li>
-        <!-- to implement -->
+        <!-- pure JS — uses locally bundled pica.min.js + jszip.min.js, no external requests -->
       </ul>
     </section>
 
@@ -36,11 +73,9 @@
       <h2 class="hub-category-title">📝 Text Tools</h2>
       <!--
           5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download
-          as JSON. add json importing to get the same organization table back. add option to save to mongodb,
-          create .env for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits
-          for tasks, colors for tasks, descriptions, locations, and labels (once a label has been created, add option to add
-          that label to other tasks as well, with one click.)
-
+          as JSON. add json importing to get the same organization table back. add option to save to mongodb (in the database 'utilities_hub' and collection 'task_organizer' with a simple schema, maybe just a json field for the whole table and a timestamp field for sorting, and an optional title field for the user to add titles to their saved tables. implement backend with python flask if necessary but try to use js in browser directly.),
+          create .env in project root for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe (use a free no-key api to autocomplete, note it down as a dependency if you implement this.) for tasks. 
+          
           8 - publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated (double, both cloudflare and another), anti bot and anti bruteforce for security. important because POTATO uses my computer's resources. it should be secure otherwise.
 
           9 - [BIG PROJECT, SEPERATE REPO] Public instance -- Hostable by everyone, open source.
@@ -66,8 +101,27 @@
         <li class="hub-item"><a href="/tools/text/word-letter-count" class="hub-link">Word & Char Counter</a></li>
         <li class="hub-item"><a href="/tools/text/regex-tester" class="hub-link">Regex Tester</a></li>
         <li class="hub-item"><a href="/tools/text/markdown-converter" class="hub-link">Markdown ↔ HTML</a></li>
-
+        <!-- uses bundled local copy of marked.js (https://marked.js.org) — file is downloaded and served locally, no CDN request at runtime -->
         <li class="hub-item"><a href="/tools/text/hash-generator" class="hub-link">Hash Generator</a></li>
+
+        <li class="hub-item"><a href="/tools/text/lorem-ipsum" class="hub-link">Lorem Ipsum Generator</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/rot13" class="hub-link">ROT13 Encoder / Decoder</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/morse-code" class="hub-link">Morse Code Translator</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/notepad" class="hub-link">Online Notepad</a></li>
+        <!-- pure JS — multi-tab plain text editor; ZIP download uses locally bundled jszip.min.js -->
+        <li class="hub-item"><a href="/tools/text/cool-text" class="hub-link">Cool Text Generator</a></li>
+        <!-- pure JS — Unicode transforms, no external requests -->
+        <li class="hub-item"><a href="/tools/text/text-art" class="hub-link">Text Art Clipboard</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/text-converters" class="hub-link">Binary / Hex / RGB Converter</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/punycode" class="hub-link">Punycode Converter</a></li>
+        <!-- pure JS — uses URL API for encoding; includes RFC 3492 decoder, no external requests -->
+        <li class="hub-item"><a href="/tools/text/ascii-art" class="hub-link">ASCII Art Generator</a></li>
+        <!-- pure JS — hand-written font bitmaps, no external requests -->
       </ul>
     </section>
 
@@ -76,67 +130,249 @@
       <h2 class="hub-category-title">✨ Quality of Life</h2>
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/qol/json-viewer" class="hub-link">JSON Viewer & Editor</a></li>
-        <!-- to implement -->
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/qol/task-organizer" class="hub-link">Task Organizer</a></li>
+        <!-- pure JS — drag-and-drop board; localStorage (30-day auto-clear); JSON export/import; no external requests -->
       </ul>
     </section>
 
     <!-- ── Internet Tools ───────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🌐 Internet Tools</h2>
+
+      <!-- Backend status bar — polled every 3 s by inline script below -->
+      <div class="backend-status-bar" id="backendStatusBar">
+        <span class="bs-dot" id="bsDot"></span>
+        <span id="bsText">Checking local backend (port 5501)…</span>
+      </div>
+
       <ul class="hub-list">
-        <!-- tools to be added here as they are built -->
-        <li class="hub-item"><a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a></li>
-        <!--
-          Internet / network tools to implement (see internet-tools TODO):
-          - What is My IP (critical)
-          - DNS Lookup (DNS-over-HTTPS, no key)
-          - IP Location Lookup (ip-api.com, no key)
-          - Subnet Calculator (pure JS)
-          - Port Checker (needs Flask backend)
-          - IP to Decimal / IPv4↔IPv6 converters (pure JS)
-          - IPv6 CIDR/Range, Compression/Expansion (pure JS)
-          - HTTP Headers Check (needs Flask or CORS proxy)
-          - SSL Certificate Checker (needs Flask)
-          - Password Generator / Strength Checker (pure JS)
-          - MAC Address Lookup (maclookup.app, no key)
-          - Ping / Traceroute (needs Flask)
+
+        <!-- ── Pure JS / no external runtime dependency ── -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/what-is-my-ip" class="hub-link">What Is My IP</a>
+        </li>
+        <!-- 
+        Flask backend → both IPv4 + IPv6, no banner
+        cloudflare.com/cdn-cgi/trace (if reachable) → one IP, blue info banner: "Showing your IP via Cloudflare trace… start python app.py for both IPv4 + IPv6"
+        icanhazip.com (Cloudflare-operated, different domain) → one IP, same blue info banner identifying the source 
         -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/subnet-calc" class="hub-link">Subnet Calculator</a>
+        </li>
+
+        <li class="hub-item">
+          <a href="/tools/internet/ip-tools" class="hub-link">IP Converters & IPv6 Tools</a>
+        </li>
+
+        <li class="hub-item">
+          <a href="/tools/internet/api-builder" class="hub-link">API Request Builder</a>
+        </li>
+
+        <li class="hub-item">
+          <a href="/tools/internet/ip-location" class="hub-link">IP Location Lookup</a>
+        </li>
+        <!-- calls ip-api.com/json/{ip} directly from browser (free, no key, CORS-enabled, ≤45 req/min) 
+         + Same dependencies as what is my ip tool, for detecting current ip when left empty. -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/dns-lookup" class="hub-link">DNS Tools</a>
+        </li>
+        <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query (Cloudflare) or https://dns.google/resolve (Google)
+             Tabs: DNS Records (A/AAAA/MX/NS/TXT/CNAME/SOA/PTR/CAA/SRV/DKIM), DMARC Validation, DNSKEY/DS Lookup, DNS Health Check -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/whois-lookup" class="hub-link">WHOIS Lookup (IP / ASN / Domain)</a>
+        </li>
+        <!-- RDAP: https://rdap.arin.net, https://rdap.db.ripe.net, https://rdap.apnic.net, https://rdap.lacnic.net, https://rdap.afrinic.net
+             Domain resolution: https://cloudflare-dns.com/dns-query (Cloudflare DoH) -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/reverse-ip" class="hub-link">Reverse IP &amp; Website to IP</a>
+        </li>
+        <!-- Reverse IP requires local backend /api/hostname; Website-to-IP uses Cloudflare DoH directly -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/domain-checker" class="hub-link">Domain Name Availability</a>
+        </li>
+        <!-- DNS-only check via https://cloudflare-dns.com/dns-query — not a definitive registrar check -->
+
+        <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/mac-lookup" class="hub-link">
+            MAC Address Lookup<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend proxies to https://api.maclookup.app/v2/macs/{mac} (maclookup.app, free, no key) -->
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/port-checker" class="hub-link">
+            Port Checker<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/http-headers" class="hub-link">
+            HTTP Headers &amp; Server OS<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/ssl-checker" class="hub-link">
+            SSL Certificate Checker<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/ping-traceroute" class="hub-link">
+            Ping & Traceroute<span class="backend-dot"></span>
+          </a>
+        </li>
+
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/link-analyzer" class="hub-link">
+            Website Link Analyzer &amp; Sitemap<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend POST /api/link-analyzer — extracts all links, generates sitemap XML; uses stdlib html.parser -->
+
       </ul>
     </section>
 
     <!-- ── Other Tools ───────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">🔧 Other Tools</h2>
-      <!--
-          Miscellaneous tools to implement:
-          - Lorem Ipsum Generator (pure JS)
-          - Password Generator + Strength Checker (pure JS)
-          - ROT13 Encoder/Decoder (pure JS)
-          - Morse Code Translator (pure JS)
-          - Online Notepad (rich text, download as .txt, pure JS)
-          - Cool Text Generator (Unicode/alt chars, pure JS)
-          - ASCII Art Generator (text → ASCII, pure JS)
-          - Base64/Hex/Binary converters (pure JS) — some already in hash tool
-          - RAID Calculator (pure JS)
-          - Robots.txt Generator (pure JS)
-          - Google SERP Simulator (pure HTML preview)
-          - Punycode Converter (pure JS)
-          - Credit Card Checker (Luhn algo, pure JS)
-          - Open Graph Preview Generator (pure JS)
-      -->
       <ul class="hub-list">
-        <!-- tools to be added here as they are built -->
+
+        <li class="hub-item"><a href="/tools/other-tools/password-gen" class="hub-link">Password Generator</a></li>
+        <!-- pure JS — Web Crypto API, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/credit-card" class="hub-link">Credit Card Checker</a></li>
+        <!-- pure JS — Luhn algorithm, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/multi-url-opener" class="hub-link">Multi URL Opener</a></li>
+        <!-- pure JS — opens tabs via window.open, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/user-agent" class="hub-link">What Is My User Agent?</a></li>
+        <!-- pure JS — reads navigator.userAgent, no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/robots-txt" class="hub-link">Robots.txt Generator</a></li>
+        <!-- pure JS — no external requests -->
+
       </ul>
     </section>
 
   </nav>
 
   <footer class="hub-footer">
-    <p class="hub-footer-text">&copy; 2024–
+    <p class="hub-footer-text">&copy; 2024 –
       <script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com"
         target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.
     </p>
   </footer>
+
+  <script>
+    /* ── Hub search ────────────────────────────────────────────────────────
+       Fuzzy filter: shows items where the query matches at least 70% of
+       characters (case-insensitive subsequence / overlap ratio).
+       Categories with zero visible items are hidden.
+    */
+    (function () {
+      "use strict";
+      const searchEl   = document.getElementById("hubSearch");
+      const allItems   = Array.from(document.querySelectorAll(".hub-item"));
+      const categories = Array.from(document.querySelectorAll(".hub-category"));
+
+      function fuzzyScore(query, target) {
+        // Returns a score 0–1 indicating how well query matches target.
+        // Uses a simple character-overlap approach: count how many chars
+        // of the query appear (in order) as a subsequence of target.
+        if (!query) return 1;
+        const q = query.toLowerCase();
+        const t = target.toLowerCase();
+        let qi = 0;
+        for (let i = 0; i < t.length && qi < q.length; i++) {
+          if (t[i] === q[qi]) qi++;
+        }
+        return qi / q.length; // 1.0 = all query chars found in order
+      }
+
+      function applySearch() {
+        const q = searchEl.value.trim();
+
+        allItems.forEach(li => {
+          const label = li.querySelector(".hub-link")
+                          ? li.querySelector(".hub-link").textContent.trim()
+                          : "";
+          const score = fuzzyScore(q, label);
+          li.classList.toggle("search-hidden", q.length > 0 && score < 0.7);
+        });
+
+        // Hide entire category if all its items are hidden
+        categories.forEach(section => {
+          const visible = section.querySelectorAll(".hub-item:not(.search-hidden)").length;
+          section.classList.toggle("search-empty", visible === 0);
+        });
+      }
+
+      searchEl.addEventListener("input", applySearch);
+    })();
+
+    /* ── Backend health poller ─────────────────────────────────────────────
+       Polls http://localhost:5501/api/health every 3 s.
+       - Items with data-needs-backend start as backend-offline (greyed, non-clickable)
+         and switch to backend-online only when the backend responds 200.
+       - The status bar shows a live coloured dot + message.
+    */
+    (function () {
+      "use strict";
+      const HEALTH_URL    = "http://localhost:5501/api/health";
+      const POLL_INTERVAL = 3000;
+
+      const dot   = document.getElementById("bsDot");
+      const txt   = document.getElementById("bsText");
+      const items = document.querySelectorAll("[data-needs-backend]");
+      const bdots = document.querySelectorAll(".backend-dot");
+
+      // Disable backend items immediately — before the first poll completes
+      items.forEach(li => { li.classList.add("backend-offline"); });
+      bdots.forEach(d  => { d.classList.add("dot-offline"); });
+
+      let lastStatus = null; // "online" | "offline" | null
+
+      function setStatus(online) {
+        if (online === lastStatus) return;
+        lastStatus = online;
+
+        if (online) {
+          dot.classList.add("online");  dot.classList.remove("offline");
+          txt.textContent = "Local backend online (port 5501) — all tools available";
+          items.forEach(li => { li.classList.add("backend-online");  li.classList.remove("backend-offline"); });
+          bdots.forEach(d  => { d.classList.add("dot-online");       d.classList.remove("dot-offline"); });
+        } else {
+          dot.classList.add("offline"); dot.classList.remove("online");
+          txt.textContent = "Local backend offline — start python app.py for tools marked with ●";
+          items.forEach(li => { li.classList.add("backend-offline"); li.classList.remove("backend-online"); });
+          bdots.forEach(d  => { d.classList.add("dot-offline");      d.classList.remove("dot-online"); });
+        }
+      }
+
+      async function poll() {
+        try {
+          const r = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(2500), cache: "no-store" });
+          setStatus(r.ok);
+        } catch (_) {
+          setStatus(false);
+        }
+      }
+
+      poll();
+      setInterval(poll, POLL_INTERVAL);
+    })();
+  </script>
 </body>
 
 </html>

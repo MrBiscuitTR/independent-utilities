@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is My User Agent?</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/user-agent.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">What Is My User Agent?</h1>
+        <p class="tool-subtitle">Your browser's full user agent string and parsed details.</p>
+    </header>
+
+    <main class="tool-main ua-main">
+
+        <div class="ua-card">
+            <div class="ua-raw-wrap">
+                <div class="ua-raw-label">User Agent String</div>
+                <div id="uaRaw" class="ua-raw mono"></div>
+                <button class="copy-btn" id="uaCopyBtn">Copy</button>
+            </div>
+        </div>
+
+        <div id="uaDetails" class="ua-details"></div>
+
+        <div class="ua-parse-section">
+            <h2 class="parse-title">Parse a different user agent string</h2>
+            <div class="form-group">
+                <textarea id="uaCustomInput" class="tool-textarea mono" rows="3"
+                    placeholder="Paste any user agent string here to parse it…"
+                    spellcheck="false"></textarea>
+            </div>
+            <button class="tool-button" id="parseBtn">Parse</button>
+            <div id="customResult" class="ua-details custom-result hidden"></div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/user-agent.js"></script>
+</body>
+</html>

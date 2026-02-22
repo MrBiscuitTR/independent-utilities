@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Tools</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/dns-lookup.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">DNS Tools</h1>
+        <p class="tool-subtitle">DNS records, DMARC, DNSKEY/DS, health check — all via DNS-over-HTTPS, no keys needed.</p>
+    </header>
+
+    <main class="tool-main dns-main">
+
+        <!-- Tab switcher -->
+        <div class="dns-tabs" id="dnsTabs">
+            <button class="dtab active" data-tab="records">DNS Records</button>
+            <button class="dtab" data-tab="dmarc">DMARC</button>
+            <button class="dtab" data-tab="dnskey">DNSKEY / DS</button>
+            <button class="dtab" data-tab="health">DNS Health</button>
+        </div>
+
+        <!-- DoH provider (shared) -->
+        <div class="doh-row">
+            <span class="doh-label">DoH resolver:</span>
+            <label><input type="radio" name="doh" value="cloudflare" checked> Cloudflare</label>
+            <label><input type="radio" name="doh" value="google"> Google</label>
+        </div>
+
+        <!-- TAB 1: DNS Records -->
+        <div class="dns-panel active" id="panel-records">
+            <div class="input-row">
+                <input type="text" id="domainInput" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <select id="typeSelect" class="tool-select type-sel">
+                    <option value="ALL">ALL common</option>
+                    <option value="A">A</option>
+                    <option value="AAAA">AAAA</option>
+                    <option value="MX">MX</option>
+                    <option value="NS">NS</option>
+                    <option value="TXT">TXT</option>
+                    <option value="CNAME">CNAME</option>
+                    <option value="SOA">SOA</option>
+                    <option value="PTR">PTR</option>
+                    <option value="CAA">CAA</option>
+                    <option value="SRV">SRV</option>
+                    <option value="DKIM">DKIM (TXT)</option>
+                </select>
+                <button class="tool-button" id="lookupBtn">Lookup</button>
+            </div>
+            <div id="dkimRow" class="dkim-row hidden">
+                <label class="tool-label" style="margin-bottom:0;white-space:nowrap">DKIM selector:</label>
+                <input type="text" id="dkimSelector" class="tool-input" placeholder="default" style="max-width:200px">
+            </div>
+            <div id="resultArea"></div>
+        </div>
+
+        <!-- TAB 2: DMARC -->
+        <div class="dns-panel" id="panel-dmarc">
+            <p class="dns-tab-desc">Fetch and validate the DMARC record for a domain. Shows the full parsed policy including sub-domain policy, percentage, and reporting addresses.</p>
+            <div class="input-row">
+                <input type="text" id="dmarcDomain" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="dmarcBtn">Check DMARC</button>
+            </div>
+            <div id="dmarcResult"></div>
+        </div>
+
+        <!-- TAB 3: DNSKEY / DS -->
+        <div class="dns-panel" id="panel-dnskey">
+            <p class="dns-tab-desc">Look up DNSKEY (zone signing public keys for DNSSEC) and DS (delegation signer hashes) records.</p>
+            <div class="input-row">
+                <input type="text" id="dnskeyDomain" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="dnskeyBtn">Lookup DNSKEY</button>
+                <button class="tool-button dns-btn-sec" id="dsBtn">Lookup DS</button>
+            </div>
+            <div id="dnskeyResult"></div>
+        </div>
+
+        <!-- TAB 4: DNS Health -->
+        <div class="dns-panel" id="panel-health">
+            <p class="dns-tab-desc">Complete DNS health report: A/AAAA reachability, MX mail setup, SPF, DMARC, NS authoritative servers, SOA serial, and DNSSEC status.</p>
+            <div class="input-row">
+                <input type="text" id="healthDomain" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="healthBtn">Run Health Check</button>
+            </div>
+            <div id="healthResult"></div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/dns-lookup.js"></script>
+</body>
+</html>

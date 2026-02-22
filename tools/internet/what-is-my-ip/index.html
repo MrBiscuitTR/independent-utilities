@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is My IP</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/what-is-my-ip.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">What Is My IP?</h1>
+        <p class="tool-subtitle">Your public IPv4 and IPv6 addresses. Works without the backend via Cloudflare 1.1.1.1.</p>
+    </header>
+
+    <main class="tool-main ip-main">
+
+        <!-- Backend status banner -->
+        <div id="backendBanner" class="backend-banner hidden">
+            ℹ️ Using Cloudflare fallback — only one IP shown. Start <code>python app.py</code> for both IPv4 + IPv6.
+        </div>
+
+        <div class="ip-card-row">
+            <div class="ip-card" id="cardV4">
+                <div class="ip-label">IPv4</div>
+                <div class="ip-value" id="ipv4Val">—</div>
+                <button class="copy-btn" data-target="ipv4Val" title="Copy">Copy</button>
+            </div>
+            <div class="ip-card" id="cardV6">
+                <div class="ip-label">IPv6</div>
+                <div class="ip-value" id="ipv6Val">—</div>
+                <button class="copy-btn" data-target="ipv6Val" title="Copy">Copy</button>
+            </div>
+        </div>
+
+        <div class="ip-actions">
+            <button class="tool-button" id="refreshBtn">Refresh</button>
+            <button class="tool-button secondary-btn" id="lookupBtn">Lookup my IP location ↓</button>
+        </div>
+
+        <!-- Location result (reuses ip-location logic) -->
+        <div id="locationResult" class="location-box hidden"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/what-is-my-ip.js"></script>
+</body>
+</html>

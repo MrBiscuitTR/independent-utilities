@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator & Strength Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/password-gen.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Password Generator</h1>
+        <p class="tool-subtitle">Generate secure random passwords and check strength — all local, nothing sent anywhere.</p>
+    </header>
+
+    <main class="tool-main pg-main">
+
+        <!-- ── Generator ─────────────────────────────────────────────────── -->
+        <section class="pg-section">
+            <h2 class="section-title">Generate</h2>
+
+            <div class="pg-output-row">
+                <input type="text" id="pgOutput" class="tool-input mono" readonly placeholder="Click Generate…" autocomplete="off">
+                <button class="icon-btn" id="pgCopy" title="Copy">Copy</button>
+                <button class="icon-btn" id="pgRegen" title="Regenerate">↺</button>
+            </div>
+
+            <div class="pg-options">
+                <div class="pg-opt-row">
+                    <label class="tool-label opt-label" for="pgLength">Length: <strong id="pgLenVal">16</strong></label>
+                    <input type="range" id="pgLength" min="4" max="128" value="16" class="pg-slider">
+                </div>
+
+                <div class="pg-checks">
+                    <label class="pg-check"><input type="checkbox" id="pgUpper" checked> A–Z uppercase</label>
+                    <label class="pg-check"><input type="checkbox" id="pgLower" checked> a–z lowercase</label>
+                    <label class="pg-check"><input type="checkbox" id="pgDigits" checked> 0–9 digits</label>
+                    <label class="pg-check"><input type="checkbox" id="pgSymbols" checked> !@#$… symbols</label>
+                    <label class="pg-check"><input type="checkbox" id="pgExcludeAmbig"> Exclude ambiguous (0, O, l, 1, I)</label>
+                </div>
+
+                <div class="pg-count-row">
+                    <label class="tool-label opt-label" for="pgCount">Batch size:</label>
+                    <select id="pgCount" class="tool-select pg-count-sel">
+                        <option value="1" selected>1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="tool-button" id="pgGenBtn">Generate</button>
+
+            <div id="pgBatchArea" class="pg-batch hidden"></div>
+        </section>
+
+        <!-- ── Strength Checker ───────────────────────────────────────────── -->
+        <section class="pg-section">
+            <h2 class="section-title">Check Strength</h2>
+            <input type="text" id="strengthInput" class="tool-input" placeholder="Type or paste a password…" autocomplete="new-password" spellcheck="false">
+
+            <div id="strengthBar" class="strength-bar">
+                <div id="strengthFill" class="strength-fill"></div>
+            </div>
+            <div id="strengthLabel" class="strength-label"></div>
+
+            <div id="strengthDetails" class="strength-details hidden">
+                <div class="sd-row"><span class="sd-key">Entropy</span><span class="sd-val" id="sdEntropy"></span></div>
+                <div class="sd-row"><span class="sd-key">Character pool</span><span class="sd-val" id="sdPool"></span></div>
+                <div class="sd-row"><span class="sd-key">Length</span><span class="sd-val" id="sdLength"></span></div>
+                <div class="sd-row"><span class="sd-key">Crack estimate</span><span class="sd-val" id="sdCrack"></span></div>
+            </div>
+
+            <div id="strengthTips" class="strength-tips hidden"></div>
+        </section>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/password-gen.js"></script>
+</body>
+</html>

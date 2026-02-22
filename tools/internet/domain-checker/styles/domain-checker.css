@@ -1,0 +1,269 @@
+/* domain-checker.css */
+
+.dc-main { max-width: 780px; }
+
+/* ── Disclaimer ──────────────────────────────────────────────────────────────── */
+.dc-disclaimer {
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    color: #7a5000;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+}
+
+/* ── Form card ───────────────────────────────────────────────────────────────── */
+.dc-form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+.dc-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.dc-input-row .tool-input { flex: 1; min-width: 180px; }
+
+/* ── TLD selector ────────────────────────────────────────────────────────────── */
+.dc-tld-section {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+}
+
+.dc-tld-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.dc-tld-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dc-tld-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+}
+
+.dc-tld-sep {
+    color: var(--color-border);
+}
+
+.dc-link-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-family: var(--font-main);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.dc-link-btn:hover {
+    color: var(--color-primary-dk);
+}
+
+.dc-tld-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dc-tld-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+}
+
+.dc-tld-chip.selected {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.dc-tld-chip:hover:not(.selected) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* ── Error box ───────────────────────────────────────────────────────────────── */
+.dc-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+.dc-error.hidden { display: none; }
+
+/* ── Results ─────────────────────────────────────────────────────────────────── */
+.dc-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dc-results-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+.dc-results-summary {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.dc-sum-item {
+    font-weight: 600;
+}
+
+.dc-sum-available { color: #1a7d44; }
+.dc-sum-taken     { color: #c00; }
+.dc-sum-unknown   { color: #7a5000; }
+
+.dc-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.6rem;
+}
+
+/* ── Result cards ────────────────────────────────────────────────────────────── */
+.dc-result-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    transition: border-color 0.2s;
+}
+
+.dc-result-card.available {
+    border-color: #2da84d;
+    background: #f0fdf4;
+}
+
+.dc-result-card.taken {
+    border-color: #f5c2c2;
+    background: #fff5f5;
+}
+
+.dc-result-card.unknown {
+    border-color: #f0c040;
+    background: #fffdf0;
+}
+
+.dc-result-card.checking {
+    opacity: 0.65;
+}
+
+.dc-card-domain {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--color-text);
+    word-break: break-all;
+}
+
+.dc-card-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.dc-card-status.available { color: #1a7d44; }
+.dc-card-status.taken     { color: #c00; }
+.dc-card-status.unknown   { color: #7a5000; }
+.dc-card-status.checking  { color: var(--color-text-muted); }
+
+.dc-card-detail {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+/* ── Status dot ──────────────────────────────────────────────────────────────── */
+.dc-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dc-dot-available { background: #28a745; }
+.dc-dot-taken     { background: #dc3545; }
+.dc-dot-unknown   { background: #ffc107; }
+.dc-dot-checking  { background: var(--color-border); }
+
+/* ── Spinner ─────────────────────────────────────────────────────────────────── */
+@keyframes dc-spin {
+    to { transform: rotate(360deg); }
+}
+
+.dc-spinner {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: dc-spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Hidden util ─────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .dc-input-row       { flex-direction: column; }
+    .dc-results-grid    { grid-template-columns: 1fr 1fr; }
+    .dc-results-summary { flex-direction: column; gap: 0.2rem; }
+}
+
+@media (max-width: 360px) {
+    .dc-results-grid { grid-template-columns: 1fr; }
+}

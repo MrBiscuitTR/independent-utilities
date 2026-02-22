@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Analyzer &amp; Sitemap Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/link-analyzer.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Link Analyzer</h1>
+        <p class="tool-subtitle">Extract all links from a webpage and generate a sitemap</p>
+    </header>
+    <main class="tool-main la-main">
+
+        <div id="backendBanner" class="la-offline-banner hidden">
+            Backend offline &mdash; start <code>python app.py</code> (port 5501) to use this tool.
+        </div>
+
+        <div class="la-form-card">
+            <div class="input-row">
+                <input
+                    type="url"
+                    id="urlInput"
+                    class="tool-input"
+                    placeholder="https://example.com"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <div class="la-options">
+                    <label class="tool-label la-max-label" for="maxLinks">Max links</label>
+                    <input type="number" id="maxLinks" class="tool-input la-max-input" value="100" min="10" max="200" />
+                </div>
+                <button id="analyzeBtn" class="tool-button">Analyze</button>
+            </div>
+        </div>
+
+        <div id="errorBox" class="la-error hidden"></div>
+
+        <div id="resultsArea" class="hidden">
+            <div class="la-meta-bar" id="metaBar"></div>
+
+            <div class="la-tabs">
+                <button class="la-tab active" data-tab="links">Links</button>
+                <button class="la-tab" data-tab="sitemap">Sitemap XML</button>
+            </div>
+
+            <!-- Links Panel -->
+            <div id="panel-links" class="la-panel active">
+                <div class="la-toolbar">
+                    <div class="la-filter-btns">
+                        <button class="la-filter active" data-filter="all">All (<span id="countAll">0</span>)</button>
+                        <button class="la-filter" data-filter="internal">Internal (<span id="countInternal">0</span>)</button>
+                        <button class="la-filter" data-filter="external">External (<span id="countExternal">0</span>)</button>
+                    </div>
+                    <button id="exportCsvBtn" class="la-action-btn">Export CSV</button>
+                </div>
+                <div class="la-table-wrap">
+                    <table class="la-table" id="linksTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Link</th>
+                                <th>Text</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linksBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sitemap Panel -->
+            <div id="panel-sitemap" class="la-panel">
+                <div class="la-sitemap-toolbar">
+                    <span class="la-sitemap-note">Sitemap includes internal links only.</span>
+                    <button id="downloadSitemapBtn" class="la-action-btn">Download sitemap.xml</button>
+                </div>
+                <pre id="sitemapXml" class="la-xml-pre"></pre>
+            </div>
+        </div>
+
+    </main>
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+    <script src="js/link-analyzer.js"></script>
+</body>
+</html>

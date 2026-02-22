@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QR Code Scanner</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/qr-scanner.css">
+</head>
+
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">QR Code Scanner</h1>
+        <p class="tool-subtitle">Scan QR codes from your webcam or upload an image — 100% local, nothing leaves your browser.</p>
+    </header>
+
+    <main class="tool-main qrs-main">
+
+        <!-- ── Tab switcher ──────────────────────────────────────────────── -->
+        <div class="qrs-tabs">
+            <button class="qrs-tab active" data-tab="webcam" id="tab-webcam">Webcam</button>
+            <button class="qrs-tab" data-tab="upload" id="tab-upload">Upload Image</button>
+        </div>
+
+        <!-- ── Webcam panel ───────────────────────────────────────────────── -->
+        <div class="qrs-panel" id="panel-webcam">
+            <div class="qrs-video-wrap" id="videoWrap">
+                <video id="qrsVideo" class="qrs-video" autoplay muted playsinline></video>
+                <canvas id="qrsOverlay" class="qrs-overlay" aria-hidden="true"></canvas>
+                <div class="qrs-crosshair" aria-hidden="true">
+                    <div class="crosshair-corner tl"></div>
+                    <div class="crosshair-corner tr"></div>
+                    <div class="crosshair-corner bl"></div>
+                    <div class="crosshair-corner br"></div>
+                </div>
+                <div class="qrs-scan-line" id="scanLine" aria-hidden="true"></div>
+            </div>
+
+            <div class="qrs-cam-controls">
+                <button class="tool-button" id="startCamBtn">Start Camera</button>
+                <button class="tool-button qrs-btn-stop" id="stopCamBtn" style="display:none">Stop Camera</button>
+                <select class="tool-select qrs-cam-select" id="cameraSelect" style="display:none" aria-label="Select camera"></select>
+            </div>
+
+            <p class="qrs-hint" id="camHint">Click "Start Camera" to begin scanning.</p>
+        </div>
+
+        <!-- ── Upload panel ───────────────────────────────────────────────── -->
+        <div class="qrs-panel" id="panel-upload" style="display:none">
+            <label class="qrs-drop" id="uploadDrop">
+                <span class="qrs-drop-icon" aria-hidden="true">&#128247;</span>
+                <span id="uploadLabel">Drop an image here or click to browse</span>
+                <input type="file" id="uploadInput" accept="image/*">
+            </label>
+            <div class="qrs-upload-preview" id="uploadPreviewWrap" style="display:none">
+                <img id="uploadPreview" class="qrs-preview-img" alt="Uploaded image preview">
+            </div>
+        </div>
+
+        <!-- ── Result area (shared) ───────────────────────────────────────── -->
+        <div class="qrs-result-wrap" id="resultWrap" style="display:none">
+            <div class="qrs-result-label">Scan Result</div>
+            <div class="qrs-result-box" id="resultBox" aria-live="polite"></div>
+            <div class="qrs-result-actions" id="resultActions"></div>
+        </div>
+
+        <!-- ── No-result / error message ─────────────────────────────────── -->
+        <div class="qrs-message" id="qrsMessage" style="display:none"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &ndash;<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/jsQR.js"></script>
+    <script src="js/qr-scanner.js"></script>
+</body>
+
+</html>

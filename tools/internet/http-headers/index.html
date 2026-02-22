@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Headers &amp; Website OS</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/http-headers.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">HTTP Headers &amp; Server Info</h1>
+        <p class="tool-subtitle">Inspect HTTP headers, security posture, and server OS fingerprint. Requires local backend.</p>
+    </header>
+
+    <main class="tool-main hh-main">
+
+        <div id="backendBanner" class="backend-banner hidden">
+            ⚠️ Local backend offline — run <code>python app.py</code> in the <code>python/</code> folder.
+        </div>
+
+        <!-- Tabs -->
+        <div class="hh-tabs" id="hhTabs">
+            <button class="hhtab active" data-tab="headers">HTTP Headers</button>
+            <button class="hhtab" data-tab="os">Website OS / Server</button>
+        </div>
+
+        <!-- TAB 1: HTTP Headers -->
+        <div class="hh-panel active" id="panel-headers">
+            <div class="input-row">
+                <input type="text" id="urlInput" class="tool-input" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="checkBtn">Check</button>
+            </div>
+            <div id="resultArea"></div>
+        </div>
+
+        <!-- TAB 2: Website OS -->
+        <div class="hh-panel" id="panel-os">
+            <p class="hh-tab-desc">Detect the server OS and software by analysing <code>Server</code>, <code>X-Powered-By</code>, and other fingerprinting headers.</p>
+            <div class="input-row">
+                <input type="text" id="osUrlInput" class="tool-input" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="osCheckBtn">Detect</button>
+            </div>
+            <div id="osResult"></div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/http-headers.js"></script>
+</body>
+</html>
