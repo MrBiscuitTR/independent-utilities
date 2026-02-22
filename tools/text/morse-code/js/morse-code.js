@@ -95,16 +95,23 @@ inputEl.addEventListener("input", translate);
 translateBtn.addEventListener("click", translate);
 
 swapBtn.addEventListener("click", () => {
-    const tmp     = inputEl.value;
+    const tmp      = inputEl.value;
     inputEl.value  = outputEl.value;
     outputEl.value = tmp;
-    // Flip mode
-    const other = currentMode === "text-to-morse" ? "morse-to-text" : "text-to-morse";
-    modeTabs.forEach(t => {
-        const isOther = t.dataset.mode === other;
-        t.classList.toggle("active", isOther);
-        if (isOther) t.click(); // triggers mode change
-    });
+    // Flip mode — update state and labels directly, no .click() to avoid re-translate
+    currentMode = currentMode === "text-to-morse" ? "morse-to-text" : "text-to-morse";
+    modeTabs.forEach(t => t.classList.toggle("active", t.dataset.mode === currentMode));
+    if (currentMode === "text-to-morse") {
+        inputLabel.textContent  = "Text";
+        outputLabel.textContent = "Morse Code";
+        inputEl.placeholder  = "Type text here…";
+        outputEl.placeholder = "Morse code appears here…";
+    } else {
+        inputLabel.textContent  = "Morse Code";
+        outputLabel.textContent = "Text";
+        inputEl.placeholder  = "Enter morse code (dots, dashes, spaces, / for word break)…";
+        outputEl.placeholder = "Decoded text appears here…";
+    }
 });
 
 copyBtn.addEventListener("click", () => {

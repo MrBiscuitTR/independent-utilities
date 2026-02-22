@@ -167,45 +167,6 @@ def _check_udp(host, port, timeout=2):
         except: pass
         return "closed"
 
-
-# @app.route("/api/port-check", methods=["POST"])
-# def api_port_check():
-#     body = request.get_json(force=True, silent=True) or {}
-#     host = body.get("host", "").strip()
-#     ports_raw = body.get("ports", [])
-
-#     # Blank host → use server's public IP (proxy for user's own IP)
-#     if not host:
-#         host = get_public_ipv4() or ""
-#     if not host:
-#         return jsonify({"error": "host required and could not auto-detect"}), 400
-#     if not _is_valid_host(host):
-#         return jsonify({"error": "Invalid or private host"}), 400
-#     if not isinstance(ports_raw, list) or not ports_raw:
-#         return jsonify({"error": "ports list required"}), 400
-
-#     # Accept both {"port":80,"proto":"tcp"} objects and plain integers
-#     entries = []
-#     for p in ports_raw[:30]:
-#         if isinstance(p, dict):
-#             entries.append({"port": int(p.get("port", 0)), "proto": str(p.get("proto", "tcp")).lower()})
-#         else:
-#             entries.append({"port": int(p), "proto": "tcp"})
-#     entries = [e for e in entries if 1 <= e["port"] <= 65535]
-
-#     results = []
-#     for e in entries:
-#         port  = e["port"]
-#         proto = e["proto"]
-#         if proto == "udp":
-#             status = _check_udp(host, port, timeout=2)
-#             results.append({"port": port, "proto": "udp", "status": status, "open": status != "closed"})
-#         else:
-#             open_ = _check_tcp(host, port, timeout=2)
-#             results.append({"port": port, "proto": "tcp", "status": "open" if open_ else "closed", "open": open_})
-
-#     return jsonify({"host": host, "results": results})
-
 def _scan_worker(host, port, proto):
     """Worker function to be executed in a thread."""
     if proto == "udp":

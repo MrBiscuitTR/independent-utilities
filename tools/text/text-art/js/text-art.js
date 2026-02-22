@@ -169,14 +169,18 @@ function render() {
             <div class="ta-name">${escHtml(item.name)}</div>
             <div class="ta-cat-badge">${escHtml(item.cat)}</div>
             <div class="ta-copied-flash" id="flash-${i}"></div>
+            <div class="ta-tooltip" id="tip-${i}">Copied!</div>
         </div>`).join("");
 
     grid.querySelectorAll(".ta-item").forEach((el, i) => {
         el.addEventListener("click", () => {
             navigator.clipboard.writeText(items[i].art).then(() => {
                 const flash = el.querySelector(".ta-copied-flash");
+                const tip   = el.querySelector(".ta-tooltip");
                 flash.classList.add("show");
+                tip.classList.add("show");
                 setTimeout(() => flash.classList.remove("show"), 400);
+                setTimeout(() => tip.classList.remove("show"), 1200);
             });
         });
     });

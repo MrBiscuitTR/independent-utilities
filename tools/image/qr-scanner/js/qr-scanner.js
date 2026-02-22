@@ -87,30 +87,38 @@
         copyBtn.className = 'qrs-action-btn';
         copyBtn.textContent = 'Copy';
         copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(text).then(() => {
+            const rawText = text; // explicit capture for clarity
+            const doFallback = () => {
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = rawText;
+                    ta.setAttribute('readonly', '');
+                    ta.style.cssText = 'position:fixed;top:0;left:0;width:2px;height:2px;opacity:0;';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                } catch (_) {}
                 copyBtn.textContent = 'Copied!';
                 copyBtn.classList.add('copied');
                 setTimeout(() => {
                     copyBtn.textContent = 'Copy';
                     copyBtn.classList.remove('copied');
                 }, 2000);
-            }).catch(() => {
-                // Fallback for browsers without clipboard API
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                copyBtn.textContent = 'Copied!';
-                copyBtn.classList.add('copied');
-                setTimeout(() => {
-                    copyBtn.textContent = 'Copy';
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            });
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(rawText).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(doFallback);
+            } else {
+                doFallback();
+            }
         });
         resultActions.appendChild(copyBtn);
 

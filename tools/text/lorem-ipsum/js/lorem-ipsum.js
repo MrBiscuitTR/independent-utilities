@@ -86,7 +86,7 @@ const infoEl    = document.getElementById("wordCountInfo");
 const genBtn    = document.getElementById("generateBtn");
 
 function run() {
-    const count  = Math.max(1, Math.min(1000, parseInt(countEl.value) || 5));
+    const count  = Math.max(1, Math.min(10000, parseInt(countEl.value) || 5));
     const unit   = unitEl.value;
     const result = generate(count, unit, classicEl.checked, htmlEl.checked);
     outputEl.value = result;

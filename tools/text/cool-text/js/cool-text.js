@@ -20,19 +20,54 @@ function makeMap(lowerStart, upperStart, digitStart) {
 
 const MAPS = {
     "Bold":                makeMap(0x1D41A, 0x1D400, 0x1D7CE),
-    "Italic":              makeMap(0x1D44E, 0x1D434, null),
+    "Italic":              (() => {
+        // Math italic block has gaps: some chars are at different codepoints
+        const m = makeMap(0x1D44E, 0x1D434, null);
+        // Lowercase overrides for letters outside the sequential block
+        m["h"] = "\u210E"; // Planck constant h
+        m["e"] = "\u212F"; // script small e (italic)
+        m["i"] = "\u{1D456}"; // i in italic block is fine — keep sequential
+        m["j"] = "\u{1D457}"; // j in italic block
+        return m;
+    })(),
     "Bold Italic":         makeMap(0x1D482, 0x1D468, null),
-    "Script":              makeMap(0x1D4B6, 0x1D49C, null),
+    "Script":              (() => {
+        const m = makeMap(0x1D4B6, 0x1D49C, null);
+        // Script block gaps
+        m["B"] = "\u212C"; m["E"] = "\u2130"; m["F"] = "\u2131";
+        m["H"] = "\u210B"; m["I"] = "\u2110"; m["L"] = "\u2112";
+        m["M"] = "\u2133"; m["R"] = "\u211B";
+        m["e"] = "\u212F"; m["g"] = "\u210A"; m["o"] = "\u2134";
+        return m;
+    })(),
     "Bold Script":         makeMap(0x1D4EA, 0x1D4D0, null),
-    "Fraktur":             makeMap(0x1D51E, 0x1D504, null),
+    "Fraktur":             (() => {
+        const m = makeMap(0x1D51E, 0x1D504, null);
+        // Fraktur block gaps
+        m["C"] = "\u212D"; m["H"] = "\u210C"; m["I"] = "\u2111";
+        m["R"] = "\u211C"; m["Z"] = "\u2128";
+        return m;
+    })(),
     "Bold Fraktur":        makeMap(0x1D586, 0x1D56C, null),
-    "Double-Struck":       makeMap(0x1D552, 0x1D538, 0x1D7D8),
+    "Double-Struck":       (() => {
+        const m = makeMap(0x1D552, 0x1D538, 0x1D7D8);
+        // Double-struck block gaps
+        m["C"] = "\u2102"; m["H"] = "\u210D"; m["N"] = "\u2115";
+        m["P"] = "\u2119"; m["Q"] = "\u211A"; m["R"] = "\u211D"; m["Z"] = "\u2124";
+        return m;
+    })(),
     "Monospace":           makeMap(0x1D68A, 0x1D670, 0x1D7F6),
     "Sans-Serif":          makeMap(0x1D5BA, 0x1D5A0, 0x1D7E2),
     "Sans Bold":           makeMap(0x1D5EE, 0x1D5D4, 0x1D7EC),
     "Sans Italic":         makeMap(0x1D622, 0x1D608, null),
     "Sans Bold Italic":    makeMap(0x1D656, 0x1D63C, null),
-    "Circled":             makeMap(0x24D0,  0x24B6,  0x2460),
+    "Circled":             (() => {
+        const m = makeMap(0x24D0, 0x24B6, null);
+        // Circled digits: ⓪ is at U+24EA, ①–⑨ are at U+2460–U+2468
+        m["0"] = "\u24EA"; // ⓪
+        for (let i = 1; i <= 9; i++) m[String(i)] = String.fromCodePoint(0x245F + i);
+        return m;
+    })(),
     "Squared":             (() => {
         const m = {};
         for (let i = 0; i < 26; i++) {
@@ -56,7 +91,7 @@ const SUPERSCRIPT_MAP = {
     "k":"ᵏ","l":"ˡ","m":"ᵐ","n":"ⁿ","o":"ᵒ","p":"ᵖ","r":"ʳ","s":"ˢ","t":"ᵗ","u":"ᵘ",
     "v":"ᵛ","w":"ʷ","x":"ˣ","y":"ʸ","z":"ᶻ",
     "A":"ᴬ","B":"ᴮ","D":"ᴰ","E":"ᴱ","G":"ᴳ","H":"ᴴ","I":"ᴵ","J":"ᴶ","K":"ᴷ","L":"ᴸ",
-    "M":"ᴹ","N":"ᴺ","O":"ᴼ","P":"ᴾ","R":"ᴿ","T":"ᵀ","U":"ᵁ","V","ᵛ":"ᵛ","W":"ᵂ",
+    "M":"ᴹ","N":"ᴺ","O":"ᴼ","P":"ᴾ","R":"ᴿ","T":"ᵀ","U":"ᵁ","V":"ᵛ","W":"ᵂ",
 };
 
 // Full-width (vaporwave aesthetic)

@@ -11,6 +11,33 @@
   <title>Utilities Hub</title>
   <link rel="stylesheet" href="/css/hub.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <style>
+    /* ── Hub search bar ───────────────────────────────────────────────────── */
+    .hub-search-wrap {
+      margin-bottom: 1.5rem;
+    }
+    .hub-search-input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hub-search-input:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    }
+    /* Hide categories with no visible items during search */
+    .hub-category.search-empty { display: none; }
+    /* Highlight matching text in search results */
+    .hub-item.search-hidden { display: none; }
+  </style>
 </head>
 
 <body class="hub-body">
@@ -20,6 +47,12 @@
   </header>
 
   <nav class="hub-nav">
+
+    <!-- ── Search ────────────────────────────────────────────────────────── -->
+    <div class="hub-search-wrap">
+      <input type="text" id="hubSearch" class="hub-search-input"
+             placeholder="Search tools…" autocomplete="off" spellcheck="false">
+    </div>
 
     <!-- ── Image Tools ──────────────────────────────────────────────────── -->
     <section class="hub-category">
@@ -71,6 +104,23 @@
         <li class="hub-item"><a href="/tools/text/markdown-converter" class="hub-link">Markdown ↔ HTML</a></li>
         <!-- uses bundled local copy of marked.js (https://marked.js.org) — file is downloaded and served locally, no CDN request at runtime -->
         <li class="hub-item"><a href="/tools/text/hash-generator" class="hub-link">Hash Generator</a></li>
+
+        <li class="hub-item"><a href="/tools/text/lorem-ipsum" class="hub-link">Lorem Ipsum Generator</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/rot13" class="hub-link">ROT13 Encoder / Decoder</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/morse-code" class="hub-link">Morse Code Translator</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/notepad" class="hub-link">Online Notepad</a></li>
+        <!-- pure JS — multi-tab plain text editor; ZIP download uses locally bundled jszip.min.js -->
+        <li class="hub-item"><a href="/tools/text/cool-text" class="hub-link">Cool Text Generator</a></li>
+        <!-- pure JS — Unicode transforms, no external requests -->
+        <li class="hub-item"><a href="/tools/text/text-art" class="hub-link">Text Art Clipboard</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/text-converters" class="hub-link">Binary / Hex / RGB Converter</a></li>
+        <!-- pure JS — no external requests -->
+        <li class="hub-item"><a href="/tools/text/punycode" class="hub-link">Punycode Converter</a></li>
+        <!-- pure JS — uses URL API for encoding; includes RFC 3492 decoder, no external requests -->
       </ul>
     </section>
 
@@ -79,7 +129,7 @@
       <h2 class="hub-category-title">✨ Quality of Life</h2>
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/qol/json-viewer" class="hub-link">JSON Viewer & Editor</a></li>
-        <!-- to implement -->
+        <!-- more to implement -->
       </ul>
     </section>
 
@@ -100,7 +150,11 @@
         <li class="hub-item">
           <a href="/tools/internet/what-is-my-ip" class="hub-link">What Is My IP</a>
         </li>
-        <!-- browser-side fallback: https://1.1.1.1/cdn-cgi/trace (Cloudflare, no key, no auth) -->
+        <!-- 
+        Flask backend → both IPv4 + IPv6, no banner
+        cloudflare.com/cdn-cgi/trace (if reachable) → one IP, blue info banner: "Showing your IP via Cloudflare trace… start python app.py for both IPv4 + IPv6"
+        icanhazip.com (Cloudflare-operated, different domain) → one IP, same blue info banner identifying the source 
+        -->
 
         <li class="hub-item">
           <a href="/tools/internet/dns-lookup" class="hub-link">DNS Lookup</a>
@@ -171,38 +225,14 @@
         <li class="hub-item"><a href="/tools/internet/password-gen" class="hub-link">Password Generator</a></li>
         <!-- pure JS — Web Crypto API, no external requests -->
 
-        <li class="hub-item"><a href="/tools/other-tools/lorem-ipsum" class="hub-link">Lorem Ipsum Generator</a></li>
-        <!-- pure JS — no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/rot13" class="hub-link">ROT13 Encoder / Decoder</a></li>
-        <!-- pure JS — no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/morse-code" class="hub-link">Morse Code Translator</a></li>
-        <!-- pure JS — no external requests -->
-
         <li class="hub-item"><a href="/tools/other-tools/credit-card" class="hub-link">Credit Card Checker</a></li>
         <!-- pure JS — Luhn algorithm, no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/notepad" class="hub-link">Online Notepad</a></li>
-        <!-- pure JS — multi-tab plain text editor; ZIP download uses locally bundled jszip.min.js -->
-
-        <li class="hub-item"><a href="/tools/other-tools/cool-text" class="hub-link">Cool Text Generator</a></li>
-        <!-- pure JS — Unicode transforms, no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/text-art" class="hub-link">Text Art Clipboard</a></li>
-        <!-- pure JS — no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/text-converters" class="hub-link">Binary / Hex / RGB Converter</a></li>
-        <!-- pure JS — no external requests -->
 
         <li class="hub-item"><a href="/tools/other-tools/multi-url-opener" class="hub-link">Multi URL Opener</a></li>
         <!-- pure JS — opens tabs via window.open, no external requests -->
 
         <li class="hub-item"><a href="/tools/other-tools/user-agent" class="hub-link">What Is My User Agent?</a></li>
         <!-- pure JS — reads navigator.userAgent, no external requests -->
-
-        <li class="hub-item"><a href="/tools/other-tools/punycode" class="hub-link">Punycode Converter</a></li>
-        <!-- pure JS — uses URL API for encoding; includes RFC 3492 decoder, no external requests -->
 
         <li class="hub-item"><a href="/tools/other-tools/robots-txt" class="hub-link">Robots.txt Generator</a></li>
         <!-- pure JS — no external requests -->
@@ -220,11 +250,57 @@
   </footer>
 
   <script>
-    /* Hub backend health poller
-       Polls http://localhost:5501/api/health every 3 s (lightweight — response is ~20 bytes).
-       - Items with data-needs-backend get class "backend-offline" (greyed, non-clickable)
-         until the backend responds 200, then switch to "backend-online".
-       - The status bar above the list shows a live coloured dot + message.
+    /* ── Hub search ────────────────────────────────────────────────────────
+       Fuzzy filter: shows items where the query matches at least 70% of
+       characters (case-insensitive subsequence / overlap ratio).
+       Categories with zero visible items are hidden.
+    */
+    (function () {
+      "use strict";
+      const searchEl   = document.getElementById("hubSearch");
+      const allItems   = Array.from(document.querySelectorAll(".hub-item"));
+      const categories = Array.from(document.querySelectorAll(".hub-category"));
+
+      function fuzzyScore(query, target) {
+        // Returns a score 0–1 indicating how well query matches target.
+        // Uses a simple character-overlap approach: count how many chars
+        // of the query appear (in order) as a subsequence of target.
+        if (!query) return 1;
+        const q = query.toLowerCase();
+        const t = target.toLowerCase();
+        let qi = 0;
+        for (let i = 0; i < t.length && qi < q.length; i++) {
+          if (t[i] === q[qi]) qi++;
+        }
+        return qi / q.length; // 1.0 = all query chars found in order
+      }
+
+      function applySearch() {
+        const q = searchEl.value.trim();
+
+        allItems.forEach(li => {
+          const label = li.querySelector(".hub-link")
+                          ? li.querySelector(".hub-link").textContent.trim()
+                          : "";
+          const score = fuzzyScore(q, label);
+          li.classList.toggle("search-hidden", q.length > 0 && score < 0.7);
+        });
+
+        // Hide entire category if all its items are hidden
+        categories.forEach(section => {
+          const visible = section.querySelectorAll(".hub-item:not(.search-hidden)").length;
+          section.classList.toggle("search-empty", visible === 0);
+        });
+      }
+
+      searchEl.addEventListener("input", applySearch);
+    })();
+
+    /* ── Backend health poller ─────────────────────────────────────────────
+       Polls http://localhost:5501/api/health every 3 s.
+       - Items with data-needs-backend start as backend-offline (greyed, non-clickable)
+         and switch to backend-online only when the backend responds 200.
+       - The status bar shows a live coloured dot + message.
     */
     (function () {
       "use strict";
@@ -235,6 +311,10 @@
       const txt   = document.getElementById("bsText");
       const items = document.querySelectorAll("[data-needs-backend]");
       const bdots = document.querySelectorAll(".backend-dot");
+
+      // Disable backend items immediately — before the first poll completes
+      items.forEach(li => { li.classList.add("backend-offline"); });
+      bdots.forEach(d  => { d.classList.add("dot-offline"); });
 
       let lastStatus = null; // "online" | "offline" | null
 

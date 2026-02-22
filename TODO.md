@@ -33,38 +33,28 @@ Dev Tools
 Dev or Developer tools are built especially for website developers (working on website projects) to make their daily tasks easy and avoid the hassle of installing various software on the computer to perform minor tasks possible without installing software and wasting time setting them up. Whether it's generating random passwords or checking website HTTP headers, or the operating system of the website's backend server, all is here to meet your needs.
 
 Check Website Operating System: Website's Backend Server OS
---ok-- ## Multi URL Opener: Open multiple URLs each in new tab, input seperated by commas or spaces or newlines
 SMTP Test: Email SMTP test tool
 htaccess Redirect Generator: Redirect HTACCESS tool
 URL Rewrite Generator: Rewrite SEO friendly URL ( also works with main url, finds hrefs and navs, suggests fixes.)
 Broken Links Checker: Find and Fix Dead Links.
 
---ok-- ## Binary to Text: Translate Binary to text --reverse button here, in same page-- Text to Binary: Translate Text to Binary +do the same for hex, and rgb to hex converter too, with color picker.
+
 
 
 Webmasters Tools
 Tools for webmasters help website owners and developers to analyze their website performance regarding various analytics, such as checking online metrics related to any domain.
 
 Website Link Analyzer: Internal & External Links Checker
---ok-- ## What is My User Agent?: Check Your User Agent Information
---ok-- ## Punycode Converter: Convert IDN to Punycode
+
 Google SERP Simulator: Preview Google SERP Simulator (skip if requires api key)
---ok-- ## Robots.txt Generator: Generate Robots.txt File Instantly
-Sitemap xml generator: generates sitemap using href, nav, header, footer links on a given url.
+
+## Sitemap xml generator: generates sitemap using href, nav, header, footer links on a given url.
 
 Network Tools
 Network tools provide network-related services, and these services may include checking open ports, i.e., TCP & UDP ports scanning and OUI lookup, i.e., checking vendors of any device using its MAC address or an AS Number lookup, which tells you complete info about any ASN number, and many more tools regarding networking and networking parameters.
 
-Port Checker (very important): Check open Network Ports for Public, using any given public ip. allow custom ports, common gaming ports, common vulnerable ports, common server ports, and other common port types to be chosen, and show which ones are about to get scanned in the "custom ports" text area. if modified by user switch selector to custom automatically, otherwise keep at, for instance, "server ports", if thae text area content matches those ports exactly (order doesnt matter, seperated by commas or spaces).
-MAC Address Generator: Generate Random MAC Address (add to random ip generator tool page)
-ASN WHOIS Lookup: Locate who owns an ASN (add to whois lookup tool)
-
-
-Cyber Security Tools
-Cyber Security tools are intended to ensure your websites are secure and meet international security standards. It contains tools for website security checkups and identifying any vulnerabilities in the site. It has become the need of time to regularly get a security health checkup on your websites to avoid any data loss or hacking and attacks.
-
-Password Encryption Utility
-Encode any Password or Text
+## MAC Address Generator: Generate Random MAC Address (add to random ip generator tool page)
+## ASN WHOIS Lookup: Locate who owns an ASN (add to whois lookup tool)
 
 
 Productivity Tools
