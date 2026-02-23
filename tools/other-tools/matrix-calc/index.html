@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Calculator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/matrix-calc.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Matrix Calculator</h1>
+        <p class="tool-subtitle">Gaussian elimination with full step-by-step output — augmented matrices, inverse, rank, nullity, kernel, and span equations. Pure client-side with exact rational arithmetic.</p>
+    </header>
+
+    <main class="tool-main mx-main">
+
+        <!-- ── Matrix Size & Mode ─────────────────────────────────────────── -->
+        <div class="mx-section">
+            <div class="mx-section-title">Matrix Configuration</div>
+            <div class="mx-config-row">
+
+                <div class="mx-field">
+                    <label class="mx-label">Rows</label>
+                    <select id="mxRows" class="tool-select mx-small-sel">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+
+                <div class="mx-field">
+                    <label class="mx-label">Base Columns (m)</label>
+                    <select id="mxCols" class="tool-select mx-small-sel">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+
+                <div class="mx-field">
+                    <label class="mx-label">
+                        Extra Columns
+                        <span class="mx-info-icon" data-tip="Extra columns appended to the right of the base matrix. Use 1 for a standard augmented matrix [A|b], 1 with variables for span/Cartesian equation problems, m for the identity [A|I] to compute A⁻¹. Set to 0 for a plain m×n matrix.">ℹ️</span>
+                    </label>
+                    <select id="mxAug" class="tool-select mx-small-sel">
+                        <option value="0">0 (plain)</option>
+                        <option value="1" selected>1 (augmented [A|b])</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <div class="mx-field">
+                    <label class="mx-label">
+                        Operation
+                        <span class="mx-info-icon" data-tip="Row Reduce (RREF): reduce to reduced row echelon form. Gaussian (REF): reduce to row echelon form only (upper triangular). Inverse: compute A⁻¹ by augmenting with I and row-reducing (requires square matrix with extra cols = base cols).">ℹ️</span>
+                    </label>
+                    <select id="mxOp" class="tool-select">
+                        <option value="rref" selected>Row Reduce (RREF)</option>
+                        <option value="ref">Gaussian Elim (REF)</option>
+                        <option value="inverse">Compute Inverse A⁻¹</option>
+                    </select>
+                </div>
+
+                <div class="mx-field">
+                    <label class="mx-label">
+                        Variable Mode
+                        <span class="mx-info-icon" data-tip="When enabled, the last extra column accepts symbolic variables (e.g. a, b, c or x, y, z). Useful for finding the Cartesian equation of span(v₁, v₂, …) or parametric solutions.">ℹ️</span>
+                    </label>
+                    <label class="mx-toggle-label">
+                        <input type="checkbox" id="mxVarMode">
+                        <span>Symbolic last column</span>
+                    </label>
+                </div>
+
+                <button class="tool-button mx-build-btn" id="buildMatrixBtn">Build Matrix</button>
+
+            </div>
+
+            <!-- Preset buttons -->
+            <div class="mx-presets">
+                <span class="mx-preset-label">Quick presets:</span>
+                <button class="mx-preset-btn" data-preset="3x3aug">3×3 Augmented</button>
+                <button class="mx-preset-btn" data-preset="3x3inv">3×3 Inverse</button>
+                <button class="mx-preset-btn" data-preset="4x3aug">4×3 Over-determined</button>
+                <button class="mx-preset-btn" data-preset="3x4aug">3×4 Under-determined</button>
+                <button class="mx-preset-btn" data-preset="span3">Span ℝ³ Cartesian</button>
+                <button class="mx-preset-btn" data-preset="2x2inv">2×2 Inverse</button>
+            </div>
+        </div>
+
+        <!-- ── Matrix Input ───────────────────────────────────────────────── -->
+        <div class="mx-section" id="matrixInputSection" style="display:none">
+            <div class="mx-section-title" id="matrixInputTitle">Enter Matrix</div>
+            <div class="mx-hint-row">
+                <span class="mx-hint">Enter fractions as <code>3/4</code>, negatives as <code>-2</code>. Leave cells blank for 0.</span>
+                <div class="mx-hint-actions">
+                    <button class="mx-small-btn" id="fillZeroBtn">Fill zeros</button>
+                    <button class="mx-small-btn" id="fillIdentityBtn">Fill identity</button>
+                    <button class="mx-small-btn" id="clearMatrixBtn">Clear</button>
+                </div>
+            </div>
+            <div class="mx-grid-wrap" id="matrixGrid"></div>
+            <div id="varModeNote" class="mx-var-note hidden">
+                <strong>Symbolic column:</strong> Enter variable expressions in the last column (e.g. <code>a</code>, <code>b</code>, <code>2a+b</code>, <code>x₁</code>). Variable names are single letters. Operations on symbolic entries will be tracked through all row operations.
+            </div>
+            <button class="tool-button mx-solve-btn" id="solveBtn">Solve &amp; Show Steps</button>
+        </div>
+
+        <!-- ── Results ───────────────────────────────────────────────────── -->
+        <div id="resultsSection" style="display:none">
+
+            <!-- Summary card -->
+            <div class="mx-section" id="summaryCard">
+                <div class="mx-section-title">Summary</div>
+                <div class="mx-summary-grid" id="summaryGrid"></div>
+            </div>
+
+            <!-- Result matrix -->
+            <div class="mx-section" id="resultMatrixCard">
+                <div class="mx-section-title" id="resultMatrixTitle">Result Matrix</div>
+                <div class="mx-matrix-display" id="resultMatrixDisplay"></div>
+            </div>
+
+            <!-- Solution / interpretation -->
+            <div class="mx-section" id="solutionCard" style="display:none">
+                <div class="mx-section-title" id="solutionTitle">Solution / Interpretation</div>
+                <div id="solutionBody"></div>
+            </div>
+
+            <!-- Step-by-step -->
+            <div class="mx-section" id="stepsCard">
+                <div class="mx-steps-header" id="stepsToggle">
+                    <span class="mx-section-title" style="margin:0">Step-by-Step Elimination</span>
+                    <span class="mx-steps-arrow">▼</span>
+                </div>
+                <div id="stepsBody" class="mx-steps-body"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <div class="mx-tooltip" id="mxTooltip"></div>
+    <script src="js/matrix-calc.js"></script>
+</body>
+</html>

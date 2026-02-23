@@ -1,0 +1,457 @@
+/* matrix-calc.css — Matrix Calculator styles */
+
+.mx-main { max-width: 960px; }
+
+/* ── Section ────────────────────────────────────────────────────────────────── */
+.mx-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.mx-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Config row ─────────────────────────────────────────────────────────────── */
+.mx-config-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: flex-end;
+}
+
+.mx-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.mx-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.mx-small-sel { width: 80px; }
+.mx-toggle-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; }
+.mx-toggle-label input { flex-shrink: 0; }
+.mx-build-btn { align-self: flex-end; padding: 0.55rem 1.4rem; }
+
+/* ── Presets ────────────────────────────────────────────────────────────────── */
+.mx-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.8rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.mx-preset-label {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    margin-right: 0.2rem;
+}
+
+.mx-preset-btn {
+    background: #f0f4fa;
+    border: 1px solid #c5d8f8;
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: var(--color-primary);
+    font-family: var(--font-main);
+    font-weight: 600;
+    transition: background 0.15s;
+}
+.mx-preset-btn:hover { background: #d8eafc; }
+
+/* ── Matrix input grid ──────────────────────────────────────────────────────── */
+.mx-hint-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.mx-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.mx-hint code {
+    font-family: var(--font-mono);
+    background: #f0f4fa;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+}
+
+.mx-hint-actions { display: flex; gap: 0.4rem; }
+
+.mx-small-btn {
+    background: #f8f9fa;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-family: var(--font-main);
+    transition: border-color 0.15s, color 0.15s;
+}
+.mx-small-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+.mx-grid-wrap {
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+}
+
+.mx-grid {
+    display: inline-grid;
+    gap: 4px;
+    border-left: 3px solid var(--color-text-muted);
+    border-right: 3px solid var(--color-text-muted);
+    padding: 6px 10px;
+    position: relative;
+    border-radius: 2px;
+}
+
+/* Top/bottom bracket lines */
+.mx-grid::before,
+.mx-grid::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    height: 3px;
+    background: var(--color-text-muted);
+}
+.mx-grid::before { top: 0; }
+.mx-grid::after  { bottom: 0; }
+
+.mx-cell {
+    width: 64px;
+    height: 36px;
+    padding: 0.3rem 0.4rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: border-color 0.15s, background 0.15s;
+    box-sizing: border-box;
+}
+
+.mx-cell:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: #fff;
+}
+
+.mx-cell.aug-col {
+    border-color: #a0c4ff;
+    background: #f0f6ff;
+}
+
+.mx-cell.aug-col:focus {
+    border-color: var(--color-primary);
+    background: #fff;
+}
+
+.mx-cell.var-col {
+    border-color: #a8d8a8;
+    background: #f0fff0;
+    min-width: 80px;
+    width: 80px;
+}
+
+.mx-cell.var-col:focus {
+    border-color: #2d8a2d;
+    background: #fff;
+}
+
+.mx-col-sep {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    font-size: 1.1rem;
+    align-self: center;
+    height: 36px;
+}
+
+.mx-var-note {
+    background: #f0fff0;
+    border: 1px solid #a8d8a8;
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.85rem;
+    font-size: 0.82rem;
+    color: #155724;
+    margin: 0.6rem 0;
+}
+.mx-var-note.hidden { display: none; }
+.mx-var-note code {
+    font-family: var(--font-mono);
+    background: #d4edda;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+}
+
+.mx-solve-btn {
+    width: 100%;
+    margin-top: 0.9rem;
+    padding: 0.8rem;
+    font-size: 0.98rem;
+}
+
+/* ── Summary grid ───────────────────────────────────────────────────────────── */
+.mx-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.mx-summary-item {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.mx-summary-key {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.mx-summary-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+}
+
+.mx-summary-val.good  { color: #155724; }
+.mx-summary-val.warn  { color: #856404; }
+.mx-summary-val.bad   { color: #721c24; }
+
+/* ── Matrix display (result / steps) ───────────────────────────────────────── */
+.mx-matrix-display {
+    overflow-x: auto;
+    padding: 0.3rem 0;
+}
+
+.mx-display-grid {
+    display: inline-grid;
+    gap: 3px;
+    border-left: 3px solid #555;
+    border-right: 3px solid #555;
+    padding: 5px 10px;
+    position: relative;
+    border-radius: 2px;
+}
+
+.mx-display-grid::before,
+.mx-display-grid::after {
+    content: "";
+    position: absolute;
+    left: -3px; right: -3px;
+    height: 3px;
+    background: #555;
+}
+.mx-display-grid::before { top: 0; }
+.mx-display-grid::after  { bottom: 0; }
+
+.mx-dval {
+    min-width: 56px;
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    background: none;
+    border-radius: 2px;
+}
+
+.mx-dval.pivot-col { background: #fff8e1; font-weight: 700; color: #856404; }
+.mx-dval.aug       { background: #f0f6ff; }
+.mx-dval.var       { background: #f0fff0; }
+.mx-dval.zero      { color: var(--color-text-muted); }
+.mx-dval.highlighted { background: #e8f0fe; font-weight: 700; }
+
+.mx-dsep {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    color: #aaa;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* ── Steps ──────────────────────────────────────────────────────────────────── */
+.mx-steps-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    margin: -1.1rem -1.2rem 0;
+    padding: 1.1rem 1.2rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transition: background 0.15s;
+}
+.mx-steps-header:hover { background: #f5f7fa; }
+
+.mx-steps-arrow {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    transition: transform 0.2s;
+}
+.mx-steps-arrow.open { transform: rotate(180deg); }
+
+.mx-steps-body { display: none; padding-top: 0.8rem; }
+.mx-steps-body.open { display: block; }
+
+/* ── Individual step ────────────────────────────────────────────────────────── */
+.mx-step {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+.mx-step:last-child { border-bottom: none; margin-bottom: 0; }
+
+.mx-step-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mx-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.mx-op-desc {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    margin-bottom: 0.45rem;
+}
+
+.mx-op-desc .op-scale   { color: #f9e2af; }  /* yellow */
+.mx-op-desc .op-swap    { color: #89dceb; }  /* cyan */
+.mx-op-desc .op-add     { color: #a6e3a1; }  /* green */
+.mx-op-desc .op-pivot   { color: #cba6f7; }  /* purple */
+.mx-op-desc .op-done    { color: #a6e3a1; }  /* green */
+
+/* ── Solution body ──────────────────────────────────────────────────────────── */
+.mx-solution {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--color-text);
+}
+
+.mx-solution p { margin: 0.3rem 0; }
+
+.mx-solution .sol-eq {
+    font-family: var(--font-mono);
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    display: block;
+    margin: 0.4rem 0;
+    font-size: 0.88rem;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.mx-solution .sol-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    margin-top: 0.75rem;
+    margin-bottom: 0.2rem;
+    display: block;
+}
+
+.mx-solution .sol-free  { color: #856404; font-weight: 600; }
+.mx-solution .sol-inconsistent { color: #721c24; font-weight: 700; }
+.mx-solution .sol-unique { color: #155724; font-weight: 700; }
+.mx-solution .sol-infinite { color: #1a3c6e; font-weight: 700; }
+
+/* ── Tooltip ────────────────────────────────────────────────────────────────── */
+.mx-info-icon { cursor: pointer; font-size: 0.8rem; opacity: 0.65; user-select: none; }
+.mx-info-icon:hover { opacity: 1; }
+
+.mx-tooltip {
+    position: fixed;
+    z-index: 999;
+    max-width: 300px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-md);
+    pointer-events: none;
+    display: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+}
+.mx-tooltip.visible { display: block; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .mx-config-row { flex-direction: column; align-items: flex-start; }
+    .mx-build-btn { width: 100%; }
+    .mx-cell { width: 52px; font-size: 0.82rem; }
+    .mx-summary-grid { grid-template-columns: 1fr 1fr; }
+    .mx-preset-btn { font-size: 0.72rem; padding: 0.2rem 0.5rem; }
+}
