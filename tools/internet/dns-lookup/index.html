@@ -20,6 +20,8 @@
         <!-- Tab switcher -->
         <div class="dns-tabs" id="dnsTabs">
             <button class="dtab active" data-tab="records">DNS Records</button>
+            <button class="dtab" data-tab="spf">SPF</button>
+            <button class="dtab" data-tab="dkim">DKIM</button>
             <button class="dtab" data-tab="dmarc">DMARC</button>
             <button class="dtab" data-tab="dnskey">DNSKEY / DS</button>
             <button class="dtab" data-tab="health">DNS Health</button>
@@ -59,7 +61,28 @@
             <div id="resultArea"></div>
         </div>
 
-        <!-- TAB 2: DMARC -->
+        <!-- TAB 2: SPF -->
+        <div class="dns-panel" id="panel-spf">
+            <p class="dns-tab-desc">Fetch and validate the SPF (Sender Policy Framework) record for a domain. Shows the raw record, parsed mechanisms, and a plain-language interpretation of the policy.</p>
+            <div class="input-row">
+                <input type="text" id="spfDomain" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="spfBtn">Check SPF</button>
+            </div>
+            <div id="spfResult"></div>
+        </div>
+
+        <!-- TAB 3: DKIM -->
+        <div class="dns-panel" id="panel-dkim">
+            <p class="dns-tab-desc">Look up DKIM (DomainKeys Identified Mail) public key records for a domain and selector. Validates the key is present and decodes key type, flags, and public key data.</p>
+            <div class="input-row">
+                <input type="text" id="dkimDomainFull" class="tool-input" placeholder="example.com" autocomplete="off" spellcheck="false">
+                <input type="text" id="dkimSelectorFull" class="tool-input" placeholder="Selector (e.g. default, google, s1)" style="max-width:220px" autocomplete="off" spellcheck="false">
+                <button class="tool-button" id="dkimFullBtn">Check DKIM</button>
+            </div>
+            <div id="dkimResult"></div>
+        </div>
+
+        <!-- TAB 4: DMARC -->
         <div class="dns-panel" id="panel-dmarc">
             <p class="dns-tab-desc">Fetch and validate the DMARC record for a domain. Shows the full parsed policy including sub-domain policy, percentage, and reporting addresses.</p>
             <div class="input-row">

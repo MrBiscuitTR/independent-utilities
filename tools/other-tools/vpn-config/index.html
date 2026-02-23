@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Config Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/vpn-config.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">VPN Config Generator</h1>
+        <p class="tool-subtitle">Generate WireGuard, OpenVPN, and other VPN configurations with advanced routing, NAT, and port-forwarding rules.</p>
+    </header>
+
+    <main class="tool-main vpn-main">
+
+        <div class="vpn-tabs" id="vpnTabs">
+            <button class="vtab active" data-tab="wg">WireGuard (wg-quick)</button>
+            <button class="vtab" data-tab="ovpn">OpenVPN</button>
+            <button class="vtab" data-tab="ref">Other VPNs Reference</button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             WireGuard tab
+        ══════════════════════════════════════════════════════════════════ -->
+        <div class="vpn-panel active" id="panel-wg">
+
+            <!-- Key generation note -->
+            <div class="vpn-section">
+                <div class="vpn-section-title">Key Generation Note</div>
+                <div class="vpn-info-box">
+                    WireGuard keys must be generated on the server/client using the <code>wg</code> tool — they cannot be generated securely in a browser.<br>
+                    <div class="vpn-cmd-hint">
+                        <code>wg genkey | tee server.key | wg pubkey &gt; server.pub</code><br>
+                        <code>cat server.key &nbsp;&nbsp;</code><span style="color:#89b4fa"># private key (keep secret)</span><br>
+                        <code>cat server.pub &nbsp;&nbsp;</code><span style="color:#89b4fa"># public key (share with peers)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Server settings -->
+            <div class="vpn-section">
+                <div class="vpn-section-title">Server Interface</div>
+                <div class="vpn-grid">
+                    <div class="vpn-field">
+                        <label class="vpn-label">Server Private Key
+                            <span class="vpn-info-icon" data-tip="The server's private key (from wg genkey). Never share this. If blank, a placeholder will be used.">ℹ️</span>
+                        </label>
+                        <input type="password" id="wgServerPrivKey" class="tool-input" placeholder="Paste server private key…" autocomplete="off">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Server Public Key
+                            <span class="vpn-info-icon" data-tip="The server's public key (from wg pubkey). Share this with clients so they can authenticate the server.">ℹ️</span>
+                        </label>
+                        <input type="text" id="wgServerPubKey" class="tool-input" placeholder="Paste server public key…" autocomplete="off">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Listen Port
+                            <span class="vpn-info-icon" data-tip="UDP port the WireGuard server listens on. Default is 51820. Make sure this port is open in your firewall (ufw allow 51820/udp).">ℹ️</span>
+                        </label>
+                        <input type="number" id="wgPort" class="tool-input" value="51820" min="1" max="65535">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">VPN Interface IP (CIDR)
+                            <span class="vpn-info-icon" data-tip="The server's IP address inside the WireGuard tunnel, in CIDR notation (e.g. 10.66.66.1/24). Clients will be assigned addresses in this subnet.">ℹ️</span>
+                        </label>
+                        <input type="text" id="wgServerIP" class="tool-input" value="10.66.66.1/24">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">DNS for Clients
+                            <span class="vpn-info-icon" data-tip="DNS server(s) pushed to clients in client configs. E.g. 1.1.1.1 (Cloudflare), 8.8.8.8 (Google), or your own resolver. Multiple: comma-separated.">ℹ️</span>
+                        </label>
+                        <input type="text" id="wgDNS" class="tool-input" placeholder="e.g. 1.1.1.1 (optional)">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">WireGuard Interface Name
+                            <span class="vpn-info-icon" data-tip="Name of the WireGuard virtual network interface. Used in PostUp/PostDown rules with %i. Default: wg0. The config file must be named /etc/wireguard/[name].conf.">ℹ️</span>
+                        </label>
+                        <input type="text" id="wgIfaceName" class="tool-input" value="wg0" placeholder="wg0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Routing & NAT ──────────────────────────────────────────────── -->
+            <div class="vpn-section">
+                <div class="vpn-section-title">
+                    Routing, NAT &amp; Forwarding (PostUp / PostDown)
+                    <span class="vpn-info-icon" data-tip="PostUp commands run when the WireGuard interface comes up. PostDown runs when it goes down. Used to set up iptables NAT, forwarding, and port forwarding rules. %i is replaced by the interface name (e.g. wg0).">ℹ️</span>
+                </div>
+
+                <!-- Outbound interface -->
+                <div class="vpn-routing-row">
+                    <label class="vpn-label">Outbound Network Interface
+                        <span class="vpn-info-icon" data-tip="The physical/virtual NIC that connects to the internet (or external network). Examples: eth0, ens3, ens6, enp0s3. Run 'ip route' to find yours — look for 'default via ... dev [name]'.">ℹ️</span>
+                    </label>
+                    <input type="text" id="wgOutIface" class="tool-input" value="eth0" placeholder="eth0" style="max-width:180px">
+                </div>
+
+                <!-- Masquerade / NAT toggle -->
+                <div class="vpn-option-group">
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="wgMasquerade" checked>
+                        <span>Enable MASQUERADE (internet access for VPN clients)
+                            <span class="vpn-info-icon" data-tip="Adds iptables MASQUERADE on the outbound interface. This lets VPN clients use the server as a gateway to the internet — their traffic appears to originate from the server's IP. Required for a 'full tunnel' VPN (routing 0.0.0.0/0 through the VPN).">ℹ️</span>
+                        </span>
+                    </label>
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="wgForwardAll" checked>
+                        <span>Allow all forwarding through VPN interface
+                            <span class="vpn-info-icon" data-tip="Adds: iptables -A FORWARD -i %i -j ACCEPT and iptables -A FORWARD -o %i -j ACCEPT. These allow packets to be forwarded in and out of the WireGuard interface. Required when VPN clients need to access anything beyond the server itself.">ℹ️</span>
+                        </span>
+                    </label>
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="wgIP6Tables">
+                        <span>Also add ip6tables rules (IPv6)
+                            <span class="vpn-info-icon" data-tip="Adds equivalent ip6tables rules alongside iptables rules. Only needed if you have IPv6 connectivity and want clients to use it.">ℹ️</span>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Port forwarding rules -->
+                <div class="vpn-subsection-title">
+                    Port Forwarding (DNAT) Rules
+                    <span class="vpn-info-icon" data-tip="DNAT (Destination NAT) forwards incoming connections on a specific port to a VPN client. Example: forward port 25565 (Minecraft) from the public internet to a client at 10.66.66.2. This makes services running inside the VPN accessible from outside.">ℹ️</span>
+                </div>
+                <div id="wgPortFwdContainer">
+                    <p class="vpn-no-rules">No port forwarding rules. Click &quot;+ Add Port Forward&quot; to expose a client's service to the internet.</p>
+                </div>
+                <button class="vpn-add-btn" id="addWgPortFwd">+ Add Port Forward</button>
+
+                <!-- Custom PostUp lines -->
+                <div class="vpn-subsection-title" style="margin-top:1rem">
+                    Custom PostUp / PostDown Lines
+                    <span class="vpn-info-icon" data-tip="Add any additional iptables or ip6tables commands here, one per line. They will be added as PostUp = ... and PostDown = ... lines (with -A changed to -D for PostDown automatically).">ℹ️</span>
+                </div>
+                <textarea id="wgCustomPostUp" class="tool-input vpn-textarea" rows="3" placeholder="iptables -A FORWARD -p tcp -d 10.66.66.2 --dport 8080 -j ACCEPT&#10;iptables -t nat -A POSTROUTING -o wg0 -p tcp --dport 8080 -d 10.66.66.2 -j MASQUERADE"></textarea>
+                <p class="vpn-hint">PostDown lines are auto-generated by replacing <code>-A</code> with <code>-D</code>.</p>
+            </div>
+
+            <!-- Peers -->
+            <div class="vpn-section">
+                <div class="vpn-section-title">Peers (Clients)</div>
+                <div id="wgPeers"></div>
+                <button class="vpn-add-btn" id="addWgPeer">+ Add Peer</button>
+            </div>
+
+            <div class="vpn-btn-row">
+                <button class="tool-button" id="genWgServer">Generate Server Config</button>
+                <button class="tool-button vpn-sec-btn" id="genWgClient">Generate Client Configs</button>
+            </div>
+
+            <div id="wgOutput"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             OpenVPN tab
+        ══════════════════════════════════════════════════════════════════ -->
+        <div class="vpn-panel" id="panel-ovpn">
+
+            <div class="vpn-section">
+                <div class="vpn-section-title">Server Settings</div>
+                <div class="vpn-grid">
+                    <div class="vpn-field">
+                        <label class="vpn-label">VPN Subnet
+                            <span class="vpn-info-icon" data-tip="The internal IP range for VPN clients, in 'network mask' format (not CIDR). Default 10.8.0.0/255.255.255.0 provides up to 62 client addresses (10.8.0.1–10.8.0.62 with tun routing).">ℹ️</span>
+                        </label>
+                        <input type="text" id="ovSubnet" class="tool-input" value="10.8.0.0 255.255.255.0">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Port
+                            <span class="vpn-info-icon" data-tip="Port OpenVPN listens on. Default 1194. Must be open in your firewall.">ℹ️</span>
+                        </label>
+                        <input type="number" id="ovPort" class="tool-input" value="1194" min="1" max="65535">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Protocol
+                            <span class="vpn-info-icon" data-tip="UDP is faster and recommended for most use cases. TCP is more reliable through restrictive firewalls (port 443 TCP can often bypass deep packet inspection) but has worse performance due to TCP-over-TCP issues.">ℹ️</span>
+                        </label>
+                        <select id="ovProto" class="tool-select">
+                            <option value="udp" selected>UDP (recommended)</option>
+                            <option value="tcp">TCP</option>
+                        </select>
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Device Type
+                            <span class="vpn-info-icon" data-tip="'tun' (layer 3, routed) is recommended for most VPNs — works for internet tunneling and remote access. 'tap' (layer 2, bridged) makes clients appear on the same LAN — useful for Windows file sharing but harder to configure.">ℹ️</span>
+                        </label>
+                        <select id="ovDev" class="tool-select">
+                            <option value="tun" selected>tun (layer 3, routed)</option>
+                            <option value="tap">tap (layer 2, bridged)</option>
+                        </select>
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Cipher
+                            <span class="vpn-info-icon" data-tip="AES-256-GCM is modern, authenticated encryption (recommended for OpenVPN 2.4+). AES-256-CBC is compatible with older clients. CHACHA20-POLY1305 is faster on devices without AES hardware acceleration (mobile, older CPUs).">ℹ️</span>
+                        </label>
+                        <select id="ovCipher" class="tool-select">
+                            <option value="AES-256-GCM" selected>AES-256-GCM (recommended)</option>
+                            <option value="AES-256-CBC">AES-256-CBC (compatible)</option>
+                            <option value="AES-128-GCM">AES-128-GCM</option>
+                            <option value="CHACHA20-POLY1305">CHACHA20-POLY1305 (fast on mobile)</option>
+                        </select>
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">TLS Auth / Crypt
+                            <span class="vpn-info-icon" data-tip="tls-crypt (OpenVPN 2.4+): encrypts and authenticates the TLS handshake — hides that you're using OpenVPN, and protects against DoS attacks. tls-auth: HMAC authentication only (older). 'None' skips this layer.">ℹ️</span>
+                        </label>
+                        <select id="ovTLS" class="tool-select">
+                            <option value="tls-crypt" selected>tls-crypt (recommended)</option>
+                            <option value="tls-auth">tls-auth (older)</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Push DNS
+                            <span class="vpn-info-icon" data-tip="DNS server pushed to clients via DHCP option. Clients will use this for DNS while connected. E.g. 1.1.1.1, 8.8.8.8, or your internal DNS.">ℹ️</span>
+                        </label>
+                        <input type="text" id="ovDNS" class="tool-input" placeholder="e.g. 1.1.1.1 (optional)">
+                    </div>
+                    <div class="vpn-field">
+                        <label class="vpn-label">Max Clients
+                            <span class="vpn-info-icon" data-tip="Maximum number of simultaneous VPN clients. Blank = unlimited.">ℹ️</span>
+                        </label>
+                        <input type="number" id="ovMaxClients" class="tool-input" placeholder="e.g. 50 (blank = unlimited)" min="1">
+                    </div>
+                    <div class="vpn-field vpn-field-full">
+                        <label class="vpn-toggle-label">
+                            <input type="checkbox" id="ovClientToClient">
+                            <span>Allow client-to-client traffic
+                                <span class="vpn-info-icon" data-tip="When enabled, VPN clients can communicate directly with each other through the VPN without the traffic leaving the server. Useful for peer-to-peer applications within a corporate VPN.">ℹ️</span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="vpn-field vpn-field-full">
+                        <label class="vpn-label">Push Routes (one per line)
+                            <span class="vpn-info-icon" data-tip="Routes to push to clients. Clients will route traffic for these networks through the VPN. Format: network mask — e.g. '192.168.1.0 255.255.255.0'. Leave blank for no extra routes.">ℹ️</span>
+                        </label>
+                        <textarea id="ovRoutes" class="tool-input" rows="2" placeholder="192.168.1.0 255.255.255.0&#10;10.0.0.0 255.0.0.0" style="resize:vertical"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OpenVPN Routing & NAT -->
+            <div class="vpn-section">
+                <div class="vpn-section-title">
+                    Routing, NAT &amp; IP Forwarding
+                    <span class="vpn-info-icon" data-tip="OpenVPN relies on the OS kernel for packet forwarding. These settings generate the iptables commands needed in the server's up/down scripts.">ℹ️</span>
+                </div>
+
+                <div class="vpn-routing-row">
+                    <label class="vpn-label">Outbound Network Interface
+                        <span class="vpn-info-icon" data-tip="The physical NIC connected to the internet. Run 'ip route' and look for the 'default via ... dev [name]' line.">ℹ️</span>
+                    </label>
+                    <input type="text" id="ovOutIface" class="tool-input" value="eth0" placeholder="eth0" style="max-width:180px">
+                </div>
+
+                <div class="vpn-option-group">
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="ovNAT" checked>
+                        <span>Enable MASQUERADE / NAT
+                            <span class="vpn-info-icon" data-tip="iptables MASQUERADE makes VPN client traffic appear to come from the server's IP. Required for clients to access the internet through the VPN.">ℹ️</span>
+                        </span>
+                    </label>
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="ovForwarding" checked>
+                        <span>Enable IP forwarding in server config
+                            <span class="vpn-info-icon" data-tip="Adds 'push redirect-gateway def1' to the server config (routes all client internet traffic through VPN) and the iptables FORWARD rule. Leave off if you only want split tunneling.">ℹ️</span>
+                        </span>
+                    </label>
+                    <label class="vpn-toggle-label">
+                        <input type="checkbox" id="ovFullTunnel">
+                        <span>Full tunnel (redirect all client traffic through VPN)
+                            <span class="vpn-info-icon" data-tip="Adds 'push redirect-gateway def1 bypass-dhcp'. All client internet traffic goes through the VPN server. Without this (split tunnel), only traffic to pushed routes goes through VPN.">ℹ️</span>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- OpenVPN Port forwarding -->
+                <div class="vpn-subsection-title">
+                    Port Forwarding Rules (iptables script)
+                    <span class="vpn-info-icon" data-tip="These rules are generated as iptables commands for an up/down script (e.g. /etc/openvpn/up.sh). OpenVPN doesn't have PostUp/PostDown natively like WireGuard — you use 'script-security 2' + 'up' and 'down' script directives.">ℹ️</span>
+                </div>
+                <div id="ovPortFwdContainer">
+                    <p class="vpn-no-rules">No port forwarding rules added.</p>
+                </div>
+                <button class="vpn-add-btn" id="addOvPortFwd">+ Add Port Forward</button>
+            </div>
+
+            <button class="tool-button" id="genOvpn" style="margin-bottom:1rem">Generate OpenVPN Configs</button>
+            <div id="ovpnOutput"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             Reference tab
+        ══════════════════════════════════════════════════════════════════ -->
+        <div class="vpn-panel" id="panel-ref">
+            <div class="vpn-ref-grid">
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">IPSec / IKEv2 (strongSwan)</div>
+                    <p>IKEv2/IPSec is built into Windows, macOS, iOS, Android. High performance, no client software needed on most platforms.</p>
+                    <p>Linux setup via <code>strongswan</code> package:</p>
+                    <div class="vpn-code-block">apt install strongswan strongswan-pki
+# Generate CA, server cert, client certs
+# Config: /etc/ipsec.conf, /etc/ipsec.secrets</div>
+                    <p style="margin-top:0.5rem"><strong>Port:</strong> UDP 500 + 4500 (NAT-T)</p>
+                </div>
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">SSH Tunnel</div>
+                    <p>Quick port forwarding or SOCKS proxy over SSH. No VPN software needed — just an SSH server.</p>
+                    <div class="vpn-code-block"># Local forward: localhost:3307 → remote:3306
+ssh -L 3307:localhost:3306 user@server -N
+
+# SOCKS5 proxy (configure browser to use)
+ssh -D 1080 user@server -N
+
+# Remote forward: server:8080 → local:8080
+ssh -R 8080:localhost:8080 user@server -N
+
+# Persistent tunnel with autossh
+autossh -M 0 -D 1080 user@server -N</div>
+                </div>
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">WireGuard iptables Reference</div>
+                    <p>Common PostUp patterns — replace <code>eth0</code> with your outbound interface:</p>
+                    <div class="vpn-code-block"># Basic NAT (internet access)
+iptables -A FORWARD -i %i -j ACCEPT
+iptables -A FORWARD -o %i -j ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# DNAT port forward (e.g. game server)
+iptables -t nat -A PREROUTING -i eth0 \
+  -p tcp --dport 25565 \
+  -j DNAT --to-destination 10.66.66.2:25565
+iptables -A FORWARD -p tcp -d 10.66.66.2 \
+  --dport 25565 -j ACCEPT
+
+# Restrict forward to specific subnet only
+iptables -A FORWARD -s 10.66.66.0/24 \
+  -o eth0 -j ACCEPT</div>
+                </div>
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">SoftEther VPN</div>
+                    <p>Multi-protocol VPN: L2TP/IPSec, SSTP, OpenVPN, SoftEther. Excellent for bypassing restrictive firewalls (uses HTTPS port 443).</p>
+                    <div class="vpn-code-block">apt install softether-vpnserver
+# or download from softether.org
+
+# Configure via CLI:
+vpncmd localhost:443 /SERVER /CMD
+# or via SoftEther VPN Server Manager GUI</div>
+                    <p style="margin-top:0.5rem">Supports SSL-VPN over TCP 443 — almost never blocked.</p>
+                </div>
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">L2TP/IPSec</div>
+                    <p>Older protocol, natively supported by all major OSes. Slower than WireGuard/OpenVPN but no client software needed.</p>
+                    <div class="vpn-code-block">apt install xl2tpd strongswan
+
+# /etc/ipsec.secrets (pre-shared key):
+%any %any : PSK "your-secret-key"
+
+# /etc/xl2tpd/xl2tpd.conf — defines IP pool
+# /etc/ppp/chap-secrets — client credentials</div>
+                </div>
+
+                <div class="vpn-ref-card">
+                    <div class="vpn-ref-title">Useful iptables Commands</div>
+                    <p>Debugging NAT and forwarding rules:</p>
+                    <div class="vpn-code-block"># List all rules with line numbers
+iptables -L -n -v --line-numbers
+
+# List NAT table
+iptables -t nat -L -n -v
+
+# Save/restore (iptables-persistent)
+netfilter-persistent save
+netfilter-persistent reload
+
+# Watch live packet counts
+watch -n1 iptables -L -n -v
+
+# Enable kernel IP forwarding
+sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf</div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <div class="vpn-tooltip" id="vpnTooltip"></div>
+    <script src="js/vpn-config.js"></script>
+</body>
+</html>

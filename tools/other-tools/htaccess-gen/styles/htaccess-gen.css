@@ -1,0 +1,253 @@
+/* htaccess-gen.css */
+
+.ht-main { max-width: 860px; }
+
+/* ── Sections ───────────────────────────────────────────────────────────────── */
+.ht-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.ht-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.8rem;
+}
+
+.ht-desc {
+    font-size: 0.84rem;
+    color: var(--color-text-muted);
+    margin: 0 0 0.7rem;
+    line-height: 1.5;
+}
+
+.ht-desc code {
+    font-family: var(--font-mono);
+    background: #f0f4fa;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.82rem;
+}
+
+/* ── Fields row ─────────────────────────────────────────────────────────────── */
+.ht-fields-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.ht-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ht-field-lg { flex: 1; min-width: 180px; }
+.ht-field-btn { justify-content: flex-end; }
+
+.ht-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.ht-sel { min-width: 180px; }
+
+/* ── Textarea ───────────────────────────────────────────────────────────────── */
+.ht-textarea {
+    width: 100%;
+    height: 110px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-bottom: 0.7rem;
+    display: block;
+}
+
+/* ── Add button ─────────────────────────────────────────────────────────────── */
+.ht-add-btn {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    font-size: 0.88rem;
+    padding: 0.5rem 1rem;
+}
+
+.ht-add-btn:hover {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+/* ── Pattern grid ───────────────────────────────────────────────────────────── */
+.ht-patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.5rem;
+}
+
+.ht-pattern-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.ht-pattern-item input[type="checkbox"] {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.ht-pattern-item label {
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.ht-pattern-desc {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--color-text-muted);
+    margin-top: 0.1rem;
+}
+
+.ht-add-patterns-btn {
+    margin-top: 0.8rem;
+}
+
+/* ── Output section ─────────────────────────────────────────────────────────── */
+.ht-output-section {
+    margin: 0.5rem 0 1rem;
+}
+
+.ht-output-block {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.ht-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    background: #f0f4fa;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.ht-output-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.ht-path-note {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.ht-output-box {
+    margin: 0;
+    padding: 1rem;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+    min-height: 80px;
+    tab-size: 4;
+}
+
+.ht-copy-btn {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ht-copy-btn:hover { background: var(--color-primary-dark, #1a56c4); }
+.ht-copy-btn.copied { background: #28a745; }
+
+.ht-action-btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.ht-action-btn:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+/* ── Guide ──────────────────────────────────────────────────────────────────── */
+.ht-guide {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.ht-guide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.2rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.ht-guide-header:hover { background: #f5f7fa; }
+
+.ht-guide-arrow {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    transition: transform 0.2s;
+}
+
+.ht-guide-arrow.open { transform: rotate(180deg); }
+
+.ht-guide-body {
+    display: none;
+    padding: 1rem 1.2rem 1.2rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+}
+
+.ht-guide-body.open { display: block; }
+.ht-guide-body h3 { margin: 1rem 0 0.3rem; font-size: 0.9rem; }
+.ht-guide-body p { margin: 0.3rem 0; }
+.ht-guide-body code { font-family: var(--font-mono); background: #f0f4fa; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.82rem; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .ht-fields-row { flex-direction: column; }
+    .ht-sel { width: 100%; }
+    .ht-patterns-grid { grid-template-columns: 1fr; }
+}

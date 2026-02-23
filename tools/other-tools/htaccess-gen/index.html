@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.htaccess Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/htaccess-gen.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">.htaccess Generator</h1>
+        <p class="tool-subtitle">Build Apache .htaccess rules visually — redirects, rewrites, security headers, and common patterns.</p>
+    </header>
+
+    <main class="tool-main ht-main">
+
+        <!-- Section 1: Single Redirect -->
+        <div class="ht-section">
+            <div class="ht-section-title">Single Redirect</div>
+            <div class="ht-fields-row">
+                <div class="ht-field ht-field-lg">
+                    <label class="ht-label">From (old path)</label>
+                    <input type="text" id="rFromPath" class="tool-input" placeholder="/old-page" autocomplete="off">
+                </div>
+                <div class="ht-field ht-field-lg">
+                    <label class="ht-label">To (new URL or path)</label>
+                    <input type="text" id="rToPath" class="tool-input" placeholder="/new-page or https://newsite.com/page" autocomplete="off">
+                </div>
+                <div class="ht-field">
+                    <label class="ht-label">Type</label>
+                    <select id="rType" class="tool-select ht-sel">
+                        <option value="301">301 (Permanent)</option>
+                        <option value="302">302 (Temporary)</option>
+                        <option value="307">307 (Temp, preserve method)</option>
+                        <option value="308">308 (Perm, preserve method)</option>
+                    </select>
+                </div>
+                <div class="ht-field ht-field-btn">
+                    <button class="tool-button ht-add-btn" id="addRedirectBtn">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Bulk Redirects -->
+        <div class="ht-section">
+            <div class="ht-section-title">Bulk Redirects</div>
+            <p class="ht-desc">One redirect per line: <code>old-path → new-url [code]</code> — e.g. <code>/old /new 301</code> or <code>/a https://example.com/b</code></p>
+            <textarea id="bulkInput" class="ht-textarea tool-input" placeholder="/old-page /new-page 301&#10;/another-old /another-new&#10;/blog/post-1 https://newsite.com/blog/post-1 301"></textarea>
+            <button class="tool-button ht-add-btn" id="addBulkBtn">Add Bulk Redirects</button>
+        </div>
+
+        <!-- Section 3: Common Patterns -->
+        <div class="ht-section">
+            <div class="ht-section-title">Common Patterns</div>
+            <div class="ht-patterns-grid" id="patternsGrid">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="ht-output-section" id="outputSection">
+            <div class="ht-output-block">
+                <div class="ht-output-header">
+                    <span>.htaccess <span class="ht-path-note">(place in your website root)</span></span>
+                    <div class="ht-output-actions">
+                        <button class="ht-action-btn" id="clearOutputBtn">Clear</button>
+                        <button class="ht-copy-btn" id="copyBtn">Copy</button>
+                    </div>
+                </div>
+                <pre class="ht-output-box" id="htOutput"># .htaccess — generated output will appear here
+# Click "Add" on any section above to build your rules</pre>
+            </div>
+        </div>
+
+        <!-- Guide -->
+        <div class="ht-guide">
+            <div class="ht-guide-header" id="htGuideToggle">
+                <span>.htaccess Quick Reference</span>
+                <span class="ht-guide-arrow">▼</span>
+            </div>
+            <div class="ht-guide-body" id="htGuideBody">
+                <h3>What is .htaccess?</h3>
+                <p>.htaccess is a per-directory configuration file for Apache web server. Place it in your website root (or any directory) to configure redirects, URL rewrites, security, caching, and more without editing the main server config.</p>
+
+                <h3>Redirect vs Rewrite</h3>
+                <p><strong>Redirect</strong> (<code>Redirect 301 /old /new</code>) tells the browser to go to a new URL. The browser makes two requests — the client sees the new URL.</p>
+                <p><strong>RewriteRule</strong> rewrites the URL internally on the server — the browser sees the original URL but the server serves different content. Used for clean URLs, removing extensions, etc.</p>
+
+                <h3>Status Codes</h3>
+                <p><strong>301 Permanent</strong> — Browsers and search engines cache this. Use when permanently moving a page.</p>
+                <p><strong>302 Temporary</strong> — Not cached. Use when a page is temporarily at a different location.</p>
+                <p><strong>307/308</strong> — Like 302/301 but preserve the HTTP method (POST stays POST after redirect).</p>
+
+                <h3>mod_rewrite</h3>
+                <p>RewriteRules use PCRE regex. Key flags: <code>[L]</code> = last rule (stop processing), <code>[R=301]</code> = redirect, <code>[NC]</code> = case-insensitive, <code>[QSA]</code> = append query string.</p>
+                <p>Test with: <code>curl -I https://yoursite.com/old-path</code> and look for the <code>Location:</code> header.</p>
+
+                <h3>Requirements</h3>
+                <p>mod_rewrite must be enabled: <code>sudo a2enmod rewrite</code> and your Apache config must have <code>AllowOverride All</code> for the directory.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/htaccess-gen.js"></script>
+</body>
+</html>

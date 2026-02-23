@@ -71,31 +71,7 @@
     <!-- ── Text Tools ───────────────────────────────────────────────────── -->
     <section class="hub-category">
       <h2 class="hub-category-title">📝 Text Tools</h2>
-      <!--
-          5 - Task Organizer Drag and Drop and save to local storage in a lightweight manner and add option to download
-          as JSON. add json importing to get the same organization table back. add option to save to mongodb (in the database 'utilities_hub' and collection 'task_organizer' with a simple schema, maybe just a json field for the whole table and a timestamp field for sorting, and an optional title field for the user to add titles to their saved tables. implement backend with python flask if necessary but try to use js in browser directly.),
-          create .env in project root for mongodb credentials. give user flexibility by letting them add different titles, tasks, time limits, importance levels, colors, labels (pre generated and user defined, persistent), descriptions/notes, and other parameters, even location maybe (use a free no-key api to autocomplete, note it down as a dependency if you implement this.) for tasks. 
-          
-          8 - publicly accessible AI dashboard -- connection to P.O.T.A.T.O? use cloudflared container, authenticated (double, both cloudflare and another), anti bot and anti bruteforce for security. important because POTATO uses my computer's resources. it should be secure otherwise.
-
-          9 - [BIG PROJECT, SEPERATE REPO] Public instance -- Hostable by everyone, open source.
-          Private notes site/PWA with authentication and end to end encryption (military grade).
-          Use locally hosted (or vps hosted) PRIVATE database for storing data, not 3rd party services.
-          Self hosted, open source and self-hostable by everyone, private, includes all necessary features, like
-          notion or google keep etc. most minimal and basic core feature is a notepad feature and e2ee (maybe key derived from password hash? passwords are also never stored as plain text in anywhere.) cross-device sharing.
-          Simple and reliable at first, more advanced features (like markdown formatting, settings, advanced text formatting, file insertions [uploaded files should also get encrypted] etc.) later. If 3rd party services are used, keep them privacy friendly.
-          Encrypt data on send in client before sending, decrypt on end devices. Use safe keys.
-          indexeddb for offline use, pwa and browser support on all platforms. IOS, android, windows, macos, linux, etc.
-          use service workers for offline support and sync when back online. encryption keys should never leave the client, and should be stored securely on the client.
-          syncing should be done in a way that doesn't cause conflicts, and should be able to handle conflicts gracefully if they do occur.
-          server shouldnt have access to the data, and should only be used for syncing and storing encrypted data.
-          for pwas, especially ios, use a manifest and all necessary features to make it installable and work well as a pwa.
-          prevent rubberbanding and other ios specific issues with pwas. make sure it works well on all platforms and browsers, with a focus on privacy and security.
-          prevent ios text field and input field zooming issues. make sure the app is responsive and works well on all screen sizes. for fields that users can click on, use font size 16px or larger to prevent zooming issues on ios. use meta tags and other techniques to prevent zooming issues on ios.
-          prevent whole app container scrolling up and down when keyboard is open on ios. use techniques to prevent this, such as preventing default behavior on focus and blur events, and using fixed positioning for the app container. make sure the app is usable and doesn't have any issues on ios when the keyboard is open.
-          also prevent whole app scrolling up and down when user drags a non scrollable area on ios. use techniques to prevent this, such as preventing default behavior on touchmove events, and using overflow hidden for non scrollable areas. make sure the app is usable and doesn't have any issues on ios when user drags a non scrollable area.
-          also prevent data loss in case of uninstallation by keeping data in indexeddb and allowing export of data as json or other formats. ( warn of security risks, exported data is not encrypted and should be kept safe by the user.)
-      -->
+      
       <ul class="hub-list">
         <li class="hub-item"><a href="/tools/text/unit-converter" class="hub-link">Unit Converter</a></li>
         <li class="hub-item"><a href="/tools/text/word-letter-count" class="hub-link">Word & Char Counter</a></li>
@@ -181,7 +157,7 @@
           <a href="/tools/internet/dns-lookup" class="hub-link">DNS Tools</a>
         </li>
         <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query (Cloudflare) or https://dns.google/resolve (Google)
-             Tabs: DNS Records (A/AAAA/MX/NS/TXT/CNAME/SOA/PTR/CAA/SRV/DKIM), DMARC Validation, DNSKEY/DS Lookup, DNS Health Check -->
+             Tabs: DNS Records (A/AAAA/MX/NS/TXT/CNAME/SOA/PTR/CAA/SRV/DKIM), SPF Checker, DKIM Checker, DMARC Validation, DNSKEY/DS Lookup, DNS Health Check -->
 
         <li class="hub-item">
           <a href="/tools/internet/whois-lookup" class="hub-link">WHOIS Lookup (IP / ASN / Domain)</a>
@@ -198,6 +174,17 @@
           <a href="/tools/internet/domain-checker" class="hub-link">Domain Name Availability</a>
         </li>
         <!-- DNS-only check via https://cloudflare-dns.com/dns-query — not a definitive registrar check -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/email-header" class="hub-link">Email Header Analyzer</a>
+        </li>
+        <!-- pure JS — parses raw email headers client-side; delivery path, SPF/DKIM/DMARC auth results, anomaly detection -->
+
+        <li class="hub-item">
+          <a href="/tools/internet/ip-blacklist" class="hub-link">IP Blacklist Checker</a>
+        </li>
+        <!-- DNS-over-HTTPS: https://cloudflare-dns.com/dns-query — reverse-IP DNSBL lookups against 17 blacklists; no API key -->
+
 
         <!-- ── Requires local backend (greyed + dot indicator when offline) ── -->
 
@@ -239,6 +226,13 @@
         </li>
         <!-- backend POST /api/link-analyzer — extracts all links, generates sitemap XML; uses stdlib html.parser -->
 
+        <li class="hub-item" data-needs-backend="true">
+          <a href="/tools/internet/smtp-test" class="hub-link">
+            SMTP Test<span class="backend-dot"></span>
+          </a>
+        </li>
+        <!-- backend POST /api/smtp-test — socket connection to SMTP server; reads banner, sends EHLO, optional STARTTLS/SSL upgrade -->
+
       </ul>
     </section>
 
@@ -261,6 +255,18 @@
 
         <li class="hub-item"><a href="/tools/other-tools/robots-txt" class="hub-link">Robots.txt Generator</a></li>
         <!-- pure JS — no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/ufw-configurator" class="hub-link">UFW Configurator</a></li>
+        <!-- pure JS — generates UFW firewall commands and config snippets; no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/vpn-config" class="hub-link">VPN Config Generator</a></li>
+        <!-- pure JS — generates WireGuard and OpenVPN config files with advanced NAT/routing/DNAT rules; no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/firewall-rules" class="hub-link">Firewall Rules Generator</a></li>
+        <!-- pure JS — generates nftables (/etc/nftables.conf) and iptables (rules.v4/v6) rule files; no external requests -->
+
+        <li class="hub-item"><a href="/tools/other-tools/htaccess-gen" class="hub-link">.htaccess Generator</a></li>
+        <!-- pure JS — generates Apache .htaccess rules: redirects, rewrites, security headers, common patterns; no external requests -->
 
       </ul>
     </section>

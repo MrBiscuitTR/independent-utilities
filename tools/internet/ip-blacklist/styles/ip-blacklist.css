@@ -1,0 +1,152 @@
+/* ip-blacklist.css */
+
+.bl-main { max-width: 760px; }
+
+/* ── Input ──────────────────────────────────────────────────────────────────── */
+.bl-input-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+
+.bl-input-row .tool-input { flex: 1; min-width: 200px; }
+
+/* ── Result section ─────────────────────────────────────────────────────────── */
+.bl-result.hidden { display: none; }
+
+/* ── Stats bar ──────────────────────────────────────────────────────────────── */
+.bl-stats {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.bl-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.6rem 1.1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    min-width: 70px;
+}
+
+.bl-stat-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.bl-stat-listed  { background: #f8d7da; color: #721c24; }
+.bl-stat-clean   { background: #d4edda; color: #155724; }
+.bl-stat-error   { background: #fff3cd; color: #856404; }
+.bl-stat-total   { background: #e2e3e5; color: #383d41; }
+
+/* ── Progress bar ───────────────────────────────────────────────────────────── */
+.bl-progress-wrap {
+    background: var(--color-border);
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.bl-progress-bar {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* ── Table ──────────────────────────────────────────────────────────────────── */
+.bl-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.bl-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+
+.bl-table th {
+    background: #f0f4fa;
+    padding: 0.45rem 0.9rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-main);
+    font-weight: 600;
+}
+
+.bl-table td {
+    padding: 0.45rem 0.9rem;
+    border-bottom: 1px solid #f4f4f4;
+    vertical-align: middle;
+}
+
+.bl-table tr:last-child td { border-bottom: none; }
+
+.bl-table tr.row-listed { background: #fff8f8; }
+
+/* ── Status cells ───────────────────────────────────────────────────────────── */
+.bl-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.bl-status-clean    { background: #d4edda; color: #155724; }
+.bl-status-listed   { background: #f8d7da; color: #721c24; }
+.bl-status-error    { background: #fff3cd; color: #856404; }
+.bl-status-checking { background: #e2e3e5; color: #383d41; }
+
+/* ── Category badge ─────────────────────────────────────────────────────────── */
+.bl-cat {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    background: #f0f4fa;
+    color: var(--color-text-muted);
+}
+
+/* ── Listed code ────────────────────────────────────────────────────────────── */
+.bl-code {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: #721c24;
+}
+
+/* ── Error message ──────────────────────────────────────────────────────────── */
+.bl-error {
+    background: #fff0f0;
+    border: 1px solid #f5c2c2;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: #c00;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .bl-table th:nth-child(2),
+    .bl-table td:nth-child(2) { display: none; }
+    .bl-table th:nth-child(4),
+    .bl-table td:nth-child(4) { display: none; }
+}
