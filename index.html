@@ -283,7 +283,7 @@
     </p>
   </footer>
 
-  <script>
+  <script defer>
     /* ── Hub search ────────────────────────────────────────────────────────
        Fuzzy filter: shows items where the query matches at least 70% of
        characters (case-insensitive subsequence / overlap ratio).
@@ -338,10 +338,6 @@
     */
     (function () {
       "use strict";
-      // Only poll when accessed over HTTP (localhost / local dev).
-      // On HTTPS (public URL) the local backend is unreachable anyway, and polling
-      // would trigger the browser's "Access other apps on this device" permission prompt.
-      if (location.protocol !== "http:") return;
 
       const HEALTH_URL    = "http://localhost:5501/api/health";
       const POLL_INTERVAL = 3000;
@@ -356,6 +352,11 @@
       bdots.forEach(d  => { d.classList.add("dot-offline"); });
 
       let lastStatus = null; // "online" | "offline" | null
+
+      // Only poll when accessed over HTTP (localhost / local dev).
+      // On HTTPS (public URL) the local backend is unreachable anyway, and polling
+      // would trigger the browser's "Access other apps on this device" permission prompt.
+      if (location.protocol !== "http:") return;
 
       function setStatus(online) {
         if (online === lastStatus) return;

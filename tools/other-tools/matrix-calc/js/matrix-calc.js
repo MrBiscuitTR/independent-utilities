@@ -588,11 +588,9 @@ function buildGrid(rows, cols, aug, varMode, prefillData) {
     const grid = document.createElement("div");
     grid.className = "mx-grid";
 
-    const totalCols = cols + effectiveAug;
-    // CSS grid: each base col, then separator, then aug cols (last one may be var)
+    // CSS grid: base cols + aug cols (no separator column — separator is CSS border)
     let gtc = "";
     for (let c = 0; c < cols; c++) gtc += "64px ";
-    if (effectiveAug > 0) gtc += "24px "; // separator
     for (let a = 0; a < effectiveAug; a++) {
         const isLast = a === effectiveAug - 1;
         const isVarCol = varMode && isLast && !isInverse;
@@ -600,9 +598,6 @@ function buildGrid(rows, cols, aug, varMode, prefillData) {
     }
     grid.style.gridTemplateColumns = gtc.trim();
     grid.style.gridTemplateRows = `repeat(${rows}, 36px)`;
-
-    // Separator column index in CSS grid (1-based)
-    const sepColIdx = effectiveAug > 0 ? cols + 1 : -1; // 1-based grid column for separator
 
     for (let r = 0; r < rows; r++) {
         // Base matrix columns
@@ -614,13 +609,12 @@ function buildGrid(rows, cols, aug, varMode, prefillData) {
             input.dataset.c = c;
             input.dataset.type = "base";
             input.placeholder = "0";
-            input.style.gridColumn = String(c + 1);
-            input.style.gridRow    = String(r + 1);
+            // Mark last base column so CSS can draw the separator border
+            if (effectiveAug > 0 && c === cols - 1) input.classList.add("mx-sep-right");
             if (prefillData && prefillData[r] && prefillData[r][c] !== undefined) {
                 input.value = prefillData[r][c] !== "0" ? prefillData[r][c] : "";
             }
             if (r === 0 && c === 0) input.autofocus = true;
-            // Keyboard navigation: arrow keys + tab
             input.addEventListener("keydown", cellKeyNav);
             grid.appendChild(input);
         }
@@ -635,8 +629,6 @@ function buildGrid(rows, cols, aug, varMode, prefillData) {
             input.dataset.c = cols + a;
             input.dataset.type = isVarCol ? "var" : "aug";
             input.placeholder = isInverse ? (r === a ? "1" : "0") : (isVarCol ? "e.g. a" : "0");
-            input.style.gridColumn = String(sepColIdx + 1 + a); // aug cols start after separator
-            input.style.gridRow    = String(r + 1);
             if (isInverse) {
                 input.value = r === a ? "1" : "";
                 input.style.background = "#f8f8f8";
@@ -648,16 +640,6 @@ function buildGrid(rows, cols, aug, varMode, prefillData) {
             input.addEventListener("keydown", cellKeyNav);
             grid.appendChild(input);
         }
-    }
-
-    // Separator — placed last, spans all rows, sits in its dedicated column
-    if (effectiveAug > 0) {
-        const sep = document.createElement("div");
-        sep.className = "mx-col-sep";
-        sep.style.gridColumn = String(sepColIdx);
-        sep.style.gridRow    = `1 / ${rows + 1}`;
-        sep.innerHTML = "|";
-        grid.appendChild(sep);
     }
 
     container.appendChild(grid);
@@ -734,10 +716,9 @@ function readMatrix() {
 // ─────────────────────────────────────────────────────────────────────────────
 function renderMatrix(mat, baseCols, augCols, pivotCols) {
     const pivotSet = new Set(pivotCols || []);
-    const totalCols = mat.cols;
+    // No separator column — separator is a CSS border on the last base cell
     let gtc = "";
     for (let c = 0; c < baseCols; c++) gtc += "56px ";
-    if (augCols > 0) gtc += "18px ";
     for (let a = 0; a < augCols; a++) gtc += "64px ";
 
     const grid = document.createElement("div");
@@ -745,15 +726,13 @@ function renderMatrix(mat, baseCols, augCols, pivotCols) {
     grid.style.gridTemplateColumns = gtc.trim();
     grid.style.gridTemplateRows = `repeat(${mat.rows}, 32px)`;
 
-    const sepCol = augCols > 0 ? baseCols + 1 : -1; // 1-based CSS grid column for separator
-
     for (let r = 0; r < mat.rows; r++) {
         for (let c = 0; c < baseCols; c++) {
             const cell = mat.get(r, c);
             const div = document.createElement("div");
-            div.className = "mx-dval" + (pivotSet.has(c) ? " pivot-col" : "") + (cell.isZero() ? " zero" : "");
-            div.style.gridColumn = String(c + 1);
-            div.style.gridRow    = String(r + 1);
+            let cls = "mx-dval" + (pivotSet.has(c) ? " pivot-col" : "") + (cell.isZero() ? " zero" : "");
+            if (augCols > 0 && c === baseCols - 1) cls += " mx-sep-right";
+            div.className = cls;
             div.innerHTML = cell.toDisplayHTML();
             grid.appendChild(div);
         }
@@ -763,21 +742,9 @@ function renderMatrix(mat, baseCols, augCols, pivotCols) {
             const div = document.createElement("div");
             const isVarCol = cell.isSym();
             div.className = "mx-dval" + (isVarCol ? " var" : " aug") + (cell.isZero() ? " zero" : "");
-            div.style.gridColumn = String(sepCol + 1 + a);
-            div.style.gridRow    = String(r + 1);
             div.innerHTML = cell.toDisplayHTML();
             grid.appendChild(div);
         }
-    }
-
-    // Separator — appended last, spans all rows
-    if (augCols > 0) {
-        const sep = document.createElement("div");
-        sep.className = "mx-dsep";
-        sep.style.gridColumn = String(sepCol);
-        sep.style.gridRow    = `1 / ${mat.rows + 1}`;
-        sep.textContent = "|";
-        grid.appendChild(sep);
     }
 
     return grid;
@@ -894,29 +861,24 @@ function solve() {
 
 function matrixToHTML(mat, baseCols, augCols, pivotCols) {
     const pivotSet = new Set(pivotCols || []);
+    // No separator column — separator is a CSS border on the last base cell
     let gtc = "";
     for (let c = 0; c < baseCols; c++) gtc += "52px ";
-    if (augCols > 0) gtc += "16px ";
     for (let a = 0; a < augCols; a++) gtc += "60px ";
-
-    const sepCol = augCols > 0 ? baseCols + 1 : -1; // 1-based CSS grid column for separator
 
     let inner = "";
     for (let r = 0; r < mat.rows; r++) {
         for (let c = 0; c < baseCols; c++) {
             const cell = mat.get(r, c);
-            const cls = "mx-dval" + (pivotSet.has(c) ? " pivot-col" : "") + (cell.isZero() ? " zero" : "");
-            inner += `<div class="${cls}" style="grid-column:${c+1};grid-row:${r+1}">${cell.toDisplayHTML()}</div>`;
+            const sep = (augCols > 0 && c === baseCols - 1) ? " mx-sep-right" : "";
+            const cls = "mx-dval" + (pivotSet.has(c) ? " pivot-col" : "") + (cell.isZero() ? " zero" : "") + sep;
+            inner += `<div class="${cls}">${cell.toDisplayHTML()}</div>`;
         }
         for (let a = 0; a < augCols; a++) {
             const cell = mat.get(r, baseCols + a);
             const cls = "mx-dval " + (cell.isSym() ? "var" : "aug") + (cell.isZero() ? " zero" : "");
-            inner += `<div class="${cls}" style="grid-column:${sepCol+1+a};grid-row:${r+1}">${cell.toDisplayHTML()}</div>`;
+            inner += `<div class="${cls}">${cell.toDisplayHTML()}</div>`;
         }
-    }
-    // Separator — last in DOM, spans all rows
-    if (augCols > 0) {
-        inner += `<div class="mx-dsep" style="grid-column:${sepCol};grid-row:1/${mat.rows+1}">|</div>`;
     }
 
     return `<div class="mx-display-grid" style="grid-template-columns:${gtc.trim()};grid-template-rows:repeat(${mat.rows},30px)">${inner}</div>`;

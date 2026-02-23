@@ -190,16 +190,9 @@
     background: #fff;
 }
 
-.mx-col-sep {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 2px;
-    color: var(--color-text-muted);
-    font-weight: 700;
-    font-size: 1.1rem;
-    align-self: center;
-    height: 36px;
+/* Separator: thick right border on the last base column cell */
+.mx-cell.mx-sep-right {
+    border-right: 2px solid #555 !important;
 }
 
 .mx-var-note {
@@ -306,14 +299,9 @@
 .mx-dval.zero      { color: var(--color-text-muted); }
 .mx-dval.highlighted { background: #e8f0fe; font-weight: 700; }
 
-.mx-dsep {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    color: #aaa;
-    font-size: 1rem;
-    font-weight: 700;
+/* Separator on display cells (result matrix / steps) */
+.mx-dval.mx-sep-right {
+    border-right: 2px solid #666 !important;
 }
 
 /* ── Steps ──────────────────────────────────────────────────────────────────── */
