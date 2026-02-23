@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firewall Rules Generator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/firewall-rules.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Firewall Rules Generator</h1>
+        <p class="tool-subtitle">Generate nftables and iptables rules from a visual builder — no syntax memorization needed.</p>
+    </header>
+
+    <main class="tool-main fw-main">
+
+        <!-- Output format tabs -->
+        <div class="fw-tabs" id="fwTabs">
+            <button class="fwtab active" data-tab="nft">nftables</button>
+            <button class="fwtab" data-tab="ipt">iptables</button>
+        </div>
+
+        <!-- Default Policies -->
+        <div class="fw-section">
+            <div class="fw-section-title">
+                Default Chain Policies
+                <span class="fw-info-icon" data-tip="Default policy applies when no rule matches. DROP is safer — packets are silently discarded. ACCEPT allows all unmatched traffic. REJECT sends an error back.">ℹ️</span>
+            </div>
+            <div class="fw-fields-row">
+                <div class="fw-field">
+                    <label class="fw-label">INPUT
+                        <span class="fw-info-icon" data-tip="Traffic coming INTO this machine (e.g., SSH connections, web requests to your server).">ℹ️</span>
+                    </label>
+                    <select id="polInput" class="tool-select fw-sel">
+                        <option value="drop" selected>drop</option>
+                        <option value="accept">accept</option>
+                        <option value="reject">reject</option>
+                    </select>
+                </div>
+                <div class="fw-field">
+                    <label class="fw-label">OUTPUT
+                        <span class="fw-info-icon" data-tip="Traffic going OUT from this machine (e.g., curl, apt-get, outbound connections).">ℹ️</span>
+                    </label>
+                    <select id="polOutput" class="tool-select fw-sel">
+                        <option value="accept" selected>accept</option>
+                        <option value="drop">drop</option>
+                        <option value="reject">reject</option>
+                    </select>
+                </div>
+                <div class="fw-field">
+                    <label class="fw-label">FORWARD
+                        <span class="fw-info-icon" data-tip="Traffic being routed THROUGH this machine to another host. Enable for VPN servers, NAT gateways, or routers.">ℹ️</span>
+                    </label>
+                    <select id="polForward" class="tool-select fw-sel">
+                        <option value="drop" selected>drop</option>
+                        <option value="accept">accept</option>
+                        <option value="reject">reject</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Options -->
+        <div class="fw-section">
+            <div class="fw-section-title">Global Options</div>
+            <div class="fw-options-grid">
+                <label class="fw-toggle-label">
+                    <input type="checkbox" id="optConntrack" checked>
+                    <span>Allow established/related connections
+                        <span class="fw-info-icon" data-tip="Allows replies to connections you initiated (e.g., responses to curl). Essential for normal operation — almost always leave checked.">ℹ️</span>
+                    </span>
+                </label>
+                <label class="fw-toggle-label">
+                    <input type="checkbox" id="optLoopback" checked>
+                    <span>Allow loopback (127.0.0.1)
+                        <span class="fw-info-icon" data-tip="Allows traffic on the lo interface (localhost). Required for many services (databases, sockets) to function on the same machine.">ℹ️</span>
+                    </span>
+                </label>
+                <label class="fw-toggle-label">
+                    <input type="checkbox" id="optICMP" checked>
+                    <span>Allow ICMP (ping)
+                        <span class="fw-info-icon" data-tip="Allows ICMP echo requests (ping). Helpful for network diagnostics. Disable only if you want to hide the host.">ℹ️</span>
+                    </span>
+                </label>
+                <label class="fw-toggle-label">
+                    <input type="checkbox" id="optIPv6">
+                    <span>Include IPv6 rules
+                        <span class="fw-info-icon" data-tip="Generates ip6tables rules (iptables) or inet rules (nftables) that cover both IPv4 and IPv6. Check if your server has IPv6 connectivity.">ℹ️</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Custom Rules -->
+        <div class="fw-section">
+            <div class="fw-section-title">
+                Rules
+                <span class="fw-info-icon" data-tip="Rules are matched top to bottom. More specific rules should come first. The first matching rule wins.">ℹ️</span>
+            </div>
+            <div id="rulesContainer"></div>
+            <button class="tool-button fw-add-btn" id="addRuleBtn">+ Add Rule</button>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="tool-button fw-gen-btn" id="generateBtn">Generate Rules</button>
+
+        <!-- Output -->
+        <div id="outputSection" class="fw-output-section hidden">
+
+            <div class="fw-panel active" id="fw-out-nft">
+                <div class="fw-output-block">
+                    <div class="fw-output-header">
+                        <span>/etc/nftables.conf</span>
+                        <button class="fw-copy-btn" data-target="outNft">Copy</button>
+                    </div>
+                    <pre class="fw-output-box" id="outNft"></pre>
+                </div>
+            </div>
+
+            <div class="fw-panel" id="fw-out-ipt">
+                <div class="fw-output-block">
+                    <div class="fw-output-header">
+                        <span>/etc/iptables/rules.v4 <span class="fw-path-note">(iptables-restore format)</span></span>
+                        <button class="fw-copy-btn" data-target="outIpt4">Copy</button>
+                    </div>
+                    <pre class="fw-output-box" id="outIpt4"></pre>
+                </div>
+                <div class="fw-output-block" id="ipt6Block" style="display:none">
+                    <div class="fw-output-header">
+                        <span>/etc/iptables/rules.v6 <span class="fw-path-note">(ip6tables-restore format)</span></span>
+                        <button class="fw-copy-btn" data-target="outIpt6">Copy</button>
+                    </div>
+                    <pre class="fw-output-box" id="outIpt6"></pre>
+                </div>
+                <div class="fw-output-block">
+                    <div class="fw-output-header">
+                        <span>Shell Commands <span class="fw-path-note">(apply immediately)</span></span>
+                        <button class="fw-copy-btn" data-target="outIptCmds">Copy</button>
+                    </div>
+                    <pre class="fw-output-box" id="outIptCmds"></pre>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Quick Reference Guide -->
+        <div class="fw-guide" id="fwGuide">
+            <div class="fw-guide-header" id="fwGuideToggle">
+                <span>nftables &amp; iptables Quick Reference</span>
+                <span class="fw-guide-arrow">▼</span>
+            </div>
+            <div class="fw-guide-body" id="fwGuideBody">
+                <h3>nftables vs iptables</h3>
+                <p>nftables is the modern replacement for iptables on Linux. It uses a cleaner syntax, supports both IPv4 and IPv6 in a single ruleset (<code>inet</code> family), and is the default on Debian 10+, Ubuntu 20.04+, and RHEL 8+.</p>
+                <p>iptables is still widely used and available everywhere. It requires separate <code>ip6tables</code> commands for IPv6. On systems with nftables, iptables is often emulated via <code>iptables-nft</code>.</p>
+
+                <h3>Applying nftables Rules</h3>
+                <p><code>sudo nft -f /etc/nftables.conf</code> — Apply rules from file.</p>
+                <p><code>sudo systemctl enable --now nftables</code> — Enable and start the nftables service (loads /etc/nftables.conf on boot).</p>
+                <p><code>sudo nft list ruleset</code> — Show current active rules.</p>
+                <p><code>sudo nft flush ruleset</code> — ⚠️ Remove all rules immediately.</p>
+
+                <h3>Applying iptables Rules</h3>
+                <p><code>sudo iptables-restore &lt; /etc/iptables/rules.v4</code> — Apply saved rules.</p>
+                <p>On Debian/Ubuntu, install <code>iptables-persistent</code>: <code>sudo apt install iptables-persistent</code>. Rules in <code>/etc/iptables/rules.v4</code> and <code>rules.v6</code> are automatically loaded on boot.</p>
+                <p><code>sudo iptables -L -n -v</code> — List active rules with packet counts.</p>
+                <p><code>sudo iptables -F</code> — ⚠️ Flush (delete) all rules.</p>
+
+                <h3>Common Patterns</h3>
+                <p><strong>Allow SSH from specific IP only:</strong> Source = 203.0.113.1, Protocol = tcp, Port = 22, Chain = INPUT, Action = accept. Add a DROP rule for port 22 from any to block all others.</p>
+                <p><strong>Rate limit connections:</strong> Use the <code>limit</code> match in nftables or <code>-m limit</code> in iptables to throttle connection rates (e.g., max 10/second).</p>
+                <p><strong>Port forwarding (DNAT):</strong> Requires a PREROUTING rule in the nat table — use a manual rule in the generated output.</p>
+
+                <h3>Protocol Values</h3>
+                <p><code>tcp</code> — HTTP, HTTPS, SSH, SMTP, most services.</p>
+                <p><code>udp</code> — DNS, WireGuard VPN, DHCP, gaming.</p>
+                <p><code>icmp</code> / <code>icmpv6</code> — Ping and network diagnostics.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <!-- Tooltip element -->
+    <div class="fw-tooltip" id="fwTooltip"></div>
+
+    <script src="js/firewall-rules.js"></script>
+</body>
+</html>

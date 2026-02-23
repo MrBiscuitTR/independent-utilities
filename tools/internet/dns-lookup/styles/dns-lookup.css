@@ -290,6 +290,51 @@
     word-break: break-all;
 }
 
+/* ── SPF table ─────────────────────────────────────────────────────────────── */
+.spf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+}
+
+.spf-table th {
+    background: #f8fafd;
+    padding: 0.35rem 0.8rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-main);
+    font-weight: 600;
+}
+
+.spf-table td {
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+
+.spf-table tr:last-child td { border-bottom: none; }
+
+.spf-desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.spf-qualifier {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+}
+
+.spf-q-\+ { background: #d4edda; color: #155724; }
+.spf-q-- { background: #f8d7da; color: #721c24; }
+.spf-q-\~ { background: #fff3cd; color: #856404; }
+.spf-q-\? { background: #e2e3e5; color: #383d41; }
+
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
     .input-row { flex-direction: column; }

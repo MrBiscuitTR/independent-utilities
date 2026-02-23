@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Blacklist Checker</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/ip-blacklist.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">IP Blacklist Checker</h1>
+        <p class="tool-subtitle">Check an IP address against major DNSBL blacklists via DNS-over-HTTPS — no API keys required.</p>
+    </header>
+
+    <!-- External dependency: Cloudflare DoH (https://cloudflare-dns.com/dns-query) — DNSBL reverse DNS lookups -->
+
+    <main class="tool-main bl-main">
+
+        <div class="bl-input-row">
+            <input type="text" id="ipInput" class="tool-input" placeholder="Enter IPv4 address, e.g. 1.2.3.4" autocomplete="off" spellcheck="false">
+            <button class="tool-button" id="checkBtn">Check IP</button>
+        </div>
+
+        <div id="resultSection" class="bl-result hidden"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/ip-blacklist.js"></script>
+</body>
+</html>

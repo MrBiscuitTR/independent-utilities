@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMTP Test</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/smtp-test.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">SMTP Test</h1>
+        <p class="tool-subtitle">Test connectivity to an SMTP server — checks port reachability, reads the banner, and queries EHLO capabilities. Requires the local backend.</p>
+    </header>
+
+    <!-- Backend dependency: POST /api/smtp-test (Flask backend at localhost:5501) -->
+
+    <main class="tool-main smtp-main">
+
+        <div class="smtp-form">
+
+            <div class="smtp-fields-row">
+                <div class="smtp-field smtp-field-grow">
+                    <label class="smtp-label">SMTP Hostname or IP</label>
+                    <input type="text" id="smtpHost" class="tool-input" placeholder="mail.example.com or 203.0.113.5" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="smtp-field">
+                    <label class="smtp-label">Port</label>
+                    <select id="smtpPortSel" class="tool-select smtp-sel" onchange="onPortSelChange()">
+                        <option value="25">25 (SMTP)</option>
+                        <option value="465">465 (SMTPS)</option>
+                        <option value="587" selected>587 (Submission)</option>
+                        <option value="2525">2525 (Alt)</option>
+                        <option value="custom">Custom…</option>
+                    </select>
+                </div>
+                <div class="smtp-field" id="customPortField" style="display:none">
+                    <label class="smtp-label">Custom Port</label>
+                    <input type="number" id="smtpPortCustom" class="tool-input" placeholder="Port" min="1" max="65535" style="max-width:100px">
+                </div>
+                <div class="smtp-field">
+                    <label class="smtp-label">TLS Mode</label>
+                    <select id="smtpTLS" class="tool-select smtp-sel">
+                        <option value="none">None (plain)</option>
+                        <option value="ssl">SSL/TLS (port 465)</option>
+                        <option value="starttls" selected>STARTTLS</option>
+                    </select>
+                </div>
+                <div class="smtp-field">
+                    <label class="smtp-label">EHLO Hostname</label>
+                    <input type="text" id="smtpEhlo" class="tool-input" placeholder="test.local" value="test.local" style="max-width:160px">
+                </div>
+            </div>
+
+            <button class="tool-button smtp-test-btn" id="testBtn">Test SMTP Connection</button>
+
+            <div id="backendWarning" class="smtp-warn hidden">
+                ⚠️ Backend not reachable. Make sure the Flask backend is running on port 5501.
+                <code>cd tools/internet/python &amp;&amp; python app.py</code>
+            </div>
+        </div>
+
+        <div id="resultSection" class="smtp-result hidden"></div>
+
+        <!-- Quick Reference -->
+        <div class="smtp-guide">
+            <div class="smtp-guide-header" id="smtpGuideToggle">
+                <span>SMTP Ports &amp; TLS Quick Reference</span>
+                <span class="smtp-guide-arrow">▼</span>
+            </div>
+            <div class="smtp-guide-body" id="smtpGuideBody">
+                <h3>Common SMTP Ports</h3>
+                <p><strong>Port 25</strong> — Original SMTP. Used for server-to-server (MTA) mail relay. Blocked by most ISPs and cloud providers for outbound use (anti-spam). Usually no authentication.</p>
+                <p><strong>Port 465</strong> — SMTPS (SMTP over implicit SSL). Deprecated by RFC but still widely used by hosting providers and ISPs for client submission. TLS starts immediately.</p>
+                <p><strong>Port 587</strong> — SMTP Submission (RFC 6409). The recommended port for client mail submission. Uses STARTTLS to upgrade to TLS. Requires authentication (SASL).</p>
+                <p><strong>Port 2525</strong> — Alternative submission port. Not an official standard but used by some providers when 587 is blocked.</p>
+
+                <h3>TLS Modes</h3>
+                <p><strong>Plain (no TLS)</strong> — Connection is unencrypted. Credentials and messages are sent in the clear. Never use this over the public internet.</p>
+                <p><strong>SSL/TLS (implicit)</strong> — TLS is established immediately on connect. Used on port 465.</p>
+                <p><strong>STARTTLS (explicit)</strong> — Connection starts plain, then upgrades to TLS after the server advertises STARTTLS in EHLO response. Standard for port 587 and common on port 25.</p>
+
+                <h3>Reading EHLO Response</h3>
+                <p>After connecting, send <code>EHLO hostname</code> — the server replies with a list of supported extensions. Key ones to look for:</p>
+                <p><code>250-STARTTLS</code> — Server supports TLS upgrade.</p>
+                <p><code>250-AUTH LOGIN PLAIN</code> — Supported authentication methods.</p>
+                <p><code>250-SIZE 52428800</code> — Maximum message size (bytes).</p>
+                <p><code>250-8BITMIME</code> — Supports 8-bit MIME content.</p>
+                <p><code>250-PIPELINING</code> — Can accept multiple commands at once (faster).</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/smtp-test.js"></script>
+</body>
+</html>

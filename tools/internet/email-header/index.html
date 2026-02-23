@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Header Analyzer</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/email-header.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Email Header Analyzer</h1>
+        <p class="tool-subtitle">Paste raw email headers to trace delivery path, check authentication results, and detect anomalies — fully client-side.</p>
+    </header>
+
+    <main class="tool-main eh-main">
+
+        <div class="eh-input-section">
+            <div class="eh-input-header">
+                <label class="eh-label">Paste Raw Email Headers</label>
+                <button class="eh-sample-btn" id="loadSample">Load Sample</button>
+            </div>
+            <textarea id="headerInput" class="eh-textarea tool-input" placeholder="Paste the full email headers here...&#10;&#10;In Gmail: Open email → ⋮ → Show original → Copy to clipboard&#10;In Outlook: File → Properties → Internet headers&#10;In Apple Mail: View → Message → All Headers"></textarea>
+            <button class="tool-button eh-analyze-btn" id="analyzeBtn">Analyze Headers</button>
+        </div>
+
+        <div id="resultSection" class="eh-result-section hidden"></div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/email-header.js"></script>
+</body>
+</html>

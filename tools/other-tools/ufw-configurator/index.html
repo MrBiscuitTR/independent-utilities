@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UFW Configurator</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/ufw-configurator.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">UFW Configurator</h1>
+        <p class="tool-subtitle">Generate UFW firewall commands and config files — no networking expertise required.</p>
+    </header>
+
+    <main class="tool-main ufw-main">
+
+        <!-- Default Policies -->
+        <div class="ufw-section">
+            <div class="ufw-section-title">
+                Default Policies
+                <span class="ufw-info-icon" data-tip="Default policies decide what happens to connections that don't match any specific rule. 'deny incoming' blocks all unsolicited inbound connections (safest). 'allow outgoing' lets your server reach the internet. 'deny forward' blocks packet routing through this machine.">ℹ️</span>
+            </div>
+            <div class="ufw-fields-row">
+                <div class="ufw-field">
+                    <label class="ufw-label">Incoming
+                        <span class="ufw-info-icon" data-tip="Controls all connections coming INTO this machine. 'deny' is recommended — only allow specific ports you need.">ℹ️</span>
+                    </label>
+                    <select id="defIncoming" class="tool-select ufw-sel">
+                        <option value="deny" selected>deny</option>
+                        <option value="allow">allow</option>
+                        <option value="reject">reject</option>
+                    </select>
+                </div>
+                <div class="ufw-field">
+                    <label class="ufw-label">Outgoing
+                        <span class="ufw-info-icon" data-tip="Controls connections going OUT from this machine. 'allow' lets your server make requests to external services.">ℹ️</span>
+                    </label>
+                    <select id="defOutgoing" class="tool-select ufw-sel">
+                        <option value="allow" selected>allow</option>
+                        <option value="deny">deny</option>
+                        <option value="reject">reject</option>
+                    </select>
+                </div>
+                <div class="ufw-field">
+                    <label class="ufw-label">Forwarding
+                        <span class="ufw-info-icon" data-tip="Controls packet routing THROUGH this machine to another network. Enable for VPN servers, NAT gateways, or routers. Leave 'deny' for regular servers.">ℹ️</span>
+                    </label>
+                    <select id="defForward" class="tool-select ufw-sel">
+                        <option value="deny" selected>deny</option>
+                        <option value="allow">allow</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Rules -->
+        <div class="ufw-section">
+            <div class="ufw-section-title">
+                Allow / Deny Rules
+                <span class="ufw-info-icon" data-tip="Add specific port rules. Rules are evaluated in order — first match wins. Always add SSH (port 22) before enabling UFW!">ℹ️</span>
+            </div>
+            <div id="rulesContainer"></div>
+            <button class="tool-button ufw-add-btn" id="addRuleBtn">+ Add Rule</button>
+        </div>
+
+        <!-- App Profiles -->
+        <div class="ufw-section">
+            <div class="ufw-section-title">
+                Application Profiles
+                <span class="ufw-info-icon" data-tip="UFW has built-in profiles for common services. These use the service's standard ports. Requires the app to be installed on the system.">ℹ️</span>
+            </div>
+            <div class="ufw-app-grid" id="appProfiles">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="ufw-section">
+            <div class="ufw-section-title">Options</div>
+            <div class="ufw-options-grid">
+                <label class="ufw-toggle-label">
+                    <input type="checkbox" id="optIPv6" checked>
+                    <span>Enable IPv6
+                        <span class="ufw-info-icon" data-tip="Sets IPV6=yes in /etc/default/ufw. Required if your server has an IPv6 address. Applies rules to both IPv4 and IPv6.">ℹ️</span>
+                    </span>
+                </label>
+                <label class="ufw-toggle-label">
+                    <input type="checkbox" id="optForwarding">
+                    <span>Enable IP Forwarding
+                        <span class="ufw-info-icon" data-tip="Enables kernel IP forwarding (sysctl net.ipv4.ip_forward=1) and adds MASQUERADE rules. Required for VPN servers or NAT gateways. Also updates /etc/default/ufw DEFAULT_FORWARD_POLICY.">ℹ️</span>
+                    </span>
+                </label>
+                <label class="ufw-toggle-label">
+                    <input type="checkbox" id="optRateLimit">
+                    <span>Rate limit SSH (port 22)
+                        <span class="ufw-info-icon" data-tip="Adds 'ufw limit ssh' — blocks IPs that attempt more than 6 connections in 30 seconds. Effective against brute-force attacks.">ℹ️</span>
+                    </span>
+                </label>
+            </div>
+            <div class="ufw-field" style="margin-top:0.8rem; max-width:300px">
+                <label class="ufw-label">Logging
+                    <span class="ufw-info-icon" data-tip="'low' logs blocked packets. 'medium' also logs allowed packets matching rules. 'high/full' is verbose. 'off' disables logging.">ℹ️</span>
+                </label>
+                <select id="optLogging" class="tool-select ufw-sel">
+                    <option value="on">on (low)</option>
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="full">full</option>
+                    <option value="off">off</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="tool-button ufw-gen-btn" id="generateBtn">Generate UFW Commands</button>
+
+        <!-- Output -->
+        <div id="outputSection" class="ufw-output-section hidden">
+
+            <div class="ufw-output-block">
+                <div class="ufw-output-header">
+                    <span>Commands to Run <span class="ufw-path-note">(run as root / sudo)</span></span>
+                    <button class="ufw-copy-btn" data-target="outCommands">Copy</button>
+                </div>
+                <pre class="ufw-output-box" id="outCommands"></pre>
+            </div>
+
+            <div class="ufw-output-block">
+                <div class="ufw-output-header">
+                    <span>/etc/default/ufw <span class="ufw-path-note">changes</span></span>
+                    <button class="ufw-copy-btn" data-target="outDefaultUfw">Copy</button>
+                </div>
+                <pre class="ufw-output-box" id="outDefaultUfw"></pre>
+            </div>
+
+            <div class="ufw-output-block" id="beforeRulesBlock" style="display:none">
+                <div class="ufw-output-header">
+                    <span>/etc/ufw/before.rules <span class="ufw-path-note">(add before COMMIT line)</span></span>
+                    <button class="ufw-copy-btn" data-target="outBeforeRules">Copy</button>
+                </div>
+                <pre class="ufw-output-box" id="outBeforeRules"></pre>
+            </div>
+
+        </div>
+
+        <!-- UFW Guide -->
+        <div class="ufw-guide" id="ufwGuide">
+            <div class="ufw-guide-header" id="ufwGuideToggle">
+                <span>UFW Quick Reference Guide</span>
+                <span class="ufw-guide-arrow">▼</span>
+            </div>
+            <div class="ufw-guide-body" id="ufwGuideBody">
+                <h3>What is UFW?</h3>
+                <p>UFW (Uncomplicated Firewall) is a frontend for iptables on Linux. It makes firewall management simple. It's installed by default on Ubuntu and available on Debian and other distros.</p>
+
+                <h3>Essential Commands</h3>
+                <p><code>sudo ufw enable</code> — Turn on the firewall (takes effect immediately).</p>
+                <p><code>sudo ufw disable</code> — Turn off the firewall (all traffic allowed).</p>
+                <p><code>sudo ufw status</code> — Show active rules and status.</p>
+                <p><code>sudo ufw status verbose</code> — More detail: shows default policies too.</p>
+                <p><code>sudo ufw status numbered</code> — Shows rules with numbers for easy deletion.</p>
+                <p><code>sudo ufw reload</code> — Reload rules after editing config files.</p>
+                <p><code>sudo ufw reset</code> — ⚠️ Delete all rules and disable UFW. Use carefully.</p>
+
+                <h3>How Rules Work</h3>
+                <p>UFW processes rules in order — the first matching rule wins. Put specific rules before broad ones. Rules you add go before the default policy.</p>
+
+                <h3>Deleting Rules</h3>
+                <p>First: <code>sudo ufw status numbered</code> to see rule numbers.</p>
+                <p>Then: <code>sudo ufw delete 3</code> to delete rule #3.</p>
+                <p>Or by specification: <code>sudo ufw delete allow 80/tcp</code></p>
+
+                <h3>Common Gotchas</h3>
+                <p>⚠️ <strong>Always allow SSH before enabling UFW!</strong> Run <code>sudo ufw allow ssh</code> or <code>sudo ufw allow 22</code> before <code>ufw enable</code> or you'll lock yourself out.</p>
+                <p>⚠️ Enabling UFW on a remote server without SSH allowed = permanent lockout.</p>
+
+                <h3>limit vs deny</h3>
+                <p><code>limit</code> allows connections but blocks IPs making more than 6 in 30 seconds. Best for SSH to block brute force while still allowing legitimate access.</p>
+                <p><code>deny</code> silently drops packets. <code>reject</code> sends an ICMP error back — slightly more honest but reveals the port exists.</p>
+
+                <h3>Logging</h3>
+                <p>Logs go to <code>/var/log/ufw.log</code>. Use <code>sudo tail -f /var/log/ufw.log</code> to watch live. <code>low</code> is usually enough for most servers.</p>
+
+                <h3>IPv6</h3>
+                <p>Set <code>IPV6=yes</code> in <code>/etc/default/ufw</code> and rules apply to both IPv4 and IPv6. Otherwise only IPv4 is firewalled.</p>
+
+                <h3>After Config File Changes</h3>
+                <p>If you edit <code>/etc/default/ufw</code> or <code>/etc/ufw/before.rules</code>, run <code>sudo ufw reload</code> to apply.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <!-- Tooltip element -->
+    <div class="ufw-tooltip" id="ufwTooltip"></div>
+
+    <script src="js/ufw-configurator.js"></script>
+</body>
+</html>

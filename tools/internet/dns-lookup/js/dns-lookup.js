@@ -354,3 +354,228 @@ async function doHealthCheck() {
 
 healthBtn.addEventListener("click", doHealthCheck);
 healthDomain.addEventListener("keydown", e => { if (e.key === "Enter") doHealthCheck(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB — SPF
+// ════════════════════════════════════════════════════════════════════════════
+const spfDomain = document.getElementById("spfDomain");
+const spfBtn    = document.getElementById("spfBtn");
+const spfResult = document.getElementById("spfResult");
+
+// Known SPF mechanism prefixes and their meanings
+const SPF_MECH_DESC = {
+    "all":      { label: "all",      desc: "Matches any sender (catch-all)" },
+    "a":        { label: "A",        desc: "IP must match the domain's A/AAAA records" },
+    "mx":       { label: "MX",       desc: "IP must match the domain's MX servers" },
+    "include":  { label: "include",  desc: "Delegate to another domain's SPF record" },
+    "ip4":      { label: "ip4",      desc: "Explicit IPv4 address or CIDR block" },
+    "ip6":      { label: "ip6",      desc: "Explicit IPv6 address or CIDR block" },
+    "exists":   { label: "exists",   desc: "DNS lookup must return a result" },
+    "redirect": { label: "redirect", desc: "Use another domain's SPF record entirely" },
+    "exp":      { label: "exp",      desc: "Explanation TXT record URL" },
+    "ptr":      { label: "ptr",      desc: "Reverse DNS must match (discouraged)" },
+};
+
+const SPF_QUALIFIERS = { "+": "pass", "-": "fail", "~": "softfail", "?": "neutral" };
+
+function parseSpf(raw) {
+    const cleaned = raw.replace(/^"|"$/g, "");
+    const parts   = cleaned.trim().split(/\s+/);
+    const version = parts[0];
+    const mechanisms = [];
+
+    for (let i = 1; i < parts.length; i++) {
+        const part = parts[i];
+        let qualifier = "+";
+        let rest = part;
+
+        if (["+", "-", "~", "?"].includes(part[0])) {
+            qualifier = part[0];
+            rest = part.slice(1);
+        }
+
+        const colonIdx = rest.indexOf("=");
+        const slashIdx = rest.indexOf(":");
+        let mech, value;
+
+        if (slashIdx !== -1 && (colonIdx === -1 || slashIdx < colonIdx)) {
+            mech  = rest.slice(0, slashIdx).toLowerCase();
+            value = rest.slice(slashIdx + 1);
+        } else if (colonIdx !== -1) {
+            mech  = rest.slice(0, colonIdx).toLowerCase();
+            value = rest.slice(colonIdx + 1);
+        } else {
+            mech  = rest.toLowerCase();
+            value = null;
+        }
+
+        const info = SPF_MECH_DESC[mech] || { label: mech, desc: "Unknown mechanism" };
+        mechanisms.push({ qualifier, mech, value, label: info.label, desc: info.desc });
+    }
+
+    return { version, mechanisms };
+}
+
+async function doSpfCheck() {
+    const domain = spfDomain.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+    if (!domain) { spfDomain.focus(); return; }
+
+    loading(spfResult);
+    spfBtn.disabled = true;
+
+    try {
+        const data    = await dohQuery(domain, "TXT");
+        const records = getAnswers(data, "TXT");
+        const spfRec  = records.find(r => {
+            const d = r.data.replace(/^"|"$/g, "");
+            return d.startsWith("v=spf1");
+        });
+
+        if (!spfRec) {
+            spfResult.innerHTML = `<div class="dns-warn-box">No SPF record found for <strong>${escHtml(domain)}</strong>.<br>
+                Without an SPF record, email senders are not authenticated and spam filters may reject or flag messages.</div>`;
+            return;
+        }
+
+        const raw = spfRec.data.replace(/^"|"$/g, "");
+        const { mechanisms } = parseSpf(raw);
+
+        // Determine overall verdict from "all" qualifier
+        const allMech = mechanisms.find(m => m.mech === "all");
+        const allQ    = allMech ? allMech.qualifier : null;
+        const verdictMap = { "-": { cls: "dns-badge-ok",   text: "Strict (fail)" },
+                             "~": { cls: "dns-badge-warn",  text: "Soft fail" },
+                             "?": { cls: "dns-badge-warn",  text: "Neutral" },
+                             "+": { cls: "dns-badge-info",  text: "Pass all (insecure)" } };
+        const verdict = allQ ? verdictMap[allQ] : { cls: "dns-badge-info", text: "No all" };
+
+        const qLabel = q => `<span class="spf-qualifier spf-q-${q}">${q} (${SPF_QUALIFIERS[q] || q})</span>`;
+
+        const rows = mechanisms.map(m => {
+            const valCell = m.value ? `<code>${escHtml(m.value)}</code>` : "—";
+            return `<tr>
+                <td>${qLabel(m.qualifier)}</td>
+                <td><strong>${escHtml(m.label)}</strong></td>
+                <td>${valCell}</td>
+                <td class="spf-desc">${escHtml(m.desc)}</td>
+            </tr>`;
+        }).join("");
+
+        spfResult.innerHTML = `
+            <div class="dns-kv-box">
+                <div class="dns-kv-header">
+                    SPF Record &nbsp;<span class="dns-badge ${verdict.cls}">${verdict.text}</span>
+                </div>
+                <div class="dns-raw-record">${escHtml(raw)}</div>
+                <table class="spf-table">
+                    <thead><tr><th>Qualifier</th><th>Mechanism</th><th>Value</th><th>Meaning</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>`;
+    } catch(e) {
+        spfResult.innerHTML = renderError(e.message);
+    } finally {
+        spfBtn.disabled = false;
+    }
+}
+
+spfBtn.addEventListener("click", doSpfCheck);
+spfDomain.addEventListener("keydown", e => { if (e.key === "Enter") doSpfCheck(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+// TAB — DKIM (full checker)
+// ════════════════════════════════════════════════════════════════════════════
+const dkimDomainFull   = document.getElementById("dkimDomainFull");
+const dkimSelectorFull = document.getElementById("dkimSelectorFull");
+const dkimFullBtn      = document.getElementById("dkimFullBtn");
+const dkimResultEl     = document.getElementById("dkimResult");
+
+function parseDkimTxt(raw) {
+    // DKIM TXT: v=DKIM1; k=rsa; p=MIGfMA0...
+    const cleaned = raw.replace(/^"|"$/g, "");
+    const tags = {};
+    cleaned.split(/\s*;\s*/).forEach(part => {
+        const eq = part.indexOf("=");
+        if (eq > 0) {
+            tags[part.slice(0, eq).trim().toLowerCase()] = part.slice(eq + 1).trim();
+        }
+    });
+    return tags;
+}
+
+const DKIM_TAG_LABELS = {
+    v: "Version",
+    k: "Key Type",
+    p: "Public Key (Base64)",
+    h: "Hash Algorithms",
+    s: "Service Type",
+    t: "Flags",
+    n: "Notes",
+};
+
+async function doDkimCheck() {
+    const domain   = dkimDomainFull.value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+    const selector = dkimSelectorFull.value.trim() || "default";
+    if (!domain) { dkimDomainFull.focus(); return; }
+
+    loading(dkimResultEl);
+    dkimFullBtn.disabled = true;
+
+    try {
+        const dkimName = `${selector}._domainkey.${domain}`;
+        const data     = await dohQuery(dkimName, "TXT");
+        const records  = getAnswers(data, "TXT");
+        const dkimRec  = records.find(r => r.data.includes("v=DKIM1") || r.data.includes("k="));
+
+        if (!dkimRec) {
+            dkimResultEl.innerHTML = `<div class="dns-warn-box">
+                No DKIM record found at <code>${escHtml(dkimName)}</code>.<br>
+                Check that the selector is correct. Common selectors: <code>default</code>, <code>google</code>, <code>s1</code>, <code>k1</code>, <code>mail</code>.
+            </div>`;
+            return;
+        }
+
+        const tags = parseDkimTxt(dkimRec.data);
+        const keyType = tags.k || "rsa";
+
+        // Truncate long public key for display
+        const pubKey = tags.p || "";
+        const pubKeyDisplay = pubKey.length > 64
+            ? pubKey.slice(0, 64) + "…  (" + pubKey.length + " chars)"
+            : pubKey || "(empty — key revoked)";
+
+        const keyRevoked = !pubKey;
+
+        let rows = Object.entries(DKIM_TAG_LABELS)
+            .filter(([k]) => tags[k] !== undefined)
+            .map(([k, label]) => {
+                let val = escHtml(tags[k]);
+                if (k === "p") val = `<code style="word-break:break-all;font-size:0.78rem">${escHtml(pubKeyDisplay)}</code>`;
+                if (k === "t" && tags[k].includes("y")) val += ' <span class="dns-badge dns-badge-warn">Testing Mode</span>';
+                if (k === "t" && tags[k].includes("s")) val += ' <span class="dns-badge dns-badge-info">Strict</span>';
+                return `<tr><td class="dns-kv-key">${label}</td><td>${val}</td></tr>`;
+            }).join("");
+
+        const statusBadge = keyRevoked
+            ? `<span class="dns-badge dns-badge-warn">Key Revoked</span>`
+            : `<span class="dns-badge dns-badge-ok">Key Present (${escHtml(keyType.toUpperCase())})</span>`;
+
+        dkimResultEl.innerHTML = `
+            <div class="dns-kv-box">
+                <div class="dns-kv-header">
+                    DKIM Record — <code>${escHtml(dkimName)}</code> &nbsp;${statusBadge}
+                </div>
+                <div class="dns-raw-record">${escHtml(dkimRec.data.slice(0, 200))}${dkimRec.data.length > 200 ? "…" : ""}</div>
+                <table class="dns-kv-table"><tbody>${rows}</tbody></table>
+            </div>
+            ${keyRevoked ? `<div class="dns-warn-box" style="margin-top:0.75rem">⚠️ Empty public key (<code>p=</code>) means this DKIM key has been revoked. Emails signed with this selector will fail DKIM validation.</div>` : ""}`;
+    } catch(e) {
+        dkimResultEl.innerHTML = renderError(e.message);
+    } finally {
+        dkimFullBtn.disabled = false;
+    }
+}
+
+dkimFullBtn.addEventListener("click", doDkimCheck);
+dkimDomainFull.addEventListener("keydown", e => { if (e.key === "Enter") doDkimCheck(); });
+dkimSelectorFull.addEventListener("keydown", e => { if (e.key === "Enter") doDkimCheck(); });

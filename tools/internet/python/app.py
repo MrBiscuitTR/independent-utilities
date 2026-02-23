@@ -511,6 +511,148 @@ def api_link_analyzer():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# /api/smtp-test  POST
+# { "host": "mail.example.com", "port": 587, "tls": "starttls"|"ssl"|"none", "ehlo": "test.local" }
+# Connects to the SMTP server, reads the banner, sends EHLO, optionally
+# upgrades to TLS via STARTTLS, and returns the conversation.
+# ─────────────────────────────────────────────────────────────────────────────
+@app.route("/api/smtp-test", methods=["POST"])
+def api_smtp_test():
+    body = request.get_json(force=True, silent=True) or {}
+    host = body.get("host", "").strip()
+    try:
+        port = int(body.get("port", 587))
+    except (ValueError, TypeError):
+        port = 587
+    tls_mode = body.get("tls", "starttls").lower()
+    ehlo_host = (body.get("ehlo") or "test.local").strip() or "test.local"
+
+    if not host:
+        return jsonify({"error": "host is required"}), 400
+    if not _is_valid_host(host):
+        return jsonify({"error": "Invalid or private host"}), 400
+    if not (1 <= port <= 65535):
+        return jsonify({"error": "Invalid port"}), 400
+
+    raw_conv = []
+    result = {
+        "connected": False,
+        "banner": None,
+        "ehlo": [],
+        "tls_ok": None,
+        "tls_version": None,
+        "tls_cipher": None,
+        "rtt_ms": None,
+        "raw_conversation": raw_conv,
+        "error": None,
+    }
+
+    import time
+    t0 = time.monotonic()
+
+    try:
+        ctx = ssl.create_default_context()
+
+        if tls_mode == "ssl":
+            # Implicit TLS — wrap socket immediately
+            raw_sock = socket.create_connection((host, port), timeout=10)
+            sock = ctx.wrap_socket(raw_sock, server_hostname=host)
+            result["tls_ok"] = True
+            cipher = sock.cipher()
+            result["tls_version"] = sock.version()
+            result["tls_cipher"] = cipher[0] if cipher else None
+        else:
+            sock = socket.create_connection((host, port), timeout=10)
+
+        result["rtt_ms"] = round((time.monotonic() - t0) * 1000)
+        result["connected"] = True
+
+        def recv_line():
+            buf = b""
+            while True:
+                ch = sock.recv(1)
+                if not ch:
+                    break
+                buf += ch
+                if ch == b"\n":
+                    break
+            return buf.decode(errors="replace").rstrip("\r\n")
+
+        def recv_response():
+            """Read multi-line SMTP response (lines ending with 3xx-text vs 3xx text)."""
+            lines = []
+            while True:
+                line = recv_line()
+                raw_conv.append(f"  {line}")
+                lines.append(line)
+                if len(line) < 4 or line[3] == " ":
+                    break
+            return lines
+
+        def send_cmd(cmd):
+            raw_conv.append(f"> {cmd}")
+            sock.sendall((cmd + "\r\n").encode())
+
+        # Read greeting banner
+        banner_lines = recv_response()
+        result["banner"] = banner_lines[0] if banner_lines else ""
+
+        # Send EHLO
+        send_cmd(f"EHLO {ehlo_host}")
+        ehlo_resp = recv_response()
+        # Collect extension lines (250-xxx or 250 xxx, skip first line which is domain greeting)
+        result["ehlo"] = [l for l in ehlo_resp if l.startswith("250")]
+
+        # STARTTLS upgrade
+        if tls_mode == "starttls":
+            has_starttls = any("STARTTLS" in l.upper() for l in result["ehlo"])
+            if has_starttls:
+                send_cmd("STARTTLS")
+                starttls_resp = recv_response()
+                if starttls_resp and starttls_resp[0].startswith("220"):
+                    try:
+                        sock = ctx.wrap_socket(sock, server_hostname=host)
+                        result["tls_ok"] = True
+                        cipher = sock.cipher()
+                        result["tls_version"] = sock.version()
+                        result["tls_cipher"] = cipher[0] if cipher else None
+                        # Re-issue EHLO after TLS
+                        send_cmd(f"EHLO {ehlo_host}")
+                        ehlo_resp2 = recv_response()
+                        result["ehlo"] = [l for l in ehlo_resp2 if l.startswith("250")]
+                    except ssl.SSLError as e:
+                        result["tls_ok"] = False
+                        result["error"] = f"TLS upgrade failed: {e}"
+                else:
+                    result["tls_ok"] = False
+            else:
+                result["tls_ok"] = False
+
+        # Polite quit
+        try:
+            send_cmd("QUIT")
+            recv_response()
+        except Exception:
+            pass
+
+        try:
+            sock.close()
+        except Exception:
+            pass
+
+    except ConnectionRefusedError:
+        result["error"] = f"Connection refused on port {port}"
+    except socket.timeout:
+        result["error"] = "Connection timed out"
+    except ssl.SSLError as e:
+        result["error"] = f"SSL error: {e}"
+    except Exception as e:
+        result["error"] = str(e)
+
+    return jsonify(result)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # /api/health  — quick liveness check used by the frontend to grey tools
 # ─────────────────────────────────────────────────────────────────────────────
 @app.route("/api/health")
