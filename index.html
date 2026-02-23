@@ -356,7 +356,10 @@
       // Only poll when accessed over HTTP (localhost / local dev).
       // On HTTPS (public URL) the local backend is unreachable anyway, and polling
       // would trigger the browser's "Access other apps on this device" permission prompt.
-      if (location.protocol !== "http:") return;
+      if (location.protocol !== "http:") {
+        lastStatus = "offline";
+        return;
+      }
 
       function setStatus(online) {
         if (online === lastStatus) return;
