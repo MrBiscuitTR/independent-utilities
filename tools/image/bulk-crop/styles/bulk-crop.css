@@ -1,0 +1,303 @@
+/* bulk-crop.css */
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+.bc-main {
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Globals panel ────────────────────────────────────────────────────────── */
+.bc-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  width: 100%;
+}
+
+.bc-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+  color: var(--color-text);
+}
+
+.bc-panel-hint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.bc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.bc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.bc-field .tool-label {
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+
+.bc-num {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.bc-ratio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bc-ratio-row .bc-num {
+  flex: 1;
+  min-width: 0;
+}
+
+.bc-ratio-sep {
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Drop zone ────────────────────────────────────────────────────────────── */
+.bc-drop-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+
+.bc-drop-zone:hover,
+.bc-drop-zone:focus,
+.bc-drop-zone.bc-drop-over {
+  border-color: var(--color-primary);
+  background: #f0f6ff;
+  outline: none;
+}
+
+.bc-drop-inner { pointer-events: none; }
+
+.bc-drop-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.bc-drop-text {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.bc-drop-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Toolbar ──────────────────────────────────────────────────────────────── */
+.bc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.bc-toolbar-spacer { flex: 1; min-width: 1rem; }
+
+.bc-btn-secondary {
+  background: #6c757d;
+}
+.bc-btn-secondary:hover { background: #545b62; }
+
+.bc-btn-export {
+  background: #27ae60;
+}
+.bc-btn-export:hover { background: #1e8449; }
+
+.bc-btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* ── Cards container ──────────────────────────────────────────────────────── */
+.bc-cards {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  width: 100%;
+}
+
+/* ── Individual card ──────────────────────────────────────────────────────── */
+.bc-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-card-error {
+  border-color: #e74c3c;
+}
+
+.bc-card-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  gap: 0.5rem;
+  background: #fafafa;
+}
+
+.bc-card-fname {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.bc-card-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  padding: 0 0.2rem;
+  transition: color 0.15s;
+}
+.bc-card-remove:hover { color: #c0392b; }
+
+/* ── Canvas wrapper ───────────────────────────────────────────────────────── */
+.bc-canvas-wrap {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0;
+}
+
+.bc-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* ── Info bar ─────────────────────────────────────────────────────────────── */
+.bc-info-bar {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  background: #fafafa;
+  min-height: 1.8rem;
+}
+
+/* ── Override toggle ──────────────────────────────────────────────────────── */
+.bc-override-toggle {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: background 0.15s;
+}
+.bc-override-toggle:hover { background: #f0f6ff; }
+
+/* ── Override panel ───────────────────────────────────────────────────────── */
+.bc-override-panel {
+  border-top: 1px solid var(--color-border);
+  padding: 0.75rem;
+  background: #f9f9f9;
+}
+
+.bc-ov-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.bc-ov-hint {
+  font-size: 0.74rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.bc-ov-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Progress ─────────────────────────────────────────────────────────────── */
+.bc-progress-wrap {
+  width: 100%;
+}
+
+.bc-progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.bc-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-primary);
+  border-radius: 99px;
+  transition: width 0.2s ease;
+}
+
+.bc-progress-label {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .bc-cards {
+    grid-template-columns: 1fr;
+  }
+  .bc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bc-toolbar-spacer { display: none; }
+}

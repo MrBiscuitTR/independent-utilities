@@ -22,6 +22,26 @@
     <form class="tool-form" id="resizer-form" onsubmit="return false;">
       <label class="tool-label" for="source-file">Select source image (PNG/JPEG):</label>
       <input class="tool-input" id="source-file" type="file" accept="image/png, image/jpeg" />
+
+      <fieldset class="size-fieldset">
+        <legend class="size-legend">Sizes to generate</legend>
+        <div class="size-presets" id="size-presets">
+          <label class="size-chip"><input type="checkbox" value="16"  checked /> 16</label>
+          <label class="size-chip"><input type="checkbox" value="32"  checked /> 32</label>
+          <label class="size-chip"><input type="checkbox" value="64"  checked /> 64</label>
+          <label class="size-chip"><input type="checkbox" value="96"  checked /> 96</label>
+          <label class="size-chip"><input type="checkbox" value="128" checked /> 128</label>
+          <label class="size-chip"><input type="checkbox" value="192" checked /> 192</label>
+          <label class="size-chip"><input type="checkbox" value="256" checked /> 256</label>
+          <label class="size-chip"><input type="checkbox" value="512" checked /> 512</label>
+        </div>
+        <div class="custom-size-row">
+          <input class="tool-input custom-size-input" id="custom-size-input" type="number" min="1" max="4096" placeholder="Custom size (e.g. 48)" />
+          <button class="tool-button custom-size-add-btn" id="add-custom-size-btn" type="button">+ Add</button>
+        </div>
+        <div class="custom-chips" id="custom-chips"></div>
+      </fieldset>
+
       <button class="tool-button" id="generate-btn" type="button">Generate Sizes & ICOs</button>
       <p class="resizer-tip">
         Tip: For best results start with a large PNG (≥512×512). On iPhone, tap "Open PNG" then long-press the image to save to Photos.

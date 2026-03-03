@@ -1,9 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const sizes = [16, 32, 64, 96, 128, 192, 256, 512];
   const input = document.getElementById('source-file');
   const btn = document.getElementById('generate-btn');
   const results = document.getElementById('results');
   const downloadZipBtn = document.getElementById('download-zip-btn');
+  const customSizeInput = document.getElementById('custom-size-input');
+  const addCustomBtn = document.getElementById('add-custom-size-btn');
+  const customChips = document.getElementById('custom-chips');
+
+  // Custom sizes added by the user
+  const customSizes = new Set();
+
+  function getSelectedSizes() {
+    const preset = Array.from(
+      document.querySelectorAll('#size-presets input[type="checkbox"]:checked')
+    ).map(cb => parseInt(cb.value, 10));
+    return [...new Set([...preset, ...customSizes])].sort((a, b) => a - b);
+  }
+
+  function addCustomSize(val) {
+    const n = parseInt(val, 10);
+    if (!n || n < 1 || n > 4096) { alert('Enter a size between 1 and 4096.'); return; }
+    if (customSizes.has(n)) return;
+    customSizes.add(n);
+
+    const chip = document.createElement('label');
+    chip.className = 'size-chip custom-chip';
+    chip.innerHTML = `<input type="checkbox" checked disabled /> ${n} <button class="chip-remove" aria-label="Remove ${n}">×</button>`;
+    chip.querySelector('.chip-remove').addEventListener('click', () => {
+      customSizes.delete(n);
+      chip.remove();
+    });
+    customChips.appendChild(chip);
+    customSizeInput.value = '';
+  }
+
+  addCustomBtn.addEventListener('click', () => addCustomSize(customSizeInput.value));
+  customSizeInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCustomSize(customSizeInput.value); } });
 
   // We'll store all generated blobs here to zip later
   let allFiles = [];
@@ -23,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load source image
     const img = await loadImageFromFile(file);
+
+    const sizes = getSelectedSizes();
+    if (!sizes.length) { alert('Please select at least one size.'); return; }
 
     for (const size of sizes) {
       try {

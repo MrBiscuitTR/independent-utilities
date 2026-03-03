@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bulk Image Crop &amp; Resize</title>
+  <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/tools.css" />
+  <link rel="stylesheet" href="styles/bulk-crop.css" />
+  <script src="./js/pica.min.js"></script>
+  <script src="./js/jszip.min.js"></script>
+</head>
+<body class="tool-body">
+
+  <header class="tool-header">
+    <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+    <h1 class="tool-title">Bulk Image Crop &amp; Resize</h1>
+    <p class="tool-subtitle">Drag crop windows on each image · aspect-ratio lock · per-image overrides · ZIP download</p>
+  </header>
+
+  <main class="tool-main bc-main">
+
+    <!-- ── Global defaults panel ─────────────────────────────────────────── -->
+    <section class="bc-panel" id="globals-panel">
+      <h2 class="bc-panel-title">Global defaults <span class="bc-panel-hint">(applied to all images unless overridden per-image)</span></h2>
+
+      <div class="bc-grid">
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-width">Output width (px)</label>
+          <input class="tool-input bc-num" id="g-width" type="number" min="1" max="8192" value="224" />
+        </div>
+        <div class="bc-field">
+          <label class="tool-label" for="g-height">Output height (px)</label>
+          <input class="tool-input bc-num" id="g-height" type="number" min="1" max="8192" value="224" />
+        </div>
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-format">Output format</label>
+          <select class="tool-input" id="g-format">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg" selected>JPEG</option>
+            <option value="image/webp">WebP</option>
+          </select>
+        </div>
+
+        <div class="bc-field" id="g-quality-wrap">
+          <label class="tool-label" for="g-quality">Quality (1–100)</label>
+          <input class="tool-input bc-num" id="g-quality" type="number" min="1" max="100" value="92" />
+        </div>
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-ar-lock">Aspect ratio lock</label>
+          <select class="tool-input" id="g-ar-lock">
+            <option value="free">Free (no lock)</option>
+            <option value="output">Match output W×H</option>
+            <option value="1:1">1 : 1 (square)</option>
+            <option value="4:3">4 : 3</option>
+            <option value="16:9">16 : 9</option>
+            <option value="3:2">3 : 2</option>
+            <option value="2:3">2 : 3</option>
+            <option value="custom">Custom ratio…</option>
+          </select>
+        </div>
+
+        <div class="bc-field" id="g-ar-custom-wrap" style="display:none;">
+          <label class="tool-label">Custom ratio (W : H)</label>
+          <div class="bc-ratio-row">
+            <input class="tool-input bc-num" id="g-ar-cw" type="number" min="1" value="16" />
+            <span class="bc-ratio-sep">:</span>
+            <input class="tool-input bc-num" id="g-ar-ch" type="number" min="1" value="9" />
+          </div>
+        </div>
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-prefix">Filename prefix</label>
+          <input class="tool-input" id="g-prefix" type="text" placeholder="e.g. train_" />
+        </div>
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-suffix">Filename suffix</label>
+          <input class="tool-input" id="g-suffix" type="text" placeholder="e.g. _crop" />
+        </div>
+
+      </div><!-- /.bc-grid -->
+    </section>
+
+    <!-- ── File drop zone ────────────────────────────────────────────────── -->
+    <div class="bc-drop-zone" id="drop-zone" tabindex="0" role="button"
+         aria-label="Click or drag images here">
+      <div class="bc-drop-inner">
+        <div class="bc-drop-icon">&#128247;</div>
+        <p class="bc-drop-text">Drop images here, or <strong>click to browse</strong></p>
+        <p class="bc-drop-sub">PNG · JPEG · WebP · BMP · GIF</p>
+      </div>
+      <input type="file" id="file-input" multiple
+             accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"
+             style="display:none;" />
+    </div>
+
+    <!-- ── Toolbar (shown once images loaded) ───────────────────────────── -->
+    <div id="toolbar" class="bc-toolbar" style="display:none;">
+      <button class="tool-button" id="reset-all-crops-btn" type="button">Reset all crops</button>
+      <button class="tool-button bc-btn-secondary" id="remove-all-btn" type="button">Remove all</button>
+      <div class="bc-toolbar-spacer"></div>
+      <button class="tool-button bc-btn-export" id="export-all-btn" type="button">Export all &amp; Download ZIP</button>
+      <button class="tool-button bc-btn-secondary" id="export-individuals-btn" type="button">Export individually</button>
+    </div>
+
+    <!-- ── Image cards ───────────────────────────────────────────────────── -->
+    <div id="cards-container" class="bc-cards"></div>
+
+    <!-- ── Progress ─────────────────────────────────────────────────────── -->
+    <div id="progress-wrap" class="bc-progress-wrap" style="display:none;">
+      <div class="bc-progress-track"><div class="bc-progress-fill" id="progress-fill"></div></div>
+      <p class="bc-progress-label" id="progress-label">Exporting…</p>
+    </div>
+
+  </main>
+
+  <footer class="tool-footer">
+    <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear())</script>
+      Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>).
+      All rights reserved.
+    </p>
+  </footer>
+
+  <script src="js/bulk-crop.js"></script>
+</body>
+</html>
