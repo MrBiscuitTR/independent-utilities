@@ -25,7 +25,7 @@ import queue as queue_module
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from urllib.parse import urlparse, urljoin, urldefrag
+from urllib.parse import urlparse, urljoin, urldefrag, unquote
 
 import requests
 from bs4 import BeautifulSoup
@@ -62,7 +62,17 @@ MAX_WORKERS     = 8
 REQUEST_TIMEOUT = 20        # seconds
 CHUNK_SIZE      = 65_536    # bytes per streaming chunk
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; RecursiveWebDownloader/1.0)"}
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/122.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+REQUEST_DELAY = 0.5   # seconds between requests to the same host - ADDED DELIBERATELY TO AVOID RATE LIMITS
 
 META_FILENAME = ".site-downloader-metadata.txt"
 
@@ -132,6 +142,25 @@ CDN_FOLDER_MAP: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 _tls = threading.local()
+
+# Per-host rate limiting: track time of last request per host
+import time as _time_mod
+_host_last_req: dict[str, float] = {}
+_host_req_lock = threading.Lock()
+
+
+def _wait_for_host(host: str) -> None:
+    """Enforce REQUEST_DELAY seconds between successive requests to the same host."""
+    if REQUEST_DELAY <= 0:
+        return
+    with _host_req_lock:
+        last = _host_last_req.get(host, 0.0)
+        now  = _time_mod.monotonic()
+        wait = REQUEST_DELAY - (now - last)
+        _host_last_req[host] = now + max(0.0, wait)
+    if wait > 0:
+        _time_mod.sleep(wait)
+
 
 def _session() -> requests.Session:
     if not hasattr(_tls, "s"):
@@ -348,7 +377,7 @@ def url_to_local_path(url: str, target_dir: Path) -> Path:
     - Path-traversal guard: result is always inside target_dir.
     """
     url_path = urlparse(url).path
-    segments = [_sanitize(s) for s in url_path.split("/") if s]
+    segments = [_sanitize(unquote(s)) for s in url_path.split("/") if s]
 
     if not segments:
         segments = ["index.html"]
@@ -692,7 +721,7 @@ def rewrite_html(
         st.clear()
         st.append(rewritten)
 
-    return soup.encode("utf-8")
+    return soup.encode("utf-8", formatter="html")
 
 
 def rewrite_css(
@@ -723,24 +752,28 @@ def rewrite_css(
 
 def fetch(
     url: str, max_bytes: int | None,
-) -> tuple[bytes | None, str, str | None]:
+) -> tuple[bytes | None, str, str, str | None]:
     """
-    GET url. Returns (body, content_type, error_or_None).
+    GET url. Returns (body, content_type, final_url, error_or_None).
+    final_url is the URL after any HTTP redirects (used as base for relative links).
     Streams response; enforces size limit. Nothing is executed.
     """
+    host = urlparse(url).netloc.lower().split(":")[0]
+    _wait_for_host(host)
     try:
         resp = _session().get(
             url, timeout=REQUEST_TIMEOUT,
             stream=True, allow_redirects=True,
         )
         resp.raise_for_status()
-        ct = resp.headers.get("Content-Type", "")
+        ct        = resp.headers.get("Content-Type", "")
+        final_url = resp.url   # URL after all redirects
 
         if max_bytes is not None:
             cl = resp.headers.get("Content-Length")
             if cl and int(cl) > max_bytes:
                 resp.close()
-                return None, ct, f"skipped: {int(cl) // 1024} KB > limit"
+                return None, ct, final_url, f"skipped: {int(cl) // 1024} KB > limit"
 
         chunks: list[bytes] = []
         total = 0
@@ -750,21 +783,21 @@ def fetch(
             total += len(chunk)
             if max_bytes is not None and total > max_bytes:
                 resp.close()
-                return None, ct, f"skipped: exceeded {max_bytes // 1024} KB limit"
+                return None, ct, final_url, f"skipped: exceeded {max_bytes // 1024} KB limit"
             chunks.append(chunk)
 
-        return b"".join(chunks), ct, None
+        return b"".join(chunks), ct, final_url, None
 
     except requests.exceptions.TooManyRedirects:
-        return None, "", "too many redirects"
+        return None, "", url, "too many redirects"
     except requests.exceptions.Timeout:
-        return None, "", "timeout"
+        return None, "", url, "timeout"
     except requests.exceptions.ConnectionError as e:
-        return None, "", f"connection error: {str(e)[:80]}"
+        return None, "", url, f"connection error: {str(e)[:80]}"
     except requests.exceptions.HTTPError as e:
-        return None, "", f"HTTP {e.response.status_code}"
+        return None, "", url, f"HTTP {e.response.status_code}"
     except Exception as e:
-        return None, "", f"error: {e}"
+        return None, "", url, f"error: {e}"
 
 
 # ---------------------------------------------------------------------------
@@ -1136,7 +1169,7 @@ class Crawler:
                 self._in_flight -= 1
 
     def _do(self, url: str, is_external: bool) -> None:
-        body, ct, err = fetch(url, self._max_bytes)
+        body, ct, final_url, err = fetch(url, self._max_bytes)
 
         if err is not None:
             if err.startswith("skipped"):
@@ -1154,6 +1187,13 @@ class Crawler:
 
         ct_base = ct.split(";")[0].strip().lower()
 
+        # If the server redirected to a different URL, mark final_url as visited too
+        # so we don't re-fetch the same resource via its canonical trailing-slash URL
+        norm_final, _ = urldefrag(final_url)
+        if norm_final != url:
+            with self._visited_lock:
+                self._visited.add(norm_final)
+
         # --- Determine local path ---
         if is_external:
             local = url_to_external_path(url, self._output_dir)
@@ -1167,19 +1207,19 @@ class Crawler:
         new_links: set[str] = set()
         if "text/html" in ct_base and not is_external:
             orig_text = body.decode("utf-8", errors="replace")
-            new_links = extract_links_html(orig_text, url)
+            new_links = extract_links_html(orig_text, final_url)
         elif "text/css" in ct_base:
             orig_text = body.decode("utf-8", errors="replace")
-            new_links = extract_links_css(orig_text, url)
+            new_links = extract_links_css(orig_text, final_url)
 
         # --- Rewrite URLs to relative paths before saving ---
         if "text/html" in ct_base and not is_external:
             body = rewrite_html(
-                body, url, local, self._output_dir, self._base_netloc, self._settings
+                body, final_url, local, self._output_dir, self._base_netloc, self._settings
             )
         elif "text/css" in ct_base:
             body = rewrite_css(
-                body, url, local, self._output_dir, self._base_netloc, self._settings
+                body, final_url, local, self._output_dir, self._base_netloc, self._settings
             )
 
         # --- Save (bytes written verbatim; nothing executed) ---
