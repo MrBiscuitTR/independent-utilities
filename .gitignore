@@ -22,3 +22,4 @@
 **/.DS_Store
 **/.env
 **/.env.local
+/other/recursive-website-downloader/downloads
