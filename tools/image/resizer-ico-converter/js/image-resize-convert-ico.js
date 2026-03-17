@@ -49,6 +49,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') { e.preventDefault(); addCustomSize(customSizeInput.value); }
   });
 
+  // ICO info panel — shown when an ICO file is selected
+  const icoSourceInfo = document.getElementById('ico-source-info');
+
+  function isIcoFile(file) {
+    return /\.ico$/i.test(file.name) ||
+           file.type === 'image/x-icon' ||
+           file.type === 'image/vnd.microsoft.icon';
+  }
+
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file || !isIcoFile(file)) { icoSourceInfo.style.display = 'none'; return; }
+
+    try {
+      const buf    = await blobToArrayBuffer(file);
+      const layers = parseIcoLayers(buf);
+      const best   = layers.reduce((a, b) => (a.width * a.height >= b.width * b.height ? a : b));
+
+      const chips = layers.map(l => {
+        const cls = (l.width === best.width && l.height === best.height) ? ' ico-layer-best' : '';
+        return `<span class="ico-layer-chip${cls}">${l.width}&times;${l.height}</span>`;
+      }).join('');
+
+      icoSourceInfo.innerHTML =
+        `<div class="ico-info-title">Source ICO &mdash; ${layers.length} layer${layers.length !== 1 ? 's' : ''} detected</div>` +
+        `<div class="ico-info-layers">${chips}</div>` +
+        `<div class="ico-info-note">Highlighted layer (${best.width}&times;${best.height}) will be used as resize source.</div>`;
+      icoSourceInfo.style.display = '';
+    } catch (e) {
+      icoSourceInfo.innerHTML = `<div class="ico-info-error">Could not read ICO layers: ${e.message}</div>`;
+      icoSourceInfo.style.display = '';
+    }
+  });
+
   // Preset handler
   function applyPreset(sizes) {
     // Uncheck all default checkboxes
@@ -90,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     multisizeIcoSection.style.display = 'none';
 
     if (!input.files || !input.files.length) {
-      alert('Please select a source image (PNG or JPG).');
+      alert('Please select a source image (PNG, JPG or ICO).');
       return;
     }
 
@@ -247,14 +281,62 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helpers ---------------------------------------------------
 
   function loadImageFromFile(file) {
+    if (isIcoFile(file)) return loadBestIcoLayer(file);
+    return loadImageFromBlob(file);
+  }
+
+  function loadImageFromBlob(blob) {
     return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(blob);
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')); };
       img.src = url;
     });
+  }
+
+  // Extracts the largest layer from an ICO file and loads it as an HTMLImageElement.
+  // PNG-stored layers are extracted directly; BMP-stored layers fall back to browser native.
+  async function loadBestIcoLayer(file) {
+    const buf = await blobToArrayBuffer(file);
+    const u8  = new Uint8Array(buf);
+    const layers = parseIcoLayers(buf);
+    if (!layers.length) throw new Error('ICO file has no layers.');
+
+    const best = layers.reduce((a, b) => (a.width * a.height >= b.width * b.height ? a : b));
+
+    if (best.isPng) {
+      if (best.offset + best.size > u8.length) throw new Error('ICO layer data exceeds file bounds.');
+      const pngBytes = u8.slice(best.offset, best.offset + best.size);
+      return loadImageFromBlob(new Blob([pngBytes], { type: 'image/png' }));
+    }
+    // BMP DIB layer — let the browser load the ICO natively
+    return loadImageFromBlob(file);
+  }
+
+  // Parse ICO directory entries; returns [{ width, height, bpp, isPng, offset, size }]
+  function parseIcoLayers(buf) {
+    const u8 = new Uint8Array(buf);
+    if (u8.length < 6 || u8[0] !== 0 || u8[1] !== 0 || u8[2] !== 1 || u8[3] !== 0) {
+      throw new Error('Not a valid ICO file.');
+    }
+    const count  = readUInt16LE(u8, 4);
+    const layers = [];
+    for (let i = 0; i < count; i++) {
+      const base   = 6 + i * 16;
+      if (base + 16 > u8.length) break;
+      const w      = u8[base + 0] === 0 ? 256 : u8[base + 0];
+      const h      = u8[base + 1] === 0 ? 256 : u8[base + 1];
+      const bpp    = readUInt16LE(u8, base + 6);
+      const sz     = readUInt32LE(u8, base + 8);
+      const off    = readUInt32LE(u8, base + 12);
+      const isPng  = off + 4 <= u8.length &&
+                     u8[off] === 0x89 && u8[off+1] === 0x50 &&
+                     u8[off+2] === 0x4E && u8[off+3] === 0x47;
+      layers.push({ width: w, height: h, bpp, isPng, offset: off, size: sz });
+    }
+    return layers;
   }
 
   function resizeImageToPNG(img, w, h) {
@@ -393,5 +475,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function readUInt32BE(u8, idx) {
     return (u8[idx] << 24) | (u8[idx+1] << 16) | (u8[idx+2] << 8) | (u8[idx+3]);
+  }
+
+  function readUInt16LE(u8, idx) {
+    return u8[idx] | (u8[idx+1] << 8);
+  }
+
+  function readUInt32LE(u8, idx) {
+    return ((u8[idx] | (u8[idx+1] << 8) | (u8[idx+2] << 16) | (u8[idx+3] << 24)) >>> 0);
   }
 });

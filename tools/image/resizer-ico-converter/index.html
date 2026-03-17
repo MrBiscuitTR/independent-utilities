@@ -15,34 +15,68 @@
   <header class="tool-header">
     <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
     <h1 class="tool-title">Batch Resizer → ICO</h1>
-    <p class="tool-subtitle">Upload one image, generate PNG + individual .ICO per size, plus a combined multi-size .ICO. Square images only.</p>
+    <p class="tool-subtitle">Upload a PNG, JPEG, or ICO — generates PNG + individual .ICO per size, plus a combined multi-size .ICO. Square images only.</p>
   </header>
 
   <main class="tool-main resizer-main">
     <form class="tool-form" id="resizer-form" onsubmit="return false;">
-      <label class="tool-label" for="source-file">Select source image (PNG/JPEG):</label>
-      <input class="tool-input" id="source-file" type="file" accept="image/png, image/jpeg" />
+      <label class="tool-label" for="source-file">Select source image (PNG / JPEG / ICO):</label>
+      <input class="tool-input" id="source-file" type="file" accept="image/png, image/jpeg, image/x-icon, image/vnd.microsoft.icon, .ico" />
+      <div id="ico-source-info" class="ico-source-info" style="display:none;"></div>
 
       <!-- Quick Presets -->
       <div class="presets-section">
         <div class="presets-label">Quick Presets</div>
         <div class="presets-list" id="preset-list">
           <button type="button" class="preset-btn" data-sizes="16,32,48"
-            title="16, 32, 48 — classic minimal favicon.ico">Favicon Classic</button>
+            title="16, 32, 48 — classic minimal favicon.ico">
+            Favicon Classic
+          </button>
+
           <button type="button" class="preset-btn" data-sizes="16,24,32,48,64,96,128,256"
-            title="16, 24, 32, 48, 64, 96, 128, 256 — full website favicon bundle">Favicon Full</button>
-          <button type="button" class="preset-btn" data-sizes="16,24,32,48,64,96,128,256"
-            title="16, 24, 32, 48, 64, 96, 128, 256 — Windows shell icon sizes">Windows App</button>
-          <button type="button" class="preset-btn" data-sizes="16,32,64,128,256,512"
-            title="16, 32, 64, 128, 256, 512 — macOS @1x &amp; @2x icon sizes">macOS App</button>
-          <button type="button" class="preset-btn" data-sizes="48,72,96,144,192,384,512,1024"
-            title="48, 72, 96, 144, 192, 384, 512, 1024 — Web App Manifest / PWA icons">PWA</button>
+            title="16, 24, 32, 48, 64, 96, 128, 256 — full website favicon bundle">
+            Favicon Full
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="16,20,24,32,40,48,64,96,128,256"
+            title="16, 20, 24, 32, 40, 48, 64, 96, 128, 256 — Windows shell & DPI scaling icons">
+            Windows App
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="16,32,64,128,256,512,1024"
+            title="16, 32, 64, 128, 256, 512, 1024 — macOS @1x & @2x icon sizes (ICNS compatible)">
+            macOS App
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="48,72,96,128,144,152,192,384,512"
+            title="48, 72, 96, 128, 144, 152, 192, 384, 512 — Web App Manifest / PWA icons">
+            PWA
+          </button>
+
           <button type="button" class="preset-btn" data-sizes="48,72,96,144,192,512"
-            title="48, 72, 96, 144, 192, 512 — Android launcher: mdpi → xxxhdpi">Android</button>
+            title="48, 72, 96, 144, 192, 512 — Android launcher: mdpi → xxxhdpi + store assets">
+            Android
+          </button>
+
           <button type="button" class="preset-btn" data-sizes="76,120,152,167,180"
-            title="76, 120, 152, 167, 180 — iOS &amp; iPadOS home screen icons">Apple Touch</button>
-          <button type="button" class="preset-btn" data-sizes="16,24,32,48,64,96,128,192,256,512"
-            title="All default sizes selected">All Sizes</button>
+            title="76, 120, 152, 167, 180 — iOS & iPadOS home screen icons">
+            Apple Touch
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="16,32,48,180,192,512"
+            title="16, 32, 48, 180, 192, 512 — common modern website favicon bundle">
+            Website Bundle
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="16,24,32,48,64,128,256"
+            title="16, 24, 32, 48, 64, 128, 256 — universal multi-layer ICO set">
+            Universal ICO
+          </button>
+
+          <button type="button" class="preset-btn" data-sizes="16,20,24,32,40,48,64,72,96,128,144,152,167,180,192,256,384,512,1024"
+            title="Full icon set covering Windows, macOS, Android, iOS, and PWAs">
+            All Sizes
+          </button>
         </div>
       </div>
 
