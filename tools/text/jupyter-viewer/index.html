@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MyST Notebook Viewer</title>
+  <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/tools.css" />
+  <link rel="stylesheet" href="styles/hljs-github.min.css" />
+  <link rel="stylesheet" href="styles/jupyter-viewer.css" />
+  <script src="./js/highlight.min.js"></script>
+  <script src="./js/temml.min.js"></script>
+  <script src="../markdown-converter/js/marked.min.js"></script>
+</head>
+<body class="tool-body">
+  <header class="tool-header">
+    <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+    <h1 class="tool-title">MyST Notebook Viewer</h1>
+    <p class="tool-subtitle">View, edit, and download MyST Markdown (.md) Jupytext notebooks — multiple tabs, paste support.</p>
+  </header>
+
+  <main class="tool-main nb-main">
+
+    <!-- ── Landing (shown when no tabs are open) ──────────────────── -->
+    <div id="nb-landing" class="nb-landing">
+      <div class="landing-panels">
+
+        <!-- Drop zone -->
+        <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Open MyST notebook files">
+          <svg class="drop-zone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 16 12 12 8 16"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+          </svg>
+          <span class="drop-zone-text">Drag &amp; drop .md files here</span>
+          <span class="drop-zone-sub">or click to browse &mdash; multiple files open as separate tabs</span>
+          <input id="file-input" type="file" multiple accept=".md,text/markdown,text/plain" />
+        </div>
+
+        <!-- Paste zone -->
+        <div class="paste-zone">
+          <div class="paste-zone-header">
+            <span class="paste-zone-label">Paste MyST Markdown</span>
+            <input id="paste-filename" class="paste-filename" type="text"
+                   placeholder="untitled.md" aria-label="File name for pasted content" />
+          </div>
+          <textarea id="paste-input" class="paste-textarea" spellcheck="false"
+                    placeholder="Paste or type MyST Markdown here&hellip;&#10;&#10;(Ctrl+V anywhere on this page will auto-fill)"></textarea>
+          <button class="tool-button" id="btn-paste-open" type="button">Open as Notebook</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Add-notebook overlay (shown when + is clicked in workspace) -->
+    <div id="add-overlay" class="add-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Add notebook">
+      <div class="add-overlay-card">
+        <button class="add-overlay-close" id="btn-overlay-close" type="button" aria-label="Close">&times;</button>
+        <p class="add-overlay-title">Add Notebook</p>
+        <div class="landing-panels">
+
+          <div id="overlay-drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Open more files">
+            <svg class="drop-zone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"></polyline>
+              <line x1="12" y1="12" x2="12" y2="21"></line>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+            </svg>
+            <span class="drop-zone-text">Drag &amp; drop .md files</span>
+            <span class="drop-zone-sub">or click to browse</span>
+            <input id="overlay-file-input" type="file" multiple accept=".md,text/markdown,text/plain" />
+          </div>
+
+          <div class="paste-zone">
+            <div class="paste-zone-header">
+              <span class="paste-zone-label">Paste text</span>
+              <input id="overlay-paste-filename" class="paste-filename" type="text"
+                     placeholder="untitled.md" aria-label="File name" />
+            </div>
+            <textarea id="overlay-paste-input" class="paste-textarea" spellcheck="false"
+                      placeholder="Paste or type MyST Markdown here&hellip;"></textarea>
+            <button class="tool-button" id="btn-overlay-paste-open" type="button">Open as Notebook</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Notebook workspace (shown when tabs are open) ───────────── -->
+    <div id="nb-workspace" class="nb-workspace" style="display:none;">
+
+      <!-- Tab bar (JS-rendered) -->
+      <div id="nb-tabbar" class="nb-tabbar" role="tablist"></div>
+
+      <!-- Toolbar -->
+      <div class="nb-toolbar">
+        <div class="nb-toolbar-left">
+          <span class="nb-cell-count" id="nb-cell-count"></span>
+        </div>
+        <div class="nb-toolbar-right">
+          <button class="tool-button sm-btn" id="btn-edit-all" type="button">Edit Mode</button>
+          <button class="tool-button sm-btn secondary-btn" id="btn-copy-source" type="button">&#8691; Copy</button>
+          <button class="tool-button sm-btn" id="btn-download" type="button">&#8595; Download</button>
+        </div>
+      </div>
+
+      <!-- Cells container -->
+      <div id="nb-cells" class="nb-cells"></div>
+
+    </div>
+  </main>
+
+  <footer class="tool-footer">
+    <p class="tool-footer-text">&copy; 2024 &ndash;<script>document.write(new Date().getFullYear())</script> &Ccedil;a&#287;an Efe &Ccedil;al&#305;da&#287; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+  </footer>
+
+  <script src="js/jupyter-viewer.js"></script>
+</body>
+</html>
