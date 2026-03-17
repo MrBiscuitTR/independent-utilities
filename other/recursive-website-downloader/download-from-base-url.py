@@ -72,7 +72,7 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
-REQUEST_DELAY = 0.5   # seconds between requests to the same host - ADDED DELIBERATELY TO AVOID RATE LIMITS
+REQUEST_DELAY = 0.3   # seconds between requests to the same host - ADDED DELIBERATELY TO AVOID RATE LIMITS
 
 META_FILENAME = ".site-downloader-metadata.txt"
 
