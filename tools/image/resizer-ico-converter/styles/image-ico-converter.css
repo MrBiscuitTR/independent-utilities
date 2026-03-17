@@ -19,7 +19,215 @@
     margin-bottom: 0;
 }
 
-/* Size selector fieldset */
+/* ----------------------------------------------------------------
+   Drop zone
+---------------------------------------------------------------- */
+.drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: 2px dashed var(--color-border, #ccc);
+    border-radius: var(--radius-lg, 10px);
+    padding: 2.25rem 1.5rem;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    background: var(--color-surface, #f9f9f9);
+    text-align: center;
+    min-height: 148px;
+    user-select: none;
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+.drop-zone:hover,
+.drop-zone:focus,
+.drop-zone.dragover {
+    border-color: var(--color-primary, #4a90e2);
+    background: rgba(74, 144, 226, 0.05);
+    outline: none;
+}
+.drop-zone.dragover {
+    border-style: solid;
+}
+.drop-zone input[type="file"] {
+    display: none;
+}
+.drop-zone-icon {
+    color: var(--color-text-muted, #aaa);
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.2rem;
+}
+.drop-zone-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+.drop-zone-sub {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+
+/* ----------------------------------------------------------------
+   Upload previews (staged files)
+---------------------------------------------------------------- */
+.upload-previews {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 0.75rem;
+}
+.upload-preview-card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.65rem;
+    background: var(--color-surface, #f5f5f5);
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: var(--radius-md, 6px);
+    padding: 0.5rem 2.25rem 0.5rem 0.6rem; /* right padding reserves space for × */
+    width: 100%;
+    box-sizing: border-box;
+}
+.upload-preview-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid var(--color-border, #eee);
+    flex-shrink: 0;
+}
+.upload-preview-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    flex: 1;
+    padding-top: 0.1rem;
+}
+.upload-preview-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text);
+    word-break: break-all;
+    line-height: 1.3;
+}
+.upload-preview-remove {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.45rem;
+    width: 20px;
+    height: 20px;
+    line-height: 19px;
+    text-align: center;
+    background: #888;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+.upload-preview-remove:hover { background: #c0392b; }
+.upload-preview-ico-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+}
+
+/* ----------------------------------------------------------------
+   Info / warning banners
+---------------------------------------------------------------- */
+.info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-md, 6px);
+    font-size: 0.84rem;
+    margin: 0.5rem 0 0.75rem;
+    line-height: 1.45;
+}
+.info-banner-icon {
+    flex-shrink: 0;
+    line-height: 1.45;
+    font-size: 1rem;
+}
+.info-banner--warn {
+    background: #fff8e1;
+    border: 1px solid #f0b429;
+    color: #7a5700;
+}
+.info-banner--info {
+    background: #e8f4fd;
+    border: 1px solid var(--color-primary, #4a90e2);
+    color: #1a4a7a;
+}
+
+/* ----------------------------------------------------------------
+   ICO layer chips (shared by upload previews and result groups)
+---------------------------------------------------------------- */
+.ico-layer-chip {
+    padding: 0.15rem 0.55rem;
+    border-radius: 12px;
+    background: var(--color-bg, #fff);
+    border: 1px solid var(--color-border, #ddd);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.ico-layer-chip.ico-layer-best {
+    background: var(--color-primary, #4a90e2);
+    border-color: var(--color-primary, #4a90e2);
+    color: #fff;
+}
+
+/* ----------------------------------------------------------------
+   Quick Presets section
+---------------------------------------------------------------- */
+.presets-section {
+    margin: 0.5rem 0 0.75rem;
+}
+.presets-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.45rem;
+}
+.presets-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.preset-btn {
+    padding: 0.28rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid var(--color-border, #ddd);
+    background: var(--color-surface, #f5f5f5);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.preset-btn:hover {
+    background: var(--color-primary, #4a90e2);
+    border-color: var(--color-primary, #4a90e2);
+    color: #fff;
+}
+
+/* ----------------------------------------------------------------
+   Size selector fieldset
+---------------------------------------------------------------- */
 .size-fieldset {
     border: 1px solid var(--color-border, #ddd);
     border-radius: var(--radius-md, 6px);
@@ -51,9 +259,7 @@
     user-select: none;
     transition: background 0.15s, border-color 0.15s;
 }
-.size-chip:hover {
-    border-color: var(--color-primary, #4a90e2);
-}
+.size-chip:hover { border-color: var(--color-primary, #4a90e2); }
 .size-chip input[type="checkbox"] {
     accent-color: var(--color-primary, #4a90e2);
     width: 14px;
@@ -100,83 +306,116 @@
     gap: 0.45rem;
 }
 
-/* ICO source info panel */
-.ico-source-info {
+/* ----------------------------------------------------------------
+   Download-all bar
+---------------------------------------------------------------- */
+.download-all-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
     background: var(--color-surface, #f5f5f5);
     border: 1px solid var(--color-border, #ddd);
-    border-left: 3px solid var(--color-primary, #4a90e2);
-    border-radius: var(--radius-md, 6px);
-    padding: 0.6rem 0.85rem;
-    margin: 0.45rem 0 0.75rem;
-    font-size: 0.85rem;
-}
-.ico-info-title {
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-}
-.ico-info-layers {
-    display: flex;
+    border-radius: var(--radius-lg, 10px);
     flex-wrap: wrap;
-    gap: 0.3rem;
-    margin-bottom: 0.35rem;
 }
-.ico-layer-chip {
-    padding: 0.15rem 0.55rem;
-    border-radius: 12px;
-    background: var(--color-bg, #fff);
+.download-all-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+}
+
+/* ----------------------------------------------------------------
+   Results: outer container (flex column of groups)
+---------------------------------------------------------------- */
+.resizer-output {
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ----------------------------------------------------------------
+   Per-image result group
+---------------------------------------------------------------- */
+.image-result-group {
+    width: 100%;
     border: 1px solid var(--color-border, #ddd);
-    font-size: 0.78rem;
-    font-weight: 600;
+    border-radius: var(--radius-lg, 10px);
+    overflow: hidden;
 }
-.ico-layer-chip.ico-layer-best {
-    background: var(--color-primary, #4a90e2);
-    border-color: var(--color-primary, #4a90e2);
-    color: #fff;
+.result-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #f5f5f5);
+    border-bottom: 1px solid var(--color-border, #ddd);
 }
-.ico-info-note {
+.result-group-thumb {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid var(--color-border, #eee);
+    flex-shrink: 0;
+}
+.result-group-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+}
+.result-group-filename {
+    font-weight: 700;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.result-group-stats {
     font-size: 0.8rem;
     color: var(--color-text-muted);
 }
-.ico-info-error {
-    color: #c0392b;
-}
-
-/* Quick Presets section */
-.presets-section {
-    margin: 0.5rem 0 0.75rem;
-}
-.presets-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-muted);
-    margin-bottom: 0.45rem;
-}
-.presets-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
-.preset-btn {
-    padding: 0.28rem 0.75rem;
-    border-radius: 20px;
-    border: 1px solid var(--color-border, #ddd);
+.result-group-actions {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--color-border, #ddd);
     background: var(--color-surface, #f5f5f5);
-    color: var(--color-text);
-    font-size: 0.82rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.preset-btn:hover {
-    background: var(--color-primary, #4a90e2);
-    border-color: var(--color-primary, #4a90e2);
-    color: #fff;
+.secondary-btn {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border, #ccc);
+    font-weight: 600;
+}
+.secondary-btn:hover {
+    background: var(--color-border, #e0e0e0);
 }
 
-/* Multi-size ICO banner */
+/* Multi-size ICO banner inside a result group (full-width, no border-radius) */
+.group-banner.multisize-banner-wrap {
+    margin: 0;
+}
+.group-banner .multisize-banner {
+    border-radius: 0;
+    box-shadow: none;
+}
+.group-info-note {
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+
+/* ----------------------------------------------------------------
+   Multi-size ICO banner (standalone — used outside groups)
+---------------------------------------------------------------- */
 .multisize-banner-wrap {
     width: 100%;
     margin-bottom: 1rem;
@@ -198,13 +437,8 @@
     flex-direction: column;
     gap: 0.2rem;
 }
-.multisize-banner-info strong {
-    font-size: 1rem;
-}
-.multisize-banner-info span {
-    font-size: 0.84rem;
-    opacity: 0.9;
-}
+.multisize-banner-info strong { font-size: 1rem; }
+.multisize-banner-info span   { font-size: 0.84rem; opacity: 0.9; }
 .multisize-dl-btn {
     white-space: nowrap;
     background: #fff !important;
@@ -213,36 +447,35 @@
     border: none;
     flex-shrink: 0;
 }
-.multisize-dl-btn:hover {
-    background: rgba(255, 255, 255, 0.88) !important;
-}
+.multisize-dl-btn:hover { background: rgba(255,255,255,0.88) !important; }
 
-/* Results grid */
-.resizer-output {
-    margin-top: 1.5rem;
-    width: 100%;
+/* ----------------------------------------------------------------
+   Preview grid inside each group
+---------------------------------------------------------------- */
+.preview-grid {
+    padding: 1rem;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
-/* Individual size card */
+/* ----------------------------------------------------------------
+   Individual size card
+---------------------------------------------------------------- */
 .preview-card {
     background: var(--color-surface);
     border: 1px solid #e6e6e6;
     padding: 0.75rem;
     border-radius: var(--radius-lg);
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-
 .preview-size {
     font-weight: 700;
     margin-bottom: 0.5rem;
     color: var(--color-text);
     font-size: 0.95rem;
 }
-
 .preview-img {
     display: block;
     margin: 0 auto 0.6rem;
@@ -253,14 +486,17 @@
     background: #f8f8f8;
     border-radius: var(--radius-md);
 }
-
+.preview-error {
+    font-size: 0.82rem;
+    color: #c0392b;
+    margin-top: 0.35rem;
+}
 .action-row {
     display: flex;
     gap: 0.5rem;
     justify-content: center;
     flex-wrap: wrap;
 }
-
 .action-btn {
     padding: 0.45rem 0.65rem;
     border-radius: var(--radius-md);
@@ -274,19 +510,9 @@
     cursor: pointer;
     transition: background-color 0.2s;
 }
-
-.action-btn:hover {
-    background: var(--color-primary-dk);
-}
-
-.action-btn.secondary {
-    background: #6c757d;
-}
-
-.action-btn.secondary:hover {
-    background: #545b62;
-}
-
+.action-btn:hover     { background: var(--color-primary-dk); }
+.action-btn.secondary { background: #6c757d; }
+.action-btn.secondary:hover { background: #545b62; }
 .small-note {
     font-size: 0.82rem;
     color: var(--color-text-muted);

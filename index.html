@@ -366,7 +366,7 @@
           bdots.forEach(d  => { d.classList.add("dot-online");       d.classList.remove("dot-offline"); });
         } else {
           dot.classList.add("offline"); dot.classList.remove("online");
-          txt.textContent = "Local backend offline — start python app.py for tools marked with ●";
+          txt.innerHTML = "Local backend offline — start <a href='https://github.com/MrBiscuitTR/independent-utilities/tree/main/tools/internet/python' target='_blank'>python app.py</a> for tools marked with ●";
           items.forEach(li => { li.classList.add("backend-offline"); li.classList.remove("backend-online"); });
           bdots.forEach(d  => { d.classList.add("dot-offline");      d.classList.remove("dot-online"); });
         }
