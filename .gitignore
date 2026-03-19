@@ -23,3 +23,5 @@
 **/.env
 **/.env.local
 /other/recursive-website-downloader/downloads
+other/multimedia-downloader/supportedsites.md
+/other/multimedia-downloader/downloads
