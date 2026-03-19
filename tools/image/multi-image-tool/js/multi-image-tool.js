@@ -193,122 +193,171 @@
 
   /* ── Metadata Reading ───────────────────────────────────────────── */
   async function readFileMetadata(file) {
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const arrayBuffer = e.target.result;
-        const dataView = new DataView(arrayBuffer);
+    const metadata = {
+      fileName: file.name,
+      fileSize: formatBytes(file.size),
+      fileType: file.type || 'unknown',
+      lastModified: new Date(file.lastModified).toLocaleString()
+    };
 
-        const metadata = {
-          fileName: file.name,
-          fileSize: formatBytes(file.size),
-          fileType: file.type || 'unknown',
-          lastModified: new Date(file.lastModified).toLocaleString()
+    try {
+      // Use exifr library for comprehensive EXIF extraction
+      if (typeof exifr !== 'undefined') {
+        let exifData = {};
+        try {
+          // Try to read all possible EXIF data
+          exifData = await exifr.parse(file) || {};
+        } catch (e) {
+          console.warn('exifr parsing failed:', e);
+        }
+
+        // Map of all possible fields with friendly names
+        const fieldMappings = {
+          // Camera/Device Info
+          'Make': 'Camera Make',
+          'Model': 'Camera Model',
+          'Software': 'Software',
+          'LensModel': 'Lens Model',
+          'LensMake': 'Lens Make',
+          'LensInfo': 'Lens Info',
+          'LensSpecification': 'Lens Specification',
+          'BodySerialNumber': 'Body Serial Number',
+          'LensSerialNumber': 'Lens Serial Number',
+          'CameraSerialNumber': 'Camera Serial Number',
+          'InternalSerialNumber': 'Internal Serial Number',
+
+          // Date/Time
+          'DateTime': 'Date/Time',
+          'DateTimeOriginal': 'Date Taken',
+          'DateTimeDigitized': 'Date Digitized',
+          'SubSecTimeOriginal': 'Subsecond Time',
+
+          // GPS
+          'latitude': 'GPS Latitude',
+          'longitude': 'GPS Longitude',
+          'altitude': 'GPS Altitude',
+          'GPSLatitude': 'GPS Latitude',
+          'GPSLongitude': 'GPS Longitude',
+          'GPSAltitude': 'GPS Altitude',
+          'GPSLatitudeRef': 'GPS Lat Ref',
+          'GPSLongitudeRef': 'GPS Long Ref',
+          'GPSAltitudeRef': 'GPS Alt Ref',
+          'GPSTimeStamp': 'GPS Time',
+          'GPSDateStamp': 'GPS Date',
+          'GPSInfo': 'GPS Info',
+          'GPSVersionID': 'GPS Version',
+          'GPSMapDatum': 'GPS Map Datum',
+
+          // Image Settings
+          'ExposureTime': 'Exposure Time',
+          'FNumber': 'F-Number',
+          'ISOSpeedRatings': 'ISO Speed',
+          'FocalLength': 'Focal Length',
+          'FocalLengthIn35mmFilm': 'Focal Length (35mm)',
+          'ExposureProgram': 'Exposure Program',
+          'MeteringMode': 'Metering Mode',
+          'Flash': 'Flash',
+          'WhiteBalance': 'White Balance',
+          'Brightness': 'Brightness',
+          'Contrast': 'Contrast',
+          'Saturation': 'Saturation',
+          'Sharpness': 'Sharpness',
+
+          // Image Dimensions
+          'ImageWidth': 'Image Width',
+          'ImageLength': 'Image Height',
+          'PixelXDimension': 'Width',
+          'PixelYDimension': 'Height',
+          'Orientation': 'Orientation',
+          'ResolutionUnit': 'Resolution Unit',
+          'XResolution': 'X Resolution',
+          'YResolution': 'Y Resolution',
+
+          // Copyright/Author
+          'Artist': 'Artist/Author',
+          'Copyright': 'Copyright',
+          'ImageDescription': 'Description',
+          'UserComment': 'User Comment',
+          'Creator': 'Creator',
+
+          // Other
+          'ColorSpace': 'Color Space',
+          'ColorArea': 'Color Area',
+          'ExifVersion': 'EXIF Version',
+          'ProcessingSoftware': 'Processing Software',
+          'FlashEnergy': 'Flash Energy',
+          'SpatialFrequencyResponse': 'Spatial Frequency',
+          'FileSource': 'File Source',
+          'SceneType': 'Scene Type',
+          'CustomRendered': 'Custom Rendered'
         };
 
-        // Also try EXIF.js
+        // Extract and format metadata
+        for (const [key, label] of Object.entries(fieldMappings)) {
+          if (exifData[key] !== undefined && exifData[key] !== null) {
+            let value = exifData[key];
+
+            // Format GPS coordinates if they're numbers or arrays
+            if ((key === 'latitude' || key === 'longitude' || key === 'altitude') && typeof value === 'number') {
+              value = value.toFixed(6) + '°';
+            } else if ((key === 'GPSLatitude' || key === 'GPSLongitude') && Array.isArray(value)) {
+              value = `${value[0]?.toFixed(0) || value[0]}° ${value[1]?.toFixed(0) || value[1]}' ${(value[2] || 0).toFixed(2)}"`;
+            } else if (key === 'GPSAltitude' && typeof value === 'number') {
+              value = value.toFixed(2) + ' m';
+            }
+
+            // Format arrays/objects
+            if (Array.isArray(value)) {
+              value = value.map(v => {
+                if (typeof v === 'object' && v !== null) return JSON.stringify(v);
+                return v;
+              }).join(', ');
+            } else if (typeof value === 'object' && value !== null) {
+              value = JSON.stringify(value);
+            }
+
+            metadata[label] = String(value).substring(0, 500); // Limit value length
+          }
+        }
+      } else {
+        // Fallback to EXIF.js if exifr not available
         const img = new Image();
         img.onload = function() {
           if (typeof EXIF !== 'undefined') {
             EXIF.getData(img, function() {
               const allTags = EXIF.getAllTags(this);
-
-              // Important EXIF fields
               const importantFields = {
-                // Camera/Device Info
-                'Make': 'Camera Make',
-                'Model': 'Camera Model',
-                'Software': 'Software',
-                'LensModel': 'Lens Model',
-                'LensMake': 'Lens Make',
-                'LensInfo': 'Lens Info',
-                'BodySerialNumber': 'Serial Number',
-                'LensSerialNumber': 'Lens Serial',
-                'CameraSerialNumber': 'Camera Serial',
-                'InternalSerialNumber': 'Internal Serial',
-
-                // Date/Time
-                'DateTime': 'Date/Time',
-                'DateTimeOriginal': 'Date Taken',
-                'DateTimeDigitized': 'Date Digitized',
-
-                // GPS
-                'GPSLatitude': 'GPS Latitude',
-                'GPSLongitude': 'GPS Longitude',
-                'GPSLatitudeRef': 'GPS Lat Ref',
-                'GPSLongitudeRef': 'GPS Long Ref',
-                'GPSAltitude': 'GPS Altitude',
-                'GPSAltitudeRef': 'GPS Alt Ref',
-                'GPSTimeStamp': 'GPS Time',
-                'GPSDateStamp': 'GPS Date',
-
-                // Image Settings
-                'ExposureTime': 'Exposure Time',
-                'FNumber': 'F-Number',
-                'ISOSpeedRatings': 'ISO',
-                'FocalLength': 'Focal Length',
-                'FocalLengthIn35mmFilm': 'Focal Length (35mm)',
-                'ExposureProgram': 'Exposure Program',
-                'MeteringMode': 'Metering Mode',
-                'Flash': 'Flash',
-                'WhiteBalance': 'White Balance',
-
-                // Image Dimensions
-                'PixelXDimension': 'Width',
-                'PixelYDimension': 'Height',
-                'Orientation': 'Orientation',
-
-                // Copyright/Author
-                'Artist': 'Artist/Author',
-                'Copyright': 'Copyright',
-                'ImageDescription': 'Description',
-                'UserComment': 'User Comment',
-
-                // Other
-                'ColorSpace': 'Color Space',
-                'ExifVersion': 'EXIF Version'
+                'Make': 'Camera Make', 'Model': 'Camera Model', 'Software': 'Software',
+                'LensModel': 'Lens Model', 'BodySerialNumber': 'Serial Number',
+                'DateTime': 'Date/Time', 'DateTimeOriginal': 'Date Taken',
+                'GPSLatitude': 'GPS Latitude', 'GPSLongitude': 'GPS Longitude',
+                'GPSAltitude': 'GPS Altitude', 'ExposureTime': 'Exposure Time',
+                'FNumber': 'F-Number', 'ISOSpeedRatings': 'ISO', 'FocalLength': 'Focal Length',
+                'Artist': 'Artist/Author', 'Copyright': 'Copyright'
               };
 
               for (const [tag, label] of Object.entries(importantFields)) {
                 if (allTags[tag] !== undefined) {
                   let value = allTags[tag];
-
-                  // Format GPS coordinates
-                  if (tag === 'GPSLatitude' || tag === 'GPSLongitude') {
-                    if (Array.isArray(value)) {
-                      value = `${value[0]}° ${value[1]}' ${value[2]}"`;
-                    }
-                  }
-
-                  // Format arrays
-                  if (Array.isArray(value)) {
-                    value = value.join(', ');
-                  }
-
+                  if (Array.isArray(value)) value = value.join(', ');
                   metadata[label] = value;
                 }
               }
-
               fileMetadata.set(file.name, metadata);
-              resolve();
             });
           } else {
             fileMetadata.set(file.name, metadata);
-            resolve();
           }
         };
-        img.onerror = () => {
-          fileMetadata.set(file.name, metadata);
-          resolve();
-        };
+        img.onerror = () => fileMetadata.set(file.name, metadata);
         img.src = URL.createObjectURL(file);
-      };
-      reader.onerror = () => {
-        fileMetadata.set(file.name, { fileName: file.name, error: 'Could not read file' });
-        resolve();
-      };
-      reader.readAsArrayBuffer(file);
-    });
+        return;
+      }
+    } catch (err) {
+      console.warn('Metadata extraction error:', err);
+    }
+
+    fileMetadata.set(file.name, metadata);
   }
 
   function showMetadata() {
@@ -348,7 +397,11 @@
       data.className = 'metadata-item-data';
 
       const lines = [];
-      const sensitiveFields = ['GPS Latitude', 'GPS Longitude', 'GPS Altitude', 'Serial Number', 'Lens Serial', 'Camera Serial', 'Internal Serial', 'Artist/Author', 'Copyright'];
+      const sensitiveFields = [
+        'GPS Latitude', 'GPS Longitude', 'GPS Altitude',
+        'Serial Number', 'Lens Serial Number', 'Camera Serial Number', 'Body Serial Number', 'Internal Serial Number',
+        'Artist/Author', 'Copyright', 'Creator'
+      ];
 
       for (const [key, value] of Object.entries(meta)) {
         if (key === 'fileName') continue;
@@ -991,6 +1044,32 @@
       renderEditorLayersList();
     });
 
+    // Rotation controls
+    const rotationSlider = document.getElementById('editor-rotation');
+    const rotationVal = document.getElementById('editor-rotation-val');
+    const resetRotationBtn = document.getElementById('btn-reset-rotation');
+
+    rotationSlider?.addEventListener('input', () => {
+      if (!selectedLayerId) return;
+      const layer = editorLayers.find(l => l.id === selectedLayerId);
+      if (layer && layer.type === 'image') {
+        layer.rotation = parseInt(rotationSlider.value);
+        rotationVal.textContent = layer.rotation + '°';
+        renderEditorCanvas();
+      }
+    });
+
+    resetRotationBtn?.addEventListener('click', () => {
+      if (!selectedLayerId) return;
+      const layer = editorLayers.find(l => l.id === selectedLayerId);
+      if (layer && layer.type === 'image') {
+        layer.rotation = 0;
+        rotationSlider.value = 0;
+        rotationVal.textContent = '0°';
+        renderEditorCanvas();
+      }
+    });
+
     // Canvas events for drawing
     previewCanvas.onmousedown = onEditorCanvasMouseDown;
     previewCanvas.onmousemove = onEditorCanvasMouseMove;
@@ -1304,9 +1383,29 @@
 
   function renderEditorLayersList() {
     const list = document.getElementById('editor-layers-list');
+    const layerSettings = document.querySelector('.editor-layer-settings');
+    const rotationSlider = document.getElementById('editor-rotation');
+    const rotationVal = document.getElementById('editor-rotation-val');
+
     if (!list) return;
 
     list.innerHTML = '<div class="layer-item base-layer"><span class="layer-name">Base Image</span></div>';
+
+    // Show/hide rotation controls based on selected layer
+    if (selectedLayerId) {
+      const selectedLayer = editorLayers.find(l => l.id === selectedLayerId);
+      if (selectedLayer && selectedLayer.type === 'image') {
+        if (layerSettings) layerSettings.style.display = '';
+        if (rotationSlider) {
+          rotationSlider.value = selectedLayer.rotation || 0;
+          rotationVal.textContent = (selectedLayer.rotation || 0) + '°';
+        }
+      } else {
+        if (layerSettings) layerSettings.style.display = 'none';
+      }
+    } else {
+      if (layerSettings) layerSettings.style.display = 'none';
+    }
 
     editorLayers.forEach(layer => {
       const item = document.createElement('div');
@@ -1769,15 +1868,36 @@
       try {
         const { canvas } = await loadImageAsCanvas(file);
         const originalMeta = fileMetadata.get(file.name) || {};
+        const originalExt = getExtension(file.name).toLowerCase();
 
+        // Determine output format and quality
         let mimeType = 'image/png';
         let ext = 'png';
-        if (outputFormat === 'jpg' || (outputFormat === 'same' && ['jpg', 'jpeg'].includes(getExtension(file.name)))) {
+        let quality = 0.85; // Default quality for lossy compression
+
+        if (outputFormat === 'jpg') {
           mimeType = 'image/jpeg';
           ext = 'jpg';
+        } else if (outputFormat === 'png') {
+          mimeType = 'image/png';
+          ext = 'png';
+        } else {
+          // 'same' format - preserve original
+          if (['jpg', 'jpeg'].includes(originalExt)) {
+            mimeType = 'image/jpeg';
+            ext = 'jpg';
+          } else if (originalExt === 'webp') {
+            mimeType = 'image/webp';
+            ext = 'webp';
+          } else {
+            mimeType = 'image/png';
+            ext = 'png';
+          }
         }
 
-        const blob = await canvasToBlob(canvas, mimeType, 0.95);
+        // Use lower quality for metadata removal (no re-encoding loss)
+        // For JPEG: 0.85 is good balance between quality and size
+        const blob = await canvasToBlob(canvas, mimeType, mimeType === 'image/jpeg' ? 0.85 : 1);
         const removedTags = Object.keys(originalMeta).filter(k => k !== 'fileName' && k !== 'fileSize' && k !== 'fileType' && k !== 'lastModified');
 
         results.push({

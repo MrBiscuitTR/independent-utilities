@@ -346,6 +346,15 @@
         <button class="tool-button sm-btn secondary-btn" id="btn-editor-clear" type="button">Clear All</button>
       </div>
 
+      <div class="editor-layer-settings" style="display:none;">
+        <div class="setting-row">
+          <label for="editor-rotation">Rotation:</label>
+          <input type="range" id="editor-rotation" min="0" max="360" value="0" />
+          <span id="editor-rotation-val">0°</span>
+          <button class="tool-button sm-btn" id="btn-reset-rotation" type="button" title="Reset to 0°">Reset</button>
+        </div>
+      </div>
+
       <!-- Layers panel -->
       <div class="editor-layers-panel">
         <div class="layers-panel-header">
@@ -358,7 +367,7 @@
         </div>
       </div>
 
-      <p class="setting-hint" style="margin-top:0.5rem;">Click layers to select. Drag on canvas to move. Corner handles resize.</p>
+      <p class="setting-hint" style="margin-top:0.5rem;">Click layers to select. Drag on canvas to move. Corner handles resize. Use rotation slider for selected layers.</p>
     </div>
 
     <div class="settings-panel" id="settings-html-to-img" style="display:none;">
