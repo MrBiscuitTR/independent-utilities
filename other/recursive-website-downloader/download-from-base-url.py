@@ -85,8 +85,9 @@ HTML_EXTS    = {".html", ".htm", ".xhtml"}
 JSON_EXTS    = {".json", ".jsonld"}
 PDF_EXTS     = {".pdf"}
 FONT_EXTS    = {".woff", ".woff2", ".ttf", ".eot", ".otf"}
-CODE_EXTS    = {".py", ".cpp", ".c", ".h", ".cs", ".java", ".rb", ".go",
-                ".ts", ".sh", ".bat", ".ps1", ".sql", ".php", ".rs", ".kt"}
+CODE_EXTS    = {".py", ".cpp", ".c", ".h", ".hpp", ".cs", ".java", ".rb", ".go",
+                ".ts", ".sh", ".bat", ".ps1", ".sql", ".php", ".rs", ".kt", ".swift", ".scala", ".lua", ".dart", ".m", ".r", ".jl", 
+                ".ipynb", ".json", ".xml", ".yml", ".yaml", ".ini", ".cfg"} # add more as needed
 DOC_EXTS     = {".txt", ".md", ".csv", ".yaml", ".yml", ".toml", ".ini", ".log"}
 ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
                 ".exe", ".dll", ".so", ".dylib", ".bin"}
