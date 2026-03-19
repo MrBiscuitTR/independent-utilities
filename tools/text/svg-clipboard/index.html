@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer SVG Clipboard</title>
+    <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/svg-clipboard.css">
+</head>
+<body class="tool-body">
+    <header class="tool-header">
+        <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+        <h1 class="tool-title">Designer SVG Clipboard</h1>
+        <p class="tool-subtitle">Ready-to-use SVG icons for web design — arrows, menus, toggles, and more. Click to copy.</p>
+    </header>
+
+    <main class="tool-main svg-main">
+
+        <div class="svg-search-bar">
+            <input type="text" id="svgSearch" class="tool-input svg-search" placeholder="Search icons (e.g. arrow, menu, chevron, close)…" autocomplete="off" spellcheck="false">
+            <div class="svg-filters">
+                <label class="filter-label">Category:
+                    <select id="svgCat" class="tool-select svg-select">
+                        <option value="">All Categories</option>
+                        <option value="arrows">Arrows</option>
+                        <option value="navigation">Navigation</option>
+                        <option value="ui-controls">UI Controls</option>
+                        <option value="media">Media</option>
+                        <option value="social">Social</option>
+                        <option value="common">Common</option>
+                    </select>
+                </label>
+                <label class="filter-label">Size:
+                    <select id="svgSize" class="tool-select svg-select">
+                        <option value="24">24px</option>
+                        <option value="32">32px</option>
+                        <option value="48">48px</option>
+                        <option value="64">64px</option>
+                    </select>
+                </label>
+                <label class="filter-label">Stroke:
+                    <select id="svgStroke" class="tool-select svg-select">
+                        <option value="1.5">1.5</option>
+                        <option value="2" selected>2</option>
+                        <option value="2.5">2.5</option>
+                        <option value="3">3</option>
+                    </select>
+                </label>
+                <label class="filter-label">Color:
+                    <input type="color" id="svgColor" value="#000000" class="svg-color-input">
+                </label>
+            </div>
+        </div>
+
+        <div id="svgCount" class="svg-count"></div>
+
+        <div id="svgGrid" class="svg-grid"></div>
+
+        <div id="copiedToast" class="copied-toast">Copied to clipboard!</div>
+
+    </main>
+
+    <footer class="tool-footer">
+        <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+    </footer>
+
+    <script src="js/svg-clipboard.js"></script>
+</body>
+</html>

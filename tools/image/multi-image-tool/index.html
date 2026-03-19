@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multi Image Tool</title>
+  <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/tools.css" />
+  <link rel="stylesheet" href="styles/multi-image-tool.css" />
+</head>
+<body class="tool-body">
+  <header class="tool-header">
+    <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
+    <h1 class="tool-title">Multi Image Tool</h1>
+    <p class="tool-subtitle">Convert, compress, edit, and transform images in bulk — fully offline.</p>
+  </header>
+
+  <main class="tool-main mit-main">
+
+    <!-- Mode selector tabs -->
+    <div class="mode-tabs" role="tablist">
+      <button class="mode-tab active" data-mode="compress" role="tab" aria-selected="true">Compress</button>
+      <button class="mode-tab" data-mode="to-svg" role="tab">To SVG</button>
+      <button class="mode-tab" data-mode="to-jpg" role="tab">To JPG</button>
+      <button class="mode-tab" data-mode="from-jpg" role="tab">From JPG</button>
+      <button class="mode-tab" data-mode="meme" role="tab">Meme</button>
+      <button class="mode-tab" data-mode="watermark" role="tab">Watermark</button>
+      <button class="mode-tab" data-mode="remove-bg" role="tab">Remove BG</button>
+      <button class="mode-tab" data-mode="metadata" role="tab">Metadata</button>
+      <button class="mode-tab" data-mode="blur-face" role="tab">Blur</button>
+      <button class="mode-tab" data-mode="upscale" role="tab">Upscale</button>
+      <button class="mode-tab" data-mode="editor" role="tab">Editor</button>
+      <button class="mode-tab" data-mode="html-to-img" role="tab">URL→IMG</button>
+      <button class="mode-tab" data-mode="python-helper" role="tab">Python</button>
+    </div>
+
+    <!-- Mode description -->
+    <p class="mode-description" id="mode-description">Compress JPG, PNG, SVG, and GIF images while maintaining quality.</p>
+
+    <!-- Drop zone -->
+    <div id="drop-zone" class="drop-zone" tabindex="0" role="button">
+      <svg class="drop-zone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+      <span class="drop-zone-text">Drag &amp; drop images here</span>
+      <span class="drop-zone-sub">or click to browse &mdash; supports JPG, PNG, GIF, WebP, HEIC, HEIF, SVG, BMP, TIFF</span>
+      <input id="file-input" type="file" multiple accept="image/*,.heic,.heif,.HEIC,.HEIF" />
+    </div>
+
+    <!-- Upload preview -->
+    <div id="upload-preview" class="upload-preview" style="display:none;">
+      <div class="upload-preview-header">
+        <span id="upload-count">0 images selected</span>
+        <button class="tool-button sm-btn secondary-btn" id="btn-clear-uploads" type="button">Clear All</button>
+      </div>
+      <div id="upload-thumbs" class="upload-thumbs"></div>
+    </div>
+
+    <!-- Settings panels (one per mode, shown/hidden) -->
+    <div class="settings-panel" id="settings-compress">
+      <div class="setting-row">
+        <label for="compress-quality">Quality:</label>
+        <input type="range" id="compress-quality" min="10" max="100" value="80" />
+        <span id="compress-quality-val">80%</span>
+      </div>
+      <div class="setting-row">
+        <label for="compress-max-size">Max dimension:</label>
+        <input type="number" id="compress-max-size" min="100" max="8000" value="1920" />
+        <span>px</span>
+      </div>
+    </div>
+
+    <div class="settings-panel" id="settings-to-svg" style="display:none;">
+      <div class="setting-row">
+        <label for="svg-colors">Color palette:</label>
+        <select id="svg-colors">
+          <option value="2">2 colors (B&W)</option>
+          <option value="4">4 colors</option>
+          <option value="8">8 colors</option>
+          <option value="16" selected>16 colors</option>
+          <option value="32">32 colors</option>
+          <option value="64">64 colors</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label for="svg-blur">Blur radius:</label>
+        <input type="range" id="svg-blur" min="0" max="5" value="0" step="1" />
+        <span id="svg-blur-val">0</span>
+      </div>
+    </div>
+
+    <div class="settings-panel" id="settings-to-jpg" style="display:none;">
+      <div class="setting-row">
+        <label for="jpg-quality">Quality:</label>
+        <input type="range" id="jpg-quality" min="10" max="100" value="92" />
+        <span id="jpg-quality-val">92%</span>
+      </div>
+      <div class="setting-row">
+        <label for="jpg-bg-color">Background (for transparency):</label>
+        <input type="color" id="jpg-bg-color" value="#ffffff" />
+      </div>
+      <p class="setting-hint">Supports: PNG, GIF, WebP, SVG, BMP, TIFF, HEIC, HEIF and more.</p>
+    </div>
+
+    <div class="settings-panel" id="settings-from-jpg" style="display:none;">
+      <div class="setting-row">
+        <label for="from-jpg-format">Output format:</label>
+        <select id="from-jpg-format">
+          <option value="png">PNG</option>
+          <option value="webp">WebP</option>
+          <option value="animated-gif" selected>Animated GIF (from multiple images)</option>
+        </select>
+      </div>
+      <div class="setting-row gif-settings">
+        <label for="gif-delay">Frame delay (ms):</label>
+        <input type="number" id="gif-delay" min="20" max="2000" value="200" />
+      </div>
+      <div class="setting-row gif-settings">
+        <label>
+          <input type="checkbox" id="gif-loop" checked />
+          Loop infinitely
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-panel" id="settings-meme" style="display:none;">
+      <div id="meme-text-fields">
+        <!-- Text fields dynamically added here -->
+      </div>
+      <button class="tool-button sm-btn" id="btn-add-meme-text" type="button">+ Add Text Field</button>
+      <div class="setting-row" style="margin-top:0.75rem;">
+        <label for="meme-font">Font:</label>
+        <select id="meme-font">
+          <option value="Impact" selected>Impact</option>
+          <option value="Arial Black">Arial Black</option>
+          <option value="Comic Sans MS">Comic Sans</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label for="meme-font-size">Font size:</label>
+        <input type="range" id="meme-font-size" min="16" max="120" value="48" />
+        <span id="meme-font-size-val">48px</span>
+      </div>
+      <div class="setting-row">
+        <label for="meme-text-color">Text color:</label>
+        <input type="color" id="meme-text-color" value="#ffffff" />
+      </div>
+      <div class="setting-row">
+        <label for="meme-stroke-color">Outline color:</label>
+        <input type="color" id="meme-stroke-color" value="#000000" />
+      </div>
+      <div class="setting-row">
+        <label for="meme-stroke-width">Outline width:</label>
+        <input type="range" id="meme-stroke-width" min="0" max="10" value="3" />
+        <span id="meme-stroke-width-val">3px</span>
+      </div>
+      <div class="setting-row">
+        <label>
+          <input type="checkbox" id="meme-text-bg" />
+          Text background box
+        </label>
+      </div>
+      <p class="setting-hint">Drag text handles on the preview to reposition (both X and Y).</p>
+    </div>
+
+    <div class="settings-panel" id="settings-watermark" style="display:none;">
+      <div class="setting-row">
+        <label for="watermark-type">Watermark type:</label>
+        <select id="watermark-type">
+          <option value="text">Text</option>
+          <option value="image">Image</option>
+        </select>
+      </div>
+      <div class="watermark-text-settings">
+        <div class="setting-row">
+          <label for="watermark-text">Text:</label>
+          <input type="text" id="watermark-text" placeholder="Your watermark" value="Watermark" />
+        </div>
+        <div class="setting-row">
+          <label for="watermark-font-size">Size:</label>
+          <input type="range" id="watermark-font-size" min="12" max="100" value="32" />
+          <span id="watermark-font-size-val">32px</span>
+        </div>
+        <div class="setting-row">
+          <label for="watermark-color">Color:</label>
+          <input type="color" id="watermark-color" value="#ffffff" />
+        </div>
+      </div>
+      <div class="watermark-image-settings" style="display:none;">
+        <div class="setting-row">
+          <label>Watermark image:</label>
+          <input type="file" id="watermark-image-input" accept="image/*" />
+        </div>
+        <div class="setting-row">
+          <label for="watermark-img-size">Size (%):</label>
+          <input type="range" id="watermark-img-size" min="5" max="50" value="20" />
+          <span id="watermark-img-size-val">20%</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label for="watermark-opacity">Opacity:</label>
+        <input type="range" id="watermark-opacity" min="10" max="100" value="50" />
+        <span id="watermark-opacity-val">50%</span>
+      </div>
+      <div class="setting-row">
+        <label for="watermark-position">Position:</label>
+        <select id="watermark-position">
+          <option value="free" selected>Free (drag to place)</option>
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+          <option value="center">Center</option>
+          <option value="tile">Tile (repeat)</option>
+        </select>
+      </div>
+      <button class="tool-button sm-btn" id="btn-add-watermark" type="button">+ Add Another Watermark</button>
+      <p class="setting-hint">Select "Free" position and drag on preview to place. Add multiple watermarks if needed.</p>
+    </div>
+
+    <div class="settings-panel" id="settings-remove-bg" style="display:none;">
+      <div class="setting-row">
+        <label for="bg-threshold">Sensitivity:</label>
+        <input type="range" id="bg-threshold" min="1" max="100" value="30" />
+        <span id="bg-threshold-val">30</span>
+      </div>
+      <div class="setting-row">
+        <label for="bg-color-pick">Background color to remove:</label>
+        <input type="color" id="bg-color-pick" value="#ffffff" />
+        <label class="checkbox-label">
+          <input type="checkbox" id="bg-auto-detect" checked />
+          Auto-detect corners
+        </label>
+      </div>
+      <p class="setting-hint">Note: This is a simple color-based removal. For complex backgrounds, consider a dedicated tool.</p>
+    </div>
+
+    <div class="settings-panel" id="settings-metadata" style="display:none;">
+      <p class="setting-hint">Upload images to view metadata, then strip EXIF, GPS, camera info, etc.</p>
+      <div class="setting-row">
+        <label>
+          <input type="checkbox" id="metadata-keep-orientation" checked />
+          Keep orientation (apply rotation before stripping)
+        </label>
+      </div>
+      <div class="setting-row">
+        <label for="metadata-output">Output format:</label>
+        <select id="metadata-output">
+          <option value="same">Same as input</option>
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+        </select>
+      </div>
+      <!-- Metadata display for uploaded images -->
+      <div id="metadata-display" class="metadata-display" style="display:none;">
+        <h4>Detected Metadata</h4>
+        <div id="metadata-list" class="metadata-list"></div>
+      </div>
+    </div>
+
+    <div class="settings-panel" id="settings-blur-face" style="display:none;">
+      <p class="setting-hint">Draw rectangles on the preview to select areas to blur (faces, plates, etc.).</p>
+      <div class="setting-row">
+        <label for="blur-intensity">Blur intensity:</label>
+        <input type="range" id="blur-intensity" min="5" max="50" value="20" />
+        <span id="blur-intensity-val">20px</span>
+      </div>
+      <div class="setting-row">
+        <label for="blur-shape">Shape:</label>
+        <select id="blur-shape">
+          <option value="rect" selected>Rectangle</option>
+          <option value="ellipse">Ellipse</option>
+        </select>
+      </div>
+      <button class="tool-button sm-btn secondary-btn" id="btn-clear-blur-regions" type="button">Clear All Regions</button>
+    </div>
+
+    <div class="settings-panel" id="settings-upscale" style="display:none;">
+      <div class="setting-row">
+        <label for="upscale-factor">Scale factor:</label>
+        <select id="upscale-factor">
+          <option value="1.5">1.5x</option>
+          <option value="2" selected>2x</option>
+          <option value="3">3x</option>
+          <option value="4">4x</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label for="upscale-method">Method:</label>
+        <select id="upscale-method">
+          <option value="smooth" selected>Smooth (bicubic)</option>
+          <option value="pixelated">Pixelated (nearest neighbor)</option>
+        </select>
+      </div>
+      <p class="setting-hint">Note: For AI-powered upscaling with better results, consider dedicated tools.</p>
+    </div>
+
+    <div class="settings-panel" id="settings-editor" style="display:none;">
+      <p class="setting-hint">Basic image editor: draw, add images, rotate, resize. Upload a base image first.</p>
+
+      <div class="editor-toolbar">
+        <div class="editor-tool-group">
+          <span class="tool-group-label">Tools:</span>
+          <button class="editor-tool-btn active" data-tool="select" title="Select/Move">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="brush" title="Brush">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="eraser" title="Eraser">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l9-9 9 9-4 4z"/><path d="M6 11l5 5"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="line" title="Line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="rect" title="Rectangle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="ellipse" title="Ellipse">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="9" ry="6"/></svg>
+          </button>
+          <button class="editor-tool-btn" data-tool="text" title="Text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M12 4v16"/><path d="M8 20h8"/></svg>
+          </button>
+        </div>
+
+        <div class="editor-tool-group">
+          <span class="tool-group-label">Brush:</span>
+          <input type="range" id="editor-brush-size" min="1" max="100" value="5" />
+          <span id="editor-brush-size-val">5px</span>
+          <input type="color" id="editor-color" value="#ff0000" title="Color" />
+        </div>
+      </div>
+
+      <div class="editor-layer-controls">
+        <span class="tool-group-label">Add image layer:</span>
+        <input type="file" id="editor-add-image" accept="image/*,.heic,.heif" />
+        <button class="tool-button sm-btn secondary-btn" id="btn-editor-undo" type="button">Undo</button>
+        <button class="tool-button sm-btn secondary-btn" id="btn-editor-redo" type="button">Redo</button>
+        <button class="tool-button sm-btn secondary-btn" id="btn-editor-clear" type="button">Clear All</button>
+      </div>
+
+      <!-- Layers panel -->
+      <div class="editor-layers-panel">
+        <div class="layers-panel-header">
+          <span>Layers</span>
+        </div>
+        <div id="editor-layers-list" class="editor-layers-list">
+          <div class="layer-item base-layer">
+            <span class="layer-name">Base Image</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="setting-hint" style="margin-top:0.5rem;">Click layers to select. Drag on canvas to move. Corner handles resize.</p>
+    </div>
+
+    <div class="settings-panel" id="settings-html-to-img" style="display:none;">
+      <p class="setting-hint">Enter a URL to capture a full-page screenshot, or paste custom HTML.</p>
+      <div class="setting-row">
+        <label for="html-source-type">Source:</label>
+        <select id="html-source-type">
+          <option value="url" selected>URL (fetch webpage)</option>
+          <option value="html">Custom HTML</option>
+        </select>
+      </div>
+      <div class="url-source-settings">
+        <div class="setting-row">
+          <label for="html-url">URL:</label>
+          <input type="url" id="html-url" placeholder="https://example.com" style="flex:1;max-width:400px;" />
+        </div>
+        <div class="setting-row">
+          <label>
+            <input type="checkbox" id="html-include-css" checked />
+            Include linked CSS stylesheets
+          </label>
+        </div>
+      </div>
+      <div class="html-source-settings" style="display:none;">
+        <textarea id="html-input" class="html-input" placeholder="<html>
+<head>
+  <style>body { font-family: Arial; padding: 20px; }</style>
+</head>
+<body>
+  <h1>Hello World</h1>
+  <p>Your content here...</p>
+</body>
+</html>"></textarea>
+        <div class="setting-row" style="margin-top:0.5rem;">
+          <label for="html-width">Width:</label>
+          <input type="number" id="html-width" min="100" max="3840" value="1200" />
+          <span>px</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label for="html-height">Max height (0 = full page):</label>
+        <input type="number" id="html-height" min="0" max="10000" value="0" />
+        <span>px</span>
+      </div>
+      <div class="setting-row">
+        <label for="html-output-format">Output:</label>
+        <select id="html-output-format">
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+        </select>
+      </div>
+      <button class="tool-button" id="btn-render-html" type="button">Capture Screenshot</button>
+      <div id="html-preview-area" class="html-preview-area" style="display:none;">
+        <div class="preview-header"><span>Preview</span></div>
+        <div id="html-preview-container" class="html-preview-container"></div>
+      </div>
+    </div>
+
+    <div class="settings-panel" id="settings-python-helper" style="display:none;">
+      <p class="setting-hint">Upload image(s) to preview effects, then generate Python/NumPy code.</p>
+
+      <!-- Image upload for preview -->
+      <div class="setting-row">
+        <label>Preview image:</label>
+        <input type="file" id="python-image-input" accept="image/*" />
+      </div>
+
+      <div class="python-ops-list">
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="grayscale" /> Grayscale</label>
+          <span class="op-desc">Convert RGB to luminance values (Y = 0.299R + 0.587G + 0.114B)</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="invert" /> Invert Colors</label>
+          <span class="op-desc">Flip pixel values (255 - pixel) for negative effect</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="gaussian" /> Gaussian Blur</label>
+          <span class="op-desc">Smooth image using Gaussian kernel convolution</span>
+          <div class="op-params" data-for="gaussian">
+            <label>Sigma: <input type="range" id="param-gaussian-sigma" min="0.5" max="10" step="0.5" value="2" /></label>
+            <span id="val-gaussian-sigma">2</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="threshold" /> Binary Threshold</label>
+          <span class="op-desc">Convert to black/white based on threshold value</span>
+          <div class="op-params" data-for="threshold">
+            <label>Threshold: <input type="range" id="param-threshold-val" min="0" max="255" value="128" /></label>
+            <span id="val-threshold-val">128</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="otsu" /> Otsu Threshold</label>
+          <span class="op-desc">Automatic threshold selection by minimizing intra-class variance</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="adaptive" /> Adaptive Threshold</label>
+          <span class="op-desc">Local thresholding based on neighborhood mean</span>
+          <div class="op-params" data-for="adaptive">
+            <label>Block size: <input type="range" id="param-adaptive-block" min="3" max="99" step="2" value="35" /></label>
+            <span id="val-adaptive-block">35</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="contour-h" /> Horizontal Contours</label>
+          <span class="op-desc">Detect horizontal edges using Sobel operator (dy)</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="contour-v" /> Vertical Contours</label>
+          <span class="op-desc">Detect vertical edges using Sobel operator (dx)</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="sobel" /> Sobel Edges</label>
+          <span class="op-desc">Combined edge detection √(dx² + dy²)</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="canny" /> Canny Edges</label>
+          <span class="op-desc">Multi-stage edge detection with hysteresis thresholding</span>
+          <div class="op-params" data-for="canny">
+            <label>Low: <input type="range" id="param-canny-low" min="0" max="255" value="50" /></label>
+            <span id="val-canny-low">50</span>
+            <label>High: <input type="range" id="param-canny-high" min="0" max="255" value="150" /></label>
+            <span id="val-canny-high">150</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="filter-color" /> Filter Color</label>
+          <span class="op-desc">Keep only pixels within tolerance of target color</span>
+          <div class="op-params" data-for="filter-color">
+            <label>Color: <input type="color" id="param-filter-color" value="#ff0000" /></label>
+            <label>Tolerance: <input type="range" id="param-filter-tol" min="5" max="100" value="30" /></label>
+            <span id="val-filter-tol">30</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="remove-color" /> Remove Color</label>
+          <span class="op-desc">Make pixels near target color transparent (alpha=0)</span>
+          <div class="op-params" data-for="remove-color">
+            <label>Color: <input type="color" id="param-remove-color" value="#ffffff" /></label>
+            <label>Tolerance: <input type="range" id="param-remove-tol" min="5" max="100" value="30" /></label>
+            <span id="val-remove-tol">30</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="foreground" /> Extract Foreground</label>
+          <span class="op-desc">Remove background color to isolate subject</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="erosion" /> Erosion</label>
+          <span class="op-desc">Shrink bright regions (morphological minimum filter)</span>
+          <div class="op-params" data-for="erosion">
+            <label>Kernel: <input type="range" id="param-erosion-k" min="1" max="15" step="2" value="3" /></label>
+            <span id="val-erosion-k">3</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="dilation" /> Dilation</label>
+          <span class="op-desc">Expand bright regions (morphological maximum filter)</span>
+          <div class="op-params" data-for="dilation">
+            <label>Kernel: <input type="range" id="param-dilation-k" min="1" max="15" step="2" value="3" /></label>
+            <span id="val-dilation-k">3</span>
+          </div>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="morphopen" /> Opening</label>
+          <span class="op-desc">Erosion then dilation - removes small bright spots</span>
+        </div>
+        <div class="python-op-item">
+          <label class="checkbox-label"><input type="checkbox" data-op="morphclose" /> Closing</label>
+          <span class="op-desc">Dilation then erosion - fills small dark holes</span>
+        </div>
+      </div>
+
+      <div class="python-actions">
+        <button class="tool-button sm-btn" id="btn-preview-python" type="button">Preview Effect</button>
+        <button class="tool-button" id="btn-generate-python" type="button">Generate Python Code</button>
+      </div>
+
+      <!-- Preview area for Python effects -->
+      <div id="python-preview-area" class="python-preview-area" style="display:none;">
+        <div class="preview-header"><span>Effect Preview</span></div>
+        <div class="python-preview-grid">
+          <div class="python-preview-item">
+            <span>Original</span>
+            <canvas id="python-original-canvas"></canvas>
+          </div>
+          <div class="python-preview-item">
+            <span>Result</span>
+            <canvas id="python-result-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div id="python-output" class="python-output" style="display:none;">
+        <div class="python-output-header">
+          <span>Generated Python Code</span>
+          <button class="tool-button sm-btn" id="btn-copy-python">Copy</button>
+        </div>
+        <pre id="python-code"></pre>
+      </div>
+    </div>
+
+    <!-- Process button -->
+    <div class="process-row" id="process-row">
+      <button class="tool-button" id="btn-process" type="button" disabled>Process Images</button>
+    </div>
+
+    <!-- Preview area (meme, watermark, blur, editor) -->
+    <div id="preview-area" class="preview-area" style="display:none;">
+      <div class="preview-header">
+        <span>Preview</span>
+        <span id="preview-hint" class="preview-hint"></span>
+      </div>
+      <div class="preview-container" id="preview-container">
+        <canvas id="preview-canvas"></canvas>
+        <!-- Draggable handles for meme text -->
+        <div id="meme-handles"></div>
+        <!-- Draggable watermarks -->
+        <div id="watermark-handles"></div>
+        <!-- Blur region drawing overlay -->
+        <div id="blur-overlay"></div>
+        <!-- Editor layer handles -->
+        <div id="editor-layers-container"></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-section" class="results-section" style="display:none;">
+      <div class="results-header">
+        <h3>Results</h3>
+        <div class="results-actions">
+          <button class="tool-button sm-btn" id="btn-download-zip" type="button">&#8595; Download All (ZIP)</button>
+        </div>
+      </div>
+      <div id="results-grid" class="results-grid"></div>
+      <div id="results-stats" class="results-stats"></div>
+    </div>
+
+  </main>
+
+  <footer class="tool-footer">
+    <p class="tool-footer-text">&copy; 2024&ndash;<script>document.write(new Date().getFullYear())</script> &Ccedil;a&#287;an Efe &Ccedil;al&#305;da&#287; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
+  </footer>
+
+  <!-- Libraries -->
+  <script src="js/jszip.min.js"></script>
+  <script src="js/browser-image-compression.js"></script>
+  <script src="js/imagetracer.js"></script>
+  <script src="js/gif.js"></script>
+  <script src="js/heic2any.min.js"></script>
+  <script src="js/exif.min.js"></script>
+  <script src="js/exifr.min.js"></script>
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/multi-image-tool.js"></script>
+</body>
+</html>
