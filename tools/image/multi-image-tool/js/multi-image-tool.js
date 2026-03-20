@@ -2167,6 +2167,87 @@
   bgThreshold?.addEventListener('input', () => bgThresholdVal.textContent = bgThreshold.value);
 
   /* ── HTML to Image ───────────────────────────────────────────────── */
+
+  function convertRelativeUrlsToAbsolute(html, baseUrl) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Add base tag so relative URLs resolve correctly
+    const baseTag = doc.createElement('base');
+    baseTag.href = baseUrl;
+    doc.head.insertBefore(baseTag, doc.head.firstChild);
+
+    // Convert img src to absolute
+    doc.querySelectorAll('img').forEach(img => {
+      if (img.src && !img.src.startsWith('data:')) {
+        try {
+          const absUrl = new URL(img.src, baseUrl).href;
+          img.src = absUrl;
+        } catch (e) {
+          console.warn('Failed to convert img src:', img.src);
+        }
+      }
+    });
+
+    // Convert background images in styles
+    doc.querySelectorAll('[style]').forEach(el => {
+      const style = el.getAttribute('style');
+      if (style && style.includes('url(')) {
+        const newStyle = style.replace(/url\((['"]?)([^)'"]+)\1\)/g, (match, quote, url) => {
+          if (url.startsWith('data:') || url.startsWith('http')) return match;
+          try {
+            const absUrl = new URL(url, baseUrl).href;
+            return `url(${quote}${absUrl}${quote})`;
+          } catch (e) {
+            return match;
+          }
+        });
+        el.setAttribute('style', newStyle);
+      }
+    });
+
+    // Convert link href for stylesheets to absolute
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+      if (link.href && !link.href.startsWith('data:')) {
+        try {
+          const absUrl = new URL(link.href, baseUrl).href;
+          link.href = absUrl;
+        } catch (e) {
+          console.warn('Failed to convert link href:', link.href);
+        }
+      }
+    });
+
+    return doc.documentElement.outerHTML;
+  }
+
+  async function inlineStylesFromHtml(html, baseUrl) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Fetch and inline external stylesheets
+    const links = doc.querySelectorAll('link[rel="stylesheet"]');
+    for (const link of links) {
+      const href = link.getAttribute('href');
+      if (!href) continue;
+
+      try {
+        const absUrl = new URL(href, baseUrl).href;
+        const cssResponse = await fetch(absUrl, { mode: 'cors' });
+        if (!cssResponse.ok) continue;
+        const cssText = await cssResponse.text();
+
+        const style = doc.createElement('style');
+        style.textContent = cssText;
+        link.parentNode.replaceChild(style, link);
+      } catch (e) {
+        console.warn('Failed to inline CSS:', href, e);
+      }
+    }
+
+    return doc.documentElement.outerHTML;
+  }
+
   const htmlSourceType = document.getElementById('html-source-type');
   htmlSourceType?.addEventListener('change', () => {
     document.querySelector('.url-source-settings').style.display = htmlSourceType.value === 'url' ? '' : 'none';
@@ -2185,7 +2266,7 @@
 
     try {
       if (sourceType === 'url') {
-        const url = document.getElementById('html-url')?.value?.trim();
+        let url = document.getElementById('html-url')?.value?.trim();
         if (!url) {
           alert('Please enter a URL');
           btn.textContent = 'Capture Screenshot';
@@ -2193,16 +2274,21 @@
           return;
         }
 
+        // Add https:// if no protocol specified
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+
         // Direct fetch - works for same-origin or CORS-enabled sites
         const response = await fetch(url, { mode: 'cors' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         htmlContent = await response.text();
 
-        // Inline CSS if requested
-        const includeCss = document.getElementById('html-include-css')?.checked;
-        if (includeCss) {
-          htmlContent = await inlineCssFromHtml(htmlContent, url);
-        }
+        // Convert relative URLs to absolute and inline CSS
+        htmlContent = convertRelativeUrlsToAbsolute(htmlContent, url);
+
+        // Always inline CSS for screenshot capture to work properly
+        htmlContent = await inlineStylesFromHtml(htmlContent, url);
       } else {
         htmlContent = document.getElementById('html-input')?.value || '';
         if (!htmlContent.trim()) {
@@ -2231,7 +2317,70 @@
       doc.write(htmlContent);
       doc.close();
 
-      // Wait for render
+      // Wait for initial render
+      await new Promise(r => setTimeout(r, 1500));
+
+      // Smooth scroll to trigger lazy loading, reveal animations, and progressive content
+      const scrollToBottom = async () => {
+        const win = iframe.contentWindow;
+        let lastHeight = doc.body.scrollHeight;
+        let unchangedCount = 0;
+
+        // Scroll through page carefully to trigger reveal animations
+        for (let attempt = 0; attempt < 50; attempt++) {
+          // Get viewport height
+          const viewportHeight = win.innerHeight || doc.documentElement.clientHeight;
+
+          // Scroll down by viewport height
+          win.scrollBy(0, viewportHeight);
+
+          // Dispatch scroll event to trigger reveal detection
+          const scrollEvent = new Event('scroll', { bubbles: true });
+          doc.dispatchEvent(scrollEvent);
+          win.dispatchEvent(scrollEvent);
+
+          // Wait for reveal animations to complete (1s transition + buffer)
+          await new Promise(r => setTimeout(r, 1200));
+
+          const newHeight = doc.body.scrollHeight;
+
+          // Check if we've reached the bottom
+          if (newHeight === lastHeight) {
+            unchangedCount++;
+            // Need 3-4 checks to confirm we're really done
+            if (unchangedCount >= 3) break;
+          } else {
+            unchangedCount = 0;
+          }
+
+          lastHeight = newHeight;
+        }
+
+        // Go back to top
+        win.scrollTo(0, 0);
+        const scrollEvent = new Event('scroll', { bubbles: true });
+        doc.dispatchEvent(scrollEvent);
+        win.dispatchEvent(scrollEvent);
+
+        // Wait for everything to settle, including any animations that trigger on top scroll
+        await new Promise(r => setTimeout(r, 2000));
+      };
+
+      try {
+        await scrollToBottom();
+      } catch (e) {
+        console.warn('Scrolling failed, continuing anyway:', e);
+      }
+
+      // Final wait for all animations to complete
+      await new Promise(r => setTimeout(r, 1500));
+
+      // Force all reveal elements to be active so they're animated and visible
+      doc.querySelectorAll('.reveal').forEach(el => {
+        el.classList.add('active');
+      });
+
+      // Wait for the final animations to play
       await new Promise(r => setTimeout(r, 1500));
 
       // Get actual content height
@@ -2240,6 +2389,7 @@
 
       // Capture using html2canvas
       if (typeof html2canvas !== 'undefined') {
+        const baseUrl = sourceType === 'url' ? document.getElementById('html-url')?.value?.trim() : null;
         const canvas = await html2canvas(doc.body, {
           width: 1200,
           height: contentHeight,
@@ -2247,7 +2397,19 @@
           allowTaint: true,
           backgroundColor: '#ffffff',
           scrollY: 0,
-          scrollX: 0
+          scrollX: 0,
+          baseURL: baseUrl || undefined,
+          onclone: (clonedDoc) => {
+            // Remove any scripts that might cause issues
+            clonedDoc.querySelectorAll('script').forEach(s => s.remove());
+            // Ensure all reveals are active so they render animated
+            clonedDoc.querySelectorAll('.reveal').forEach(el => {
+              el.classList.add('active');
+            });
+            // Ensure scroll is at top
+            clonedDoc.documentElement.scrollTop = 0;
+            clonedDoc.body.scrollTop = 0;
+          }
         });
 
         const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
