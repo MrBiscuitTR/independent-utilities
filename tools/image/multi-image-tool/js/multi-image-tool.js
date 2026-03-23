@@ -1076,6 +1076,11 @@
     previewCanvas.onmouseup = onEditorCanvasMouseUp;
     previewCanvas.onmouseleave = onEditorCanvasMouseUp;
 
+    // Touch events for mobile support
+    previewCanvas.ontouchstart = onEditorCanvasTouchStart;
+    previewCanvas.ontouchmove = onEditorCanvasTouchMove;
+    previewCanvas.ontouchend = onEditorCanvasTouchEnd;
+
     renderEditorLayersList();
   }
 
@@ -1260,6 +1265,41 @@
     drawStart = null;
     resizeHandle = null;
     renderEditorCanvas();
+  }
+
+  function onEditorCanvasTouchStart(e) {
+    if (e.touches.length === 0) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      bubbles: true
+    });
+    previewCanvas.dispatchEvent(mouseEvent);
+  }
+
+  function onEditorCanvasTouchMove(e) {
+    if (e.touches.length === 0) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      bubbles: true
+    });
+    previewCanvas.dispatchEvent(mouseEvent);
+  }
+
+  function onEditorCanvasTouchEnd(e) {
+    e.preventDefault();
+
+    const mouseEvent = new MouseEvent('mouseup', {
+      bubbles: true
+    });
+    previewCanvas.dispatchEvent(mouseEvent);
   }
 
   function drawCurrentShape() {
