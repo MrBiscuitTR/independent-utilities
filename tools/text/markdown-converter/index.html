@@ -6,9 +6,11 @@
     <title>Markdown ↔ HTML Converter</title>
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="styles/hljs-github.min.css">
     <link rel="stylesheet" href="styles/markdown-converter.css">
     <!-- marked.js for Markdown→HTML parsing (local copy in js/) -->
     <script src="./js/marked.min.js"></script>
+    <script src="./js/highlight.min.js"></script>
 </head>
 <body class="tool-body">
     <header class="tool-header">
@@ -19,43 +21,64 @@
 
     <main class="tool-main md-main">
 
-        <!-- Toolbar -->
-        <div class="md-toolbar">
-            <div class="mode-tabs">
-                <button class="mode-tab active" data-mode="md-to-html">Markdown → HTML</button>
-                <button class="mode-tab" data-mode="html-to-md">HTML → Markdown</button>
+        <!-- Drop zone (small, horizontal) -->
+        <div id="drop-area" class="drop-area" tabindex="0" role="button" aria-label="Open markdown files">
+            <svg class="drop-area-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16"></polyline>
+                <line x1="12" y1="12" x2="12" y2="21"></line>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+            </svg>
+            <span class="drop-area-text">Drag & drop .md / .html files or click to browse · Opens in new tabs</span>
+            <input id="file-input" type="file" multiple accept=".md,.html,.txt,text/markdown,text/html,text/plain" />
+        </div>
+
+        <!-- Tab bar (hidden initially, shown when files are loaded) -->
+        <div id="md-tabbar" class="md-tabbar" style="display:none;" role="tablist"></div>
+
+        <!-- Default workspace (shown by default) -->
+        <div id="default-workspace" class="md-workspace-container active">
+            <!-- Toolbar -->
+            <div class="md-toolbar">
+                <div class="mode-tabs">
+                    <button class="mode-tab active" data-mode="md-to-html">Markdown → HTML</button>
+                    <button class="mode-tab" data-mode="html-to-md">HTML → Markdown</button>
+                </div>
+                <div class="toolbar-right">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="splitToggle" checked>
+                        Split preview
+                    </label>
+                    <button class="tool-button sm-btn" id="copyOutput">Copy output</button>
+                    <button class="tool-button sm-btn secondary-btn" id="clearAll">Clear</button>
+                </div>
             </div>
-            <div class="toolbar-right">
-                <label class="toggle-label">
-                    <input type="checkbox" id="splitToggle" checked>
-                    Split preview
-                </label>
-                <button class="tool-button sm-btn" id="copyOutput">Copy output</button>
-                <button class="tool-button sm-btn secondary-btn" id="clearAll">Clear</button>
+
+            <!-- Editor / Preview panes -->
+            <div class="md-workspace" id="workspace">
+                <div class="md-pane" id="inputPane">
+                    <div class="pane-label" id="inputLabel">Markdown input</div>
+                    <textarea id="inputArea" class="pane-editor" spellcheck="false" placeholder="Type or paste Markdown here…"></textarea>
+                </div>
+                <div class="pane-divider" id="divider"></div>
+                <div class="md-pane" id="outputPane">
+                    <div class="pane-label-row">
+                        <span class="pane-label" id="outputLabel">HTML output</span>
+                        <div class="view-tabs">
+                            <button class="view-tab active" data-view="rendered">Rendered</button>
+                            <button class="view-tab" data-view="source">Source</button>
+                        </div>
+                    </div>
+                    <!-- rendered preview -->
+                    <div id="renderedView" class="pane-rendered markdown-body"></div>
+                    <!-- raw HTML/Markdown source -->
+                    <textarea id="sourceView" class="pane-editor source-editor" readonly spellcheck="false" style="display:none"></textarea>
+                </div>
             </div>
         </div>
 
-        <!-- Editor / Preview panes -->
-        <div class="md-workspace" id="workspace">
-            <div class="md-pane" id="inputPane">
-                <div class="pane-label" id="inputLabel">Markdown input</div>
-                <textarea id="inputArea" class="pane-editor" spellcheck="false" placeholder="Type or paste Markdown here…"></textarea>
-            </div>
-            <div class="pane-divider" id="divider"></div>
-            <div class="md-pane" id="outputPane">
-                <div class="pane-label-row">
-                    <span class="pane-label" id="outputLabel">HTML output</span>
-                    <div class="view-tabs">
-                        <button class="view-tab active" data-view="rendered">Rendered</button>
-                        <button class="view-tab" data-view="source">Source</button>
-                    </div>
-                </div>
-                <!-- rendered preview -->
-                <div id="renderedView" class="pane-rendered markdown-body"></div>
-                <!-- raw HTML/Markdown source -->
-                <textarea id="sourceView" class="pane-editor source-editor" readonly spellcheck="false" style="display:none"></textarea>
-            </div>
-        </div>
+        <!-- File-loaded workspaces (dynamically added here) -->
+        <div id="workspaces"></div>
 
     </main>
 

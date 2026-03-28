@@ -107,6 +107,25 @@ def ask_user_input():
     print("  Examples: socks5://127.0.0.1:1080 or http://proxy:port")
     proxy = input("Proxy URL [default: none]: ").strip() or None
 
+    # Browser cookies (for YouTube bot detection)
+    print("\nBrowser cookies (helps avoid YouTube bot detection):")
+    print("  1. None (skip)")
+    print("  2. Chrome")
+    print("  3. Firefox")
+    print("  4. Edge")
+    print("  5. Safari")
+    cookies_choice = input("Choice (1/2/3/4/5) [default: 1 - None]: ").strip() or "1"
+
+    cookies_from_browser = None
+    if cookies_choice == "2":
+        cookies_from_browser = "chrome"
+    elif cookies_choice == "3":
+        cookies_from_browser = "firefox"
+    elif cookies_choice == "4":
+        cookies_from_browser = "edge"
+    elif cookies_choice == "5":
+        cookies_from_browser = "safari"
+
     # Summary
     print("\n" + "="*60)
     print("DOWNLOAD SUMMARY")
@@ -119,6 +138,8 @@ def ask_user_input():
         print(f"Sleep interval: {sleep_interval}s")
     if proxy:
         print(f"Proxy: {proxy}")
+    if cookies_from_browser:
+        print(f"Cookies from: {cookies_from_browser.title()}")
     print("="*60 + "\n")
 
     confirm = input("Proceed with download? (y/n) [default: y]: ").strip().lower() or "y"
@@ -126,10 +147,10 @@ def ask_user_input():
         print("Download cancelled.")
         sys.exit(0)
 
-    return urls, format_type, quality, output_dir, proxy, sleep_interval
+    return urls, format_type, quality, output_dir, proxy, sleep_interval, cookies_from_browser
 
 
-def download_media(urls, format_type='mp4', quality='best', output_dir='downloads', proxy=None, sleep_interval=3):
+def download_media(urls, format_type='mp4', quality='best', output_dir='downloads', proxy=None, sleep_interval=3, cookies_from_browser=None):
     """
     Download media from URLs
 
@@ -140,6 +161,7 @@ def download_media(urls, format_type='mp4', quality='best', output_dir='download
         output_dir: Directory to save downloads
         proxy: Proxy URL (e.g., 'socks5://127.0.0.1:1080' or 'http://proxy:port')
         sleep_interval: Seconds to wait between downloads (default: 3, helps avoid rate limits)
+        cookies_from_browser: Browser to extract cookies from (e.g., 'chrome', 'firefox', 'edge')
     """
     # Create output directory
     output_path = Path(output_dir)
@@ -165,6 +187,10 @@ def download_media(urls, format_type='mp4', quality='best', output_dir='download
     # Add proxy if provided
     if proxy:
         ydl_opts['proxy'] = proxy
+
+    # Add cookies from browser if provided
+    if cookies_from_browser:
+        ydl_opts['cookiesfrombrowser'] = (cookies_from_browser,)
 
     # Format-specific options
     if format_type == 'mp3':
@@ -195,6 +221,8 @@ def download_media(urls, format_type='mp4', quality='best', output_dir='download
             print(f"Output directory: {output_path.absolute()}")
             if proxy:
                 print(f"Proxy: {proxy}")
+            if cookies_from_browser:
+                print(f"Using cookies from: {cookies_from_browser.title()}")
             if len(urls) > 1:
                 print(f"Sleep interval: {sleep_interval}s between downloads")
             print(f"{'='*60}\n")
@@ -212,7 +240,18 @@ def download_media(urls, format_type='mp4', quality='best', output_dir='download
                         time.sleep(sleep_interval)
 
                 except Exception as e:
+                    error_msg = str(e)
                     print(f"✗ Error downloading {url}: {e}")
+
+                    # Provide helpful hints for common errors
+                    if "Could not copy" in error_msg and "cookie database" in error_msg:
+                        print("\n💡 Hint: Close your browser completely and try again.")
+                        print("   The browser has locked the cookie database.")
+                        print("   Or try a different browser: --cookies-from-browser firefox")
+                    elif "Sign in to confirm you're not a bot" in error_msg:
+                        print("\n💡 Hint: Use --cookies-from-browser chrome (or firefox/edge)")
+                        print("   This bypasses YouTube's bot detection.")
+
                     error_count += 1
                     # Still sleep after errors to avoid triggering rate limits
                     if i < len(urls) and sleep_interval > 0:
@@ -268,6 +307,9 @@ Examples:
   # Download audio as MP3 (default format)
   python mm-downloader.py "https://www.youtube.com/watch?v=VIDEO_ID"
 
+  # Download with browser cookies (bypasses YouTube bot detection)
+  python mm-downloader.py --cookies-from-browser chrome "URL"
+
   # Download video as MP4
   python mm-downloader.py -f mp4 "https://www.youtube.com/watch?v=VIDEO_ID"
 
@@ -302,6 +344,8 @@ Supported sites: YouTube, Vimeo, Facebook, Twitter, Instagram, TikTok, and 1000+
     parser.add_argument('-o', '--output', default=None,
                         help='Output directory (default: script_dir/downloads)')
     parser.add_argument('--proxy', help='Proxy URL (e.g., socks5://127.0.0.1:1080 or http://proxy:port)')
+    parser.add_argument('--cookies-from-browser', choices=['chrome', 'firefox', 'edge', 'safari', 'chromium', 'opera', 'brave'],
+                        help='Browser to extract cookies from (helps bypass YouTube bot detection)')
     parser.add_argument('--sleep', type=float, default=3.0,
                         help='Seconds to wait between downloads (default: 3, helps avoid rate limits)')
     parser.add_argument('--list-formats', action='store_true',
@@ -313,8 +357,8 @@ Supported sites: YouTube, Vimeo, Facebook, Twitter, Instagram, TikTok, and 1000+
 
     # Interactive mode: if no arguments provided or --interactive flag
     if args.interactive or (not args.urls and not args.input_file):
-        urls, format_type, quality, output_dir, proxy, sleep_interval = ask_user_input()
-        download_media(urls, format_type, quality, output_dir, proxy, sleep_interval)
+        urls, format_type, quality, output_dir, proxy, sleep_interval, cookies_from_browser = ask_user_input()
+        download_media(urls, format_type, quality, output_dir, proxy, sleep_interval, cookies_from_browser)
         sys.exit(0)
 
     # Collect URLs
@@ -348,7 +392,7 @@ Supported sites: YouTube, Vimeo, Facebook, Twitter, Instagram, TikTok, and 1000+
         sys.exit(0)
 
     # Download
-    download_media(urls, args.format, args.quality, output_dir, args.proxy, args.sleep)
+    download_media(urls, args.format, args.quality, output_dir, args.proxy, args.sleep, args.cookies_from_browser)
 
 
 if __name__ == '__main__':

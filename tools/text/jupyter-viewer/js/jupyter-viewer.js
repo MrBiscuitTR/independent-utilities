@@ -662,6 +662,15 @@
     }
   });
 
+  /* ── Tab bar horizontal scrolling with mouse wheel ──────────────── */
+  nbTabbar.addEventListener('wheel', (e) => {
+    // Enable horizontal scrolling with mouse wheel when cursor is in tab bar
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      nbTabbar.scrollLeft += e.deltaY;
+    }
+  }, { passive: false });
+
   /* ── Initial state ───────────────────────────────────────────────── */
   showLanding();
 

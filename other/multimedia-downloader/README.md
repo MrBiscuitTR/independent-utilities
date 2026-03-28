@@ -57,6 +57,7 @@ The script will ask you:
 - Output directory - supports ~/Downloads, relative paths, etc.
 - Sleep interval between downloads (for bulk downloads)
 - Proxy settings (optional)
+- Browser cookies (optional, helps bypass YouTube bot detection)
 
 ### Command Line Mode
 
@@ -81,6 +82,18 @@ python mm-downloader.py -i urls.txt
 ```
 
 ### Advanced Options
+
+**Bypass YouTube bot detection (use browser cookies):**
+```bash
+# Chrome
+python mm-downloader.py --cookies-from-browser chrome "URL"
+
+# Firefox
+python mm-downloader.py --cookies-from-browser firefox "URL"
+
+# Edge
+python mm-downloader.py --cookies-from-browser edge "URL"
+```
 
 **Specific quality:**
 ```bash
@@ -129,6 +142,7 @@ options:
   -q, --quality        Quality: best, worst, or specific (e.g., 720p, 1080p) (default: worst)
   -o, --output         Output directory (supports ~ and relative paths) (default: script_dir/downloads)
   --proxy              Proxy URL (e.g., socks5://127.0.0.1:1080 or http://proxy:port)
+  --cookies-from-browser  Browser to extract cookies from: chrome, firefox, edge, safari, etc.
   --sleep              Seconds to wait between downloads (default: 3, helps avoid rate limits)
   --interactive        Run in interactive Q&A mode
   --list-formats       List available formats for a URL without downloading
@@ -204,6 +218,23 @@ pip install yt-dlp
 **Download fails with "Video unavailable":**
 - The video might be private, deleted, or region-restricted
 - Try updating yt-dlp: `pip install -U yt-dlp`
+
+**"Sign in to confirm you're not a bot" error (YouTube):**
+- YouTube is blocking yt-dlp - use browser cookies to bypass:
+  ```bash
+  python mm-downloader.py --cookies-from-browser chrome "URL"
+  ```
+- **IMPORTANT: Close your browser completely before running the command** (check system tray too)
+- Windows browsers lock their cookie database while running
+- Make sure you're logged into YouTube in that browser first
+- Supported browsers: chrome, firefox, edge, safari, chromium, opera, brave
+- If it still fails, try a different browser or update yt-dlp: `pip install -U yt-dlp`
+
+**"Could not copy cookie database" error:**
+- Your browser is currently running and has locked the cookie file
+- **Close the browser completely** (check system tray/background processes)
+- Then run the command again
+- Firefox handles this better on Windows - try: `--cookies-from-browser firefox`
 
 **Slow downloads:**
 - Some sites may throttle download speeds

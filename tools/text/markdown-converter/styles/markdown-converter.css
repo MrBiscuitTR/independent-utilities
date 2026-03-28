@@ -10,6 +10,145 @@
     box-sizing: border-box;
 }
 
+/* ── Landing (drop zone) ────────────────────────────────────────────────── */
+.md-landing {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.drop-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 2px dashed var(--color-border, #ccc);
+    border-radius: var(--radius-md, 6px);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    background: var(--color-surface, #fff);
+    text-align: center;
+    user-select: none;
+    position: relative;
+}
+
+.drop-area:hover,
+.drop-area.dragover {
+    border-color: var(--color-primary, #4a90e2);
+    background: rgba(74, 144, 226, 0.05);
+}
+.drop-area.dragover { border-style: solid; }
+.drop-area input[type="file"] { display: none; }
+
+.drop-area-text {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.drop-area-icon {
+    color: var(--color-text-muted, #aaa);
+    width: 20px;
+    height: 20px;
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────────────── */
+.md-tabbar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow-x: auto;
+    background: var(--color-bg, #f9f9f9);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 6px);
+    height: 36px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.md-tabbar::-webkit-scrollbar { display: none; }
+
+.md-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.85rem;
+    height: 100%;
+    border: none;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-bg, #f9f9f9);
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+.md-tab:hover { background: var(--color-surface, #fff); color: var(--color-text); }
+.md-tab.active {
+    background: var(--color-surface, #fff);
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-primary);
+    margin-bottom: -1px;
+}
+
+.tab-name {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 3px;
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+}
+.md-tab:hover .tab-close,
+.md-tab.active .tab-close { opacity: 1; }
+.tab-close:hover { background: rgba(0,0,0,0.1); color: #c0392b; }
+
+.tab-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.85rem;
+    height: 100%;
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.15s, background 0.15s;
+}
+.tab-add-btn:hover { background: var(--color-surface); color: var(--color-primary); }
+
+.tabbar-spacer { flex: 1; }
+
+.md-workspace-container {
+    display: none;
+}
+
+.md-workspace-container.active {
+    display: block;
+}
+
 /* ── Toolbar ───────────────────────────────────────────────────────────────── */
 .md-toolbar {
     display: flex;
@@ -236,7 +375,50 @@
     font-size: 0.87rem;
     line-height: 1.5;
 }
-.markdown-body pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+.markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+}
+
+/* Override highlight.js colors for dark background */
+.markdown-body pre code .hljs-comment,
+.markdown-body pre code .hljs-quote {
+    color: #7f849c;
+}
+.markdown-body pre code .hljs-keyword,
+.markdown-body pre code .hljs-selector-tag,
+.markdown-body pre code .hljs-literal,
+.markdown-body pre code .hljs-type {
+    color: #cba6f7;
+}
+.markdown-body pre code .hljs-string,
+.markdown-body pre code .hljs-regexp {
+    color: #a6e3a1;
+}
+.markdown-body pre code .hljs-number,
+.markdown-body pre code .hljs-built_in {
+    color: #fab387;
+}
+.markdown-body pre code .hljs-function .hljs-title,
+.markdown-body pre code .hljs-title {
+    color: #89b4fa;
+}
+.markdown-body pre code .hljs-variable,
+.markdown-body pre code .hljs-name,
+.markdown-body pre code .hljs-attr {
+    color: #f9e2af;
+}
+.markdown-body pre code .hljs-meta,
+.markdown-body pre code .hljs-built_in {
+    color: #f5c2e7;
+}
+.markdown-body pre code .hljs-operator,
+.markdown-body pre code .hljs-punctuation {
+    color: #94e2d5;
+}
+
 .markdown-body blockquote {
     border-left: 4px solid var(--color-primary);
     margin: 0.75rem 0;
