@@ -1,27 +1,38 @@
 /* ip-location.js
-   Calls ip-api.com directly from the browser — no backend needed.
-   ip-api.com: free, no key, ≤45 req/min, Access-Control-Allow-Origin: *
-
-   "My IP" auto-detection (when input is blank):
-     1. cloudflare.com/cdn-cgi/trace  — CORS-enabled Cloudflare edge endpoint
-     2. icanhazip.com                 — Cloudflare-operated plain-text echo
-*/
+ *
+ * Nothing is contacted until you press Lookup.
+ *
+ * Before any request goes out, the address you typed is checked locally
+ * (/js/ip-sources.js -> classifyIP). A typo or an address on your own LAN is
+ * rejected here rather than being handed to a third party — a private address
+ * has no public location anyway, and sending one only tells a stranger how
+ * your network is laid out.
+ *
+ * Geolocation chain, tried in order until one answers:
+ *   ipwho.is  ->  get.geojs.io  ->  api.iplocation.net
+ * The previous provider (ip-api.com) is HTTP-only, so on the live https://
+ * site the browser blocked it as mixed content and this tool never worked.
+ */
 
 "use strict";
 
-// ── External API endpoints ──────────────────────────────────────────────────
-const IP_API_URL = "http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query";
-const CF_TRACE   = "https://cloudflare.com/cdn-cgi/trace";
-const ICANHAZIP  = "https://icanhazip.com";
+const S = window.IPSources;
 
-// ── DOM ─────────────────────────────────────────────────────────────────────
 const ipInput    = document.getElementById("ipInput");
 const lookupBtn  = document.getElementById("lookupBtn");
 const resultArea = document.getElementById("resultArea");
+const idleNote   = document.getElementById("idleNote");
 
-// Hide the backend banner — this tool no longer needs the backend
 const backendBanner = document.getElementById("backendBanner");
 if (backendBanner) backendBanner.classList.add("hidden");
+
+function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function showError(html) {
+    resultArea.innerHTML = '<div class="loc-error">' + html + "</div>";
+}
 
 // ── Country code → flag emoji ─────────────────────────────────────────────
 function flagEmoji(cc) {
@@ -30,91 +41,98 @@ function flagEmoji(cc) {
     return [...cc.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))).join("");
 }
 
-// ── Resolve own public IP (used when input is blank) ──────────────────────
-async function getMyIp() {
-    try {
-        const r = await fetch(CF_TRACE, { signal: AbortSignal.timeout(5000), cache: "no-store" });
-        const body = await r.text();
-        if (body.includes("ip=")) {
-            const ip = (body.match(/^ip=(.+)$/m) || [])[1]?.trim();
-            if (ip) return ip;
-        }
-    } catch (_) {}
-
-    try {
-        const r = await fetch(ICANHAZIP, { signal: AbortSignal.timeout(5000), cache: "no-store" });
-        const ip = (await r.text()).trim();
-        if (ip && /^[\d:.a-fA-F]+$/.test(ip)) return ip;
-    } catch (_) {}
-
-    return null;
-}
-
 // ── Main lookup ───────────────────────────────────────────────────────────
 async function doLookup() {
-    let ip = ipInput.value.trim();
-    resultArea.innerHTML = `<p style="color:var(--color-text-muted);font-size:0.9rem">Looking up…</p>`;
+    const typed = ipInput.value.trim();
+    if (idleNote) idleNote.classList.add("hidden");
+
+    // Validate locally first — nothing goes out for input that cannot work.
+    if (typed) {
+        const c = S.classifyIP(typed);
+        if (!c.valid) { showError(esc(c.reason)); return; }
+        if (c.reserved) {
+            showError(
+                esc(typed) + " is " + esc(c.reason) + ", so it has no public location. " +
+                "Nothing was sent anywhere \u2014 addresses like this only exist inside a network."
+            );
+            return;
+        }
+    }
+
+    resultArea.innerHTML = '<p class="net-source">Looking up\u2026</p>';
     lookupBtn.disabled = true;
 
     try {
+        let ip = typed;
+        let ipVia = null;
+
         if (!ip) {
-            ip = await getMyIp();
-            if (!ip) throw new Error("Could not detect your public IP. Check your connection or enter an IP manually.");
+            const det = await S.detectIP("any");
+            ip = det.value;
+            ipVia = det.provider.host;
         }
 
-        const url = IP_API_URL.replace("{ip}", encodeURIComponent(ip));
-        const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
-        if (!resp.ok) throw new Error(`ip-api.com returned HTTP ${resp.status}`);
-
-        const data = await resp.json();
-        if (data.status === "fail") throw new Error(data.message || "Lookup failed");
-
-        renderResult(data);
+        const res = await S.lookupGeo(ip);
+        renderResult(res.value, res.provider, ipVia);
     } catch (e) {
-        resultArea.innerHTML = `<div class="loc-error">Error: ${e.message}</div>`;
+        showError(
+            "Lookup failed: " + esc(e.message) +
+            (e.details ? "<br><small>" + esc(e.details.join(" \u00b7 ")) + "</small>" : "") +
+            "<br><small>If every provider failed, a tracking-blocker extension is the usual cause.</small>"
+        );
     } finally {
         lookupBtn.disabled = false;
     }
 }
 
-function renderResult(d) {
+function renderResult(d, provider, ipVia) {
     const flag = flagEmoji(d.countryCode);
+    const country = d.country
+        ? d.country + (d.countryCode ? " (" + d.countryCode + ")" : "")
+        : null;
+
     const fields = [
-        ["IP",           d.query],
-        ["Country",      `${d.country} (${d.countryCode})`],
-        ["Region",       d.regionName],
+        ["IP",           d.ip],
+        ["Country",      country],
+        ["Region",       d.region],
         ["City",         d.city],
-        ["ZIP",          d.zip],
+        ["Postcode",     d.postal],
         ["Latitude",     d.lat],
         ["Longitude",    d.lon],
         ["Timezone",     d.timezone],
         ["ISP",          d.isp],
         ["Organisation", d.org],
-        ["ASN",          d.as],
-    ].filter(([, v]) => v !== undefined && v !== null && v !== "");
+        ["ASN",          d.asn]
+    ].filter(f => f[1] !== undefined && f[1] !== null && f[1] !== "");
 
-    const fieldHtml = fields.map(([k, v]) => `
-        <div class="loc-field">
-            <div class="loc-field-key">${k}</div>
-            <div class="loc-field-val">${v}</div>
-        </div>`).join("");
+    const fieldHtml = fields.map(f =>
+        '<div class="loc-field"><div class="loc-field-key">' + esc(f[0]) +
+        '</div><div class="loc-field-val">' + esc(f[1]) + "</div></div>").join("");
 
-    const mapUrl = `https://www.openstreetmap.org/?mlat=${d.lat}&mlon=${d.lon}&zoom=10`;
+    const place = [d.city, d.region, d.country].filter(Boolean).join(", ");
 
-    resultArea.innerHTML = `
-        <div class="loc-card">
-            <div class="loc-card-header">
-                <span class="loc-flag">${flag}</span>
-                <div>
-                    <div class="loc-ip-big">${d.query}</div>
-                    <div class="loc-city-line">${[d.city, d.regionName, d.country].filter(Boolean).join(", ")}</div>
-                </div>
-            </div>
-            <div class="loc-grid">${fieldHtml}</div>
-            <div class="loc-map-row">
-                <a href="${mapUrl}" target="_blank" rel="noopener">📍 View on OpenStreetMap</a>
-            </div>
-        </div>`;
+    const mapRow = (d.lat !== undefined && d.lon !== undefined)
+        ? '<div class="loc-map-row"><a href="https://www.openstreetmap.org/?mlat=' +
+          encodeURIComponent(d.lat) + "&mlon=" + encodeURIComponent(d.lon) +
+          '&zoom=10" target="_blank" rel="noopener noreferrer">\ud83d\udccd View on OpenStreetMap</a></div>'
+        : "";
+
+    const via = "Answered by <code>" + esc(provider.host) + "</code>" +
+        (ipVia ? "; your own address came from <code>" + esc(ipVia) + "</code>" : "") + ".";
+
+    resultArea.innerHTML =
+        '<div class="loc-card">' +
+            '<div class="loc-card-header">' +
+                '<span class="loc-flag">' + flag + "</span>" +
+                "<div>" +
+                    '<div class="loc-ip-big">' + esc(d.ip) + "</div>" +
+                    '<div class="loc-city-line">' + esc(place) + "</div>" +
+                "</div>" +
+            "</div>" +
+            '<div class="loc-grid">' + fieldHtml + "</div>" +
+            mapRow +
+        "</div>" +
+        '<p class="net-source">' + via + "</p>";
 }
 
 lookupBtn.addEventListener("click", doLookup);

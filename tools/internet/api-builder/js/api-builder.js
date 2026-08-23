@@ -275,6 +275,7 @@
         // Add a default row if empty
         const fl = document.getElementById('fieldList');
         if (!fl.children.length) addKvRow('fieldList', 'myField', 'response.data');
+        updateExtracted(); // render the snippet now, not on the next keystroke
     }
 
     // Observe field list changes to update extracted snippet

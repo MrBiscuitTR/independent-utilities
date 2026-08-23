@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Helper scripts, not pages.
+Disallow: /other/
+
+Sitemap: https://utilities.cagancalidag.com/sitemap.xml

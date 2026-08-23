@@ -3,8 +3,61 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>QR Code Generator</title>
+    <!-- SEO -->
+    <title>Free QR Code Generator — Permanent, No Expiry, No Sign-Up</title>
+    <meta name="description" content="Create a free QR code that never expires. Generate permanent QR codes from any link or text, download as PNG, and keep scanning forever — no account, no tracking, no scan limits.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/image/qr-generator/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="Free QR Code Generator — Permanent, No Expiry, No Sign-Up">
+    <meta property="og:description" content="Create a free QR code that never expires. Generate permanent QR codes from any link or text, download as PNG, and keep scanning forever — no account, no tracking, no scan limits.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/image/qr-generator/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free QR Code Generator — Permanent, No Expiry, No Sign-Up">
+    <meta name="twitter:description" content="Create a free QR code that never expires. Generate permanent QR codes from any link or text, download as PNG, and keep scanning forever — no account, no tracking, no scan limits.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Free QR Code Generator",
+      "url": "https://utilities.cagancalidag.com/tools/image/qr-generator/",
+      "description": "Create a free QR code that never expires. Generate permanent QR codes from any link or text, download as PNG, and keep scanning forever — no account, no tracking, no scan limits.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "Permanent static QR codes that never expire",
+            "Encode any URL or plain text",
+            "Download as PNG",
+            "High error correction for reliable scanning",
+            "Works offline — nothing is uploaded"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/qr.css">
@@ -12,7 +65,7 @@
     <script src="./js/qr.js" defer></script>
 </head>
 
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">QR Code Generator</h1>
@@ -27,6 +80,29 @@
         </form>
         <div id="qr-output" class="qr-output"></div>
     </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>A free QR code generator whose codes really are permanent</h2>
+      <p>Most &ldquo;free&rdquo; QR generators hand you a <strong>dynamic</strong> QR code: the image points at
+        <em>their</em> short link, which redirects to yours. If that company shuts the link down, raises its
+        price, or goes out of business, every code you printed stops working.</p>
+      <p>This tool makes <strong>static</strong> QR codes instead. Your link or text is encoded directly into
+        the black-and-white pattern, so the code is self-contained. There is no redirect, no server, no
+        account, and no scan limit — which is why it cannot expire, and why it will still scan in ten years
+        on a business card, a poster, a menu or a product label.</p>
+      <h3>How to use it</h3>
+      <ul>
+        <li>Paste a URL or any text and press <strong>Generate QR Code</strong>.</li>
+        <li>Download the PNG and print it at any size — the pattern is resolution-independent.</li>
+        <li>Test the printed code before a large print run, and leave a quiet margin around it.</li>
+      </ul>
+      <p>The trade-off of a static code: because the destination is baked in, you cannot change where it
+        points afterwards, and you get no scan analytics. Generation happens entirely in your browser — the
+        text you encode is never sent anywhere.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

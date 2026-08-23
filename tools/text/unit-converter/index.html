@@ -3,13 +3,66 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- CSP -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+<!-- /CSP -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unit Converter</title>
+<!-- SEO -->
+    <title>Unit Converter — Length, Weight, Temperature & Science Units</title>
+    <meta name="description" content="Free online unit converter: cm to inches, kg to lbs, Celsius to Fahrenheit, and every length, mass, volume, area, speed, time, energy and pressure unit. Every field updates live as you type.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/text/unit-converter/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="Unit Converter — Length, Weight, Temperature & Science Units">
+    <meta property="og:description" content="Free online unit converter: cm to inches, kg to lbs, Celsius to Fahrenheit, and every length, mass, volume, area, speed, time, energy and pressure unit. Every field updates live as you type.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/text/unit-converter/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Unit Converter — Length, Weight, Temperature & Science Units">
+    <meta name="twitter:description" content="Free online unit converter: cm to inches, kg to lbs, Celsius to Fahrenheit, and every length, mass, volume, area, speed, time, energy and pressure unit. Every field updates live as you type.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Unit Converter",
+      "url": "https://utilities.cagancalidag.com/tools/text/unit-converter/",
+      "description": "Free online unit converter: cm to inches, kg to lbs, Celsius to Fahrenheit, and every length, mass, volume, area, speed, time, energy and pressure unit. Every field updates live as you type.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "Length, mass, temperature, volume, area, speed, time, energy and pressure",
+            "Metric, imperial/US and SI scientific units",
+            "All units in a category update live as you type",
+            "Physics units: electronvolt, astronomical unit, slug, Rankine, pascal",
+            "Runs entirely offline"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
 <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="/css/tools.css">
 <link rel="stylesheet" href="styles/unit-converter.css">
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">📏 Unit Converter</h1>
@@ -155,6 +208,27 @@
             </div>
         </div>
     </div>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>Convert every unit in a category at once</h2>
+      <p>Type a value into any box and every other unit in that group updates immediately — you do not
+        pick a &ldquo;from&rdquo; and a &ldquo;to&rdquo; unit. That makes it quick to sanity-check an answer against
+        several units at the same time.</p>
+      <h3>What is covered</h3>
+      <ul>
+        <li><strong>Length</strong> — mm, cm, m, km, inches, feet, yards, miles, micrometres, nanometres, nautical miles, astronomical units.</li>
+        <li><strong>Mass</strong> — mg, g, kg, tonnes, pounds, ounces, stone, slugs.</li>
+        <li><strong>Temperature</strong> — Celsius, Fahrenheit, Kelvin, Rankine.</li>
+        <li><strong>Volume &amp; area</strong> — mL, L, m&sup3;, cubic inches and feet, US and UK gallons, barrels; mm&sup2; to square miles, hectares and acres.</li>
+        <li><strong>Speed, time, energy, pressure</strong> — m/s, km/h, mph, knots, the speed of light; nanoseconds to centuries; joules, calories, kWh, electronvolts, BTU; pascals, bar, atmospheres, psi, torr.</li>
+      </ul>
+      <p>Conversion factors are exact where an exact definition exists (an inch is exactly 25.4&nbsp;mm, a
+        pound exactly 0.45359237&nbsp;kg). Everything is computed locally — the converter works with no
+        internet connection at all.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

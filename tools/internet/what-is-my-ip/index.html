@@ -2,25 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data: https://ipv4.icanhazip.com https://ipv6.icanhazip.com https://api.ipify.org https://api6.ipify.org https://cloudflare.com https://get.geojs.io https://ipwho.is https://api.iplocation.net http://localhost:5501 http://127.0.0.1:5501; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What Is My IP</title>
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/what-is-my-ip.css">
+    <script src="/js/ext-badge.js" defer></script>
 </head>
 <body class="tool-body">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">What Is My IP?</h1>
-        <p class="tool-subtitle">Your public IPv4 and IPv6 addresses. Works without the backend via Cloudflare 1.1.1.1.</p>
+        <p class="tool-subtitle">Your public IPv4 and IPv6 addresses — looked up only when you ask.</p>
     </header>
 
     <main class="tool-main ip-main">
 
-        <!-- Backend status banner -->
-        <div id="backendBanner" class="backend-banner hidden">
-            ℹ️ Using Cloudflare fallback — only one IP shown. Start <code>python app.py</code> for both IPv4 + IPv6.
-        </div>
+        <!-- Status banner, filled in by the script -->
+        <div id="backendBanner" class="backend-banner hidden"></div>
+
+        <p class="net-idle" id="idleNote">
+            This page has not contacted anything yet. Press the button below and it will
+            ask an IP-echo service what address your connection is coming from.
+        </p>
 
         <div class="ip-card-row">
             <div class="ip-card" id="cardV4">
@@ -35,9 +42,11 @@
             </div>
         </div>
 
+        <p class="net-source hidden" id="sourceLine"></p>
+
         <div class="ip-actions">
-            <button class="tool-button" id="refreshBtn">Refresh</button>
-            <button class="tool-button secondary-btn" id="lookupBtn">Lookup my IP location ↓</button>
+            <button class="tool-button" id="showBtn">Show my IP address</button>
+            <button class="tool-button secondary-btn" id="lookupBtn">Look up its location ↓</button>
         </div>
 
         <!-- Location result (reuses ip-location logic) -->
@@ -49,6 +58,7 @@
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
     </footer>
 
+    <script src="/js/ip-sources.js"></script>
     <script src="js/what-is-my-ip.js"></script>
 </body>
 </html>

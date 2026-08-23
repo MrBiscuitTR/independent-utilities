@@ -158,6 +158,200 @@ body.tool-body {
   background-color: var(--color-primary-dk);
 }
 
+/* ── External-dependency badge (top-right of header) ──────────────────────────
+   Injected by /js/ext-badge.js on the tools that talk to a third-party service.
+   Tooltip opens on hover on pointer devices, and on click/tap everywhere. */
+.ext-badge-wrap {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.ext-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.ext-badge-btn:hover,
+.ext-badge-btn[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.ext-badge-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.ext-badge-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(20rem, calc(100vw - 2rem));
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0.85rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-weight: 400;
+  cursor: default;
+}
+
+.ext-badge-wrap.open .ext-badge-panel {
+  display: block;
+}
+
+.ext-badge-panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-primary-dk);
+}
+
+.ext-badge-panel .ext-note {
+  margin: 0 0 0.6rem;
+  color: var(--color-text-muted);
+}
+
+.ext-badge-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ext-badge-panel li + li {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.ext-badge-panel .ext-host {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.ext-badge-panel .ext-line {
+  margin: 0.2rem 0 0;
+}
+
+.ext-badge-panel .ext-line b {
+  color: var(--color-text);
+}
+
+.ext-badge-panel .ext-cdn-none {
+  margin: 0.7rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .ext-badge-btn .ext-badge-label { display: none; }
+  .tool-header { padding-left: 3.5rem; padding-right: 3.5rem; }
+}
+
+/* ── Network-tool provenance notes ───────────────────────────
+   .net-idle  — shown before anything has been contacted.
+   .net-source — names the provider that actually answered. */
+.net-idle,
+.net-source {
+  margin: 0.6rem 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.net-idle {
+  padding: 0.6rem 0.75rem;
+  background: #f5f7fa;
+  border: 1px solid #e0e4ea;
+  border-radius: var(--radius-md);
+}
+
+.net-source code,
+.net-idle code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: #eef1f5;
+  padding: 0.05rem 0.3rem;
+  border-radius: var(--radius-sm);
+}
+
+.net-idle.hidden,
+.net-source.hidden { display: none; }
+
+/* ── "About this tool" copy below the tool ────────────────────────────────── */
+/* .tool-main normally carries flex:1 so the footer stays at the bottom of a
+   short page. On a page that also has an about section that would open a wide
+   empty gap between the tool and the copy, so the growth moves to the about
+   section instead. A body class rather than :has() so it works everywhere. */
+.tool-body.has-about .tool-main  { flex: 0 0 auto; }
+.tool-body.has-about .tool-about { flex: 1 0 auto; }
+
+.tool-about {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.tool-about h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.tool-about h3 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.tool-about p {
+  margin: 0 0 0.75rem;
+}
+
+.tool-about ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.2rem;
+}
+
+.tool-about li {
+  margin-bottom: 0.25rem;
+}
+
+.tool-about a {
+  color: var(--color-primary-dk);
+}
+
 /* ── Footer ────────────────────────────────────────────────────────────────── */
 .tool-footer {
   background-color: var(--color-footer-bg);

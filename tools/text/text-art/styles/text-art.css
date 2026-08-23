@@ -63,7 +63,12 @@
 .ta-art {
     font-size: 1rem;
     line-height: 1.4;
-    word-break: break-all;
+    /* pre-wrap keeps the newlines and runs of spaces that multi-line ASCII art
+       depends on; without it the rocket, skull and divider pieces collapse
+       onto a single line. anywhere (not break-all) so long emoticons wrap at
+       the edge without being sliced mid-face. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     color: var(--color-text);
     font-family: var(--font-mono);
     max-width: 100%;

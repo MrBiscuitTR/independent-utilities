@@ -3,6 +3,15 @@
 
 (function () {
 
+  /* ── Local library paths ─────────────────────────────────────────────
+     browser-image-compression spawns a web worker that importScripts() the
+     library by URL. Its built-in default points at cdn.jsdelivr.net, so the
+     bundled copy in js/ has to be named explicitly or the tool quietly makes
+     an external request (and breaks offline). Absolute so the blob worker
+     resolves it against the origin rather than against blob:. */
+  const LOCAL_COMPRESSION_LIB =
+    new URL('js/browser-image-compression.js', document.baseURI).href;
+
   /* ── State ───────────────────────────────────────────────────────── */
   let currentMode = 'compress';
   let uploadedFiles = [];
@@ -1574,6 +1583,10 @@
           maxSizeMB: 10,
           maxWidthOrHeight: maxDim,
           useWebWorker: true,
+          // Without this, the worker importScripts() the library from
+          // cdn.jsdelivr.net — an external request this site does not make, and
+          // one that fails outright when you are offline.
+          libURL: LOCAL_COMPRESSION_LIB,
           initialQuality: quality
         });
 

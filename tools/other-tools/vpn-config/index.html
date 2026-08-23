@@ -2,13 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPN Config Generator</title>
+    <!-- SEO -->
+    <title>WireGuard & OpenVPN Config Generator — Free Config Files</title>
+    <meta name="description" content="Generate ready-to-use WireGuard wg-quick and OpenVPN config files with routing, NAT, DNS, kill-switch and port-forwarding rules. Free browser tool — no keys or configs leave your device.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/other-tools/vpn-config/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="WireGuard & OpenVPN Config Generator — Free Config Files">
+    <meta property="og:description" content="Generate ready-to-use WireGuard wg-quick and OpenVPN config files with routing, NAT, DNS, kill-switch and port-forwarding rules. Free browser tool — no keys or configs leave your device.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/other-tools/vpn-config/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="WireGuard & OpenVPN Config Generator — Free Config Files">
+    <meta name="twitter:description" content="Generate ready-to-use WireGuard wg-quick and OpenVPN config files with routing, NAT, DNS, kill-switch and port-forwarding rules. Free browser tool — no keys or configs leave your device.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "VPN Config Generator",
+      "url": "https://utilities.cagancalidag.com/tools/other-tools/vpn-config/",
+      "description": "Generate ready-to-use WireGuard wg-quick and OpenVPN config files with routing, NAT, DNS, kill-switch and port-forwarding rules. Free browser tool — no keys or configs leave your device.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "WireGuard wg-quick server and peer configs",
+            "OpenVPN server .conf and client .ovpn files",
+            "Split tunnelling and AllowedIPs control",
+            "NAT/masquerade, DNAT port forwarding and firewall rules",
+            "Custom DNS and kill-switch options",
+            "Reference notes for other VPN protocols"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/vpn-config.css">
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">VPN Config Generator</h1>
@@ -394,6 +448,29 @@ echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf</div>
         </div>
 
     </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>Generate a VPN config without hunting through forum posts</h2>
+      <p>Fill in the fields and get a complete, commented config file you can drop straight onto a server
+        or import into a client:</p>
+      <ul>
+        <li><strong>WireGuard</strong> — a <code>wg-quick</code> interface for the server plus matching peer
+          blocks, with <code>AllowedIPs</code> for full or split tunnelling, <code>PostUp</code>/<code>PostDown</code>
+          masquerade rules, keepalive, custom DNS and MTU.</li>
+        <li><strong>OpenVPN</strong> — a server <code>.conf</code> and a client <code>.ovpn</code>, with UDP or TCP,
+          cipher and auth choices, pushed routes and DNS, and client-to-client settings.</li>
+        <li><strong>Routing extras</strong> — NAT/masquerade, DNAT port forwarding to a machine behind the VPN,
+          and kill-switch rules so traffic drops instead of leaking when the tunnel is down.</li>
+      </ul>
+      <h3>About the keys</h3>
+      <p>WireGuard keypairs are deliberately <em>not</em> generated here. A browser is the wrong place to
+        create a private key you intend to trust — generate them on the machine that will use them with
+        <code>wg genkey | tee private.key | wg pubkey &gt; public.key</code>, and paste only the public key
+        in. The generator runs entirely client-side, so nothing you type is transmitted or stored.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 &#x2013;<script>document.write(new Date().getFullYear());</script> Ça&#x11F;an Efe Çal&#x131;da&#x11F; (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

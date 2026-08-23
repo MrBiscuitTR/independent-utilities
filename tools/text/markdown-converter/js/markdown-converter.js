@@ -482,9 +482,11 @@
 
     // ── HTML → Markdown converter ─────────────────────────────────────────
     function htmlToMarkdown(html) {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        return nodeToMd(div).trim();
+        // DOMParser builds an inert document: unlike assigning innerHTML on a
+        // live element, it never fetches <img>/<iframe> sources or fires inline
+        // handlers from the markup being converted.
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return nodeToMd(doc.body).trim();
     }
 
     function nodeToMd(node, opts) {

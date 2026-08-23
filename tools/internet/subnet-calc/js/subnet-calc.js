@@ -89,13 +89,15 @@ function calculate() {
         const isPrivate     = checkPrivate(network, prefix);
         const binaryMask    = toBinaryMask(prefix);
 
+        // /31 is the RFC 3021 point-to-point case: both addresses are usable.
+        // /32 is a single host. Neither has a network/broadcast pair to exclude.
         const fields = [
-            ["Input CIDR",      `${intToIp(network)}/${prefix}`],
+            ["Input CIDR",      `${ip}/${prefix}`],
             ["IP Address",      ip],
             ["Network Address", intToIp(network)],
             ["Broadcast",       intToIp(broadcast)],
-            ["First Usable",    prefix < 31 ? intToIp(firstHost) : "—"],
-            ["Last Usable",     prefix < 31 ? intToIp(lastHost)  : "—"],
+            ["First Usable",    intToIp(firstHost)],
+            ["Last Usable",     intToIp(lastHost)],
             ["Subnet Mask",     maskDotted],
             ["Wildcard Mask",   wildcardMask],
             ["Prefix Length",   `/${prefix}`],

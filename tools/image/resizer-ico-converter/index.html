@@ -2,19 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob: data:; child-src 'self' blob: data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+  <!-- /CSP -->
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Batch Image Resizer → ICO</title>
+  <!-- SEO -->
+    <title>PNG to ICO Converter — Free Favicon & Multi-Size .ICO Maker</title>
+    <meta name="description" content="Convert PNG or JPG to ICO online for free. Generates every favicon size from 16x16 to 256x256 plus one combined multi-size .ico file, in batch, without uploading your images anywhere.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/image/resizer-ico-converter/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="PNG to ICO Converter — Free Favicon & Multi-Size .ICO Maker">
+    <meta property="og:description" content="Convert PNG or JPG to ICO online for free. Generates every favicon size from 16x16 to 256x256 plus one combined multi-size .ico file, in batch, without uploading your images anywhere.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/image/resizer-ico-converter/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="PNG to ICO Converter — Free Favicon & Multi-Size .ICO Maker">
+    <meta name="twitter:description" content="Convert PNG or JPG to ICO online for free. Generates every favicon size from 16x16 to 256x256 plus one combined multi-size .ico file, in batch, without uploading your images anywhere.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PNG to ICO Converter & Favicon Generator",
+      "url": "https://utilities.cagancalidag.com/tools/image/resizer-ico-converter/",
+      "description": "Convert PNG or JPG to ICO online for free. Generates every favicon size from 16x16 to 256x256 plus one combined multi-size .ico file, in batch, without uploading your images anywhere.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "PNG, JPG and ICO input",
+            "Every favicon size: 16, 32, 48, 64, 128, 256 and custom",
+            "Combined multi-size .ico in a single file",
+            "Batch conversion of many images at once",
+            "PNG output for every size as well",
+            "ZIP download of all outputs"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
   <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="/css/tools.css" />
   <link rel="stylesheet" href="styles/image-ico-converter.css" />
   <script src="./js/pica.min.js"></script>
   <script src="./js/jszip.min.js"></script>
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
   <header class="tool-header">
     <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
     <h1 class="tool-title">Batch Resizer → ICO</h1>
-    <p class="tool-subtitle">Upload PNG, JPEG, or ICO files — generates per-size PNG + .ICO, plus a combined multi-size .ICO per image.</p>
+    <p class="tool-subtitle">Upload PNG, JPEG, or ICO files — generates per-size PNG + .ICO, plus a combined multi-size .ICO per image. Use square images for best results.</p>
   </header>
 
   <main class="tool-main resizer-main">
@@ -29,7 +83,7 @@
           <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
         </svg>
         <span class="drop-zone-text">Drag &amp; drop images here</span>
-        <span class="drop-zone-sub">or click to browse &mdash; PNG, JPEG, ICO &mdash; multiple files supported</span>
+        <span class="drop-zone-sub">or click to browse &mdash; PNG, JPEG, ICO &mdash; multiple files supported. Use square images for best results.</span>
         <input id="source-file" type="file" multiple
                accept="image/png, image/jpeg, image/x-icon, image/vnd.microsoft.icon, .ico" />
       </div>
@@ -120,6 +174,31 @@
     <!-- Results (grouped per image, populated by JS) -->
     <div id="results" class="resizer-output"></div>
   </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>PNG to ICO, and a proper multi-size favicon</h2>
+      <p>A <code>.ico</code> file is a container that can hold several images at different resolutions.
+        Windows and browsers then pick whichever one fits — 16&times;16 in a browser tab, 32&times;32 in the
+        taskbar, 256&times;256 in Explorer&rsquo;s large-icon view. A single-size icon gets scaled by the
+        operating system and looks blurry everywhere it does not fit exactly.</p>
+      <p>This tool resizes your source image to each size you tick, then packs the results into one
+        combined multi-size <code>.ico</code>, plus individual <code>.ico</code> and <code>.png</code>
+        files for each size.</p>
+      <h3>Notes that save time</h3>
+      <ul>
+        <li>Start from a <strong>square</strong> image — non-square sources get squashed into the icon box.</li>
+        <li>256&times;256 is the largest size the ICO format can address, so bigger sizes are exported as PNG
+          only and left out of the combined icon.</li>
+        <li>For a website favicon, put <code>favicon.ico</code> at the site root; it is still the most widely
+          supported option.</li>
+        <li>You can also feed an existing <code>.ico</code> back in — the largest layer inside it is used as
+          the source.</li>
+      </ul>
+      <p>Conversion happens locally in your browser; the images never leave your device.</p>
+    </section>
+    <!-- /ABOUT -->
 
   <footer class="tool-footer">
     <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear())</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

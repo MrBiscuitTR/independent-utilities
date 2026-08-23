@@ -39,7 +39,7 @@ const ART_DATA = [
 
     // ── Animals ──────────────────────────────────────────────────────────────
     { cat:"Animals", name:"Dog",             art:"(・∀・)",       tags:["dog","shibe"] },
-    { cat:"Animals", name:"Bunny",           art:"(\_/)  (='.'=)  (\\\")(\\\")",  tags:["bunny","rabbit"] },
+    { cat:"Animals", name:"Bunny",           art:"(\\_/)  (='.'=)  (\")(\")",  tags:["bunny","rabbit"] },
     { cat:"Animals", name:"Penguin",         art:"(>'-')>",       tags:["penguin","bird"] },
     { cat:"Animals", name:"Fish",            art:"<°)))><",       tags:["fish","sea"] },
     { cat:"Animals", name:"Shark",           art:"/\\___/\\",     tags:["shark"] },

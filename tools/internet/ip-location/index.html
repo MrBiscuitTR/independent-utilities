@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data: https://ipv4.icanhazip.com https://ipv6.icanhazip.com https://api.ipify.org https://api6.ipify.org https://cloudflare.com https://get.geojs.io https://ipwho.is https://api.iplocation.net; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Location Lookup</title>
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/ip-location.css">
+    <script src="/js/ext-badge.js" defer></script>
 </head>
 <body class="tool-body">
     <header class="tool-header">
@@ -17,9 +21,12 @@
 
     <main class="tool-main iploc-main">
 
-        <div id="backendBanner" class="backend-banner hidden">
-            ⚠️ Local backend offline — run <code>python app.py</code> in the <code>python/</code> folder.
-        </div>
+        <div id="backendBanner" class="backend-banner hidden"></div>
+
+        <p class="net-idle" id="idleNote">
+            Nothing is contacted until you press Lookup. The address is checked here first,
+            so a typo or a private address never leaves your browser.
+        </p>
 
         <div class="input-row">
             <input type="text" id="ipInput" class="tool-input" placeholder="8.8.8.8 or 2001:4860:4860::8888" autocomplete="off" spellcheck="false">
@@ -35,6 +42,7 @@
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>
     </footer>
 
+    <script src="/js/ip-sources.js"></script>
     <script src="js/ip-location.js"></script>
 </body>
 </html>

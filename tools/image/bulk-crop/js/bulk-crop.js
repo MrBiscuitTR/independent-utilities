@@ -651,7 +651,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. Draw cropped region to a tmp canvas (natural size)
       const tmp = document.createElement('canvas');
       tmp.width = w; tmp.height = h;
-      tmp.getContext('2d').drawImage(this.img, x, y, w, h, 0, 0, w, h);
+      const tctx = tmp.getContext('2d');
+      // JPEG has no alpha channel: transparent pixels would encode as black.
+      // Matte them onto white first, which is what every other tool does.
+      if (fmt === 'image/jpeg') {
+        tctx.fillStyle = '#ffffff';
+        tctx.fillRect(0, 0, w, h);
+      }
+      tctx.drawImage(this.img, x, y, w, h, 0, 0, w, h);
 
       // 2. Resize to output with pica
       const out = document.createElement('canvas');

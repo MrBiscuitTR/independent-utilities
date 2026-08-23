@@ -2,13 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <!-- connect-src is open here on purpose: this tool exists to send a
+             request to whatever URL you type into it. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src *; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Request Builder</title>
+    <!-- SEO -->
+    <title>Online API Request Builder — Free REST Client & cURL Maker</title>
+    <meta name="description" content="Build and send HTTP requests from your browser: GET, POST, PUT, DELETE, headers, query parameters, JSON body and auth. Inspect the response and generate cURL, JavaScript or Python code.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/internet/api-builder/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="Online API Request Builder — Free REST Client & cURL Maker">
+    <meta property="og:description" content="Build and send HTTP requests from your browser: GET, POST, PUT, DELETE, headers, query parameters, JSON body and auth. Inspect the response and generate cURL, JavaScript or Python code.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/internet/api-builder/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Online API Request Builder — Free REST Client & cURL Maker">
+    <meta name="twitter:description" content="Build and send HTTP requests from your browser: GET, POST, PUT, DELETE, headers, query parameters, JSON body and auth. Inspect the response and generate cURL, JavaScript or Python code.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "API Request Builder",
+      "url": "https://utilities.cagancalidag.com/tools/internet/api-builder/",
+      "description": "Build and send HTTP requests from your browser: GET, POST, PUT, DELETE, headers, query parameters, JSON body and auth. Inspect the response and generate cURL, JavaScript or Python code.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "GET, POST, PUT, PATCH, DELETE, HEAD and OPTIONS",
+            "Query parameters, custom headers and JSON, text or form bodies",
+            "Bearer token, Basic and API-key auth",
+            "Pretty-printed JSON response, raw body and response headers",
+            "Generates cURL, JavaScript fetch and Python requests code",
+            "Nothing to install and no account"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/api-builder.css">
+    <script src="/js/ext-badge.js" defer></script>
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">API Request Builder</h1>
@@ -134,6 +191,28 @@
         </div>
 
     </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>A REST client that is just a web page</h2>
+      <p>Set a method and URL, add query parameters, headers, a JSON or form body and an auth scheme, then
+        send. You get the status code, the response time, pretty-printed JSON, the raw body and the
+        response headers — plus a ready-to-paste <strong>cURL</strong>, <strong>JavaScript fetch</strong> or
+        <strong>Python requests</strong> snippet for the exact request you just built.</p>
+      <h3>Two things to know</h3>
+      <ul>
+        <li>Requests go <strong>directly from your browser</strong> to the target, so they are subject to that
+          server&rsquo;s <strong>CORS</strong> policy. An API that does not send
+          <code>Access-Control-Allow-Origin</code> will fail here even though the same request works from a
+          terminal — in that case, copy the cURL snippet and run it locally.</li>
+        <li>Nothing is proxied through a server here, so any token or password you type goes only to the
+          URL you entered, and is never stored.</li>
+      </ul>
+      <p>Handy as a lightweight stand-in for Postman or Insomnia when you just need to poke an endpoint
+        and get working code out of it.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

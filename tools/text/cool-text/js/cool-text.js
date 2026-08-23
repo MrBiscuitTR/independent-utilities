@@ -21,13 +21,12 @@ function makeMap(lowerStart, upperStart, digitStart) {
 const MAPS = {
     "Bold":                makeMap(0x1D41A, 0x1D400, 0x1D7CE),
     "Italic":              (() => {
-        // Math italic block has gaps: some chars are at different codepoints
+        // The math italic block has exactly one gap: U+1D455 is unassigned and
+        // italic h sits at U+210E (PLANCK CONSTANT) instead. Every other letter
+        // is sequential, so h is the only override needed — mapping e to U+212F
+        // would give SCRIPT small e, which is a different style.
         const m = makeMap(0x1D44E, 0x1D434, null);
-        // Lowercase overrides for letters outside the sequential block
-        m["h"] = "\u210E"; // Planck constant h
-        m["e"] = "\u212F"; // script small e (italic)
-        m["i"] = "\u{1D456}"; // i in italic block is fine — keep sequential
-        m["j"] = "\u{1D457}"; // j in italic block
+        m["h"] = "\u210E";
         return m;
     })(),
     "Bold Italic":         makeMap(0x1D482, 0x1D468, null),
@@ -194,6 +193,12 @@ function buildStyles(input) {
     return styles;
 }
 
+// Characters the style maps do not cover (<, >, &, punctuation) pass straight
+// through, so the styled text must be escaped before it is written to innerHTML.
+function escHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 // ── DOM ───────────────────────────────────────────────────────────────────────
 const ctInput   = document.getElementById("ctInput");
 const ctResults = document.getElementById("ctResults");
@@ -208,7 +213,7 @@ function render(input) {
         <div class="ct-item">
             <div class="ct-left">
                 <div class="ct-style-name">${s.name}</div>
-                <div class="ct-text" id="ct-text-${i}">${s.text}</div>
+                <div class="ct-text" id="ct-text-${i}">${escHtml(s.text)}</div>
             </div>
             <button class="ct-copy-btn" data-idx="${i}">Copy</button>
         </div>`).join("");

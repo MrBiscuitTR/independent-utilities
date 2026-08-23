@@ -2,15 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob: data:; child-src 'self' blob: data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+  <!-- /CSP -->
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bulk Image Crop &amp; Resize</title>
+  <!-- SEO -->
+    <title>Bulk Image Resizer — Crop & Resize Multiple Images Free</title>
+    <meta name="description" content="Resize and crop multiple images at once in your browser. Batch resize JPG, PNG and WebP to exact pixel dimensions, drag a crop box on each image, and download everything as a ZIP.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/image/bulk-crop/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="Bulk Image Resizer — Crop & Resize Multiple Images Free">
+    <meta property="og:description" content="Resize and crop multiple images at once in your browser. Batch resize JPG, PNG and WebP to exact pixel dimensions, drag a crop box on each image, and download everything as a ZIP.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/image/bulk-crop/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Bulk Image Resizer — Crop & Resize Multiple Images Free">
+    <meta name="twitter:description" content="Resize and crop multiple images at once in your browser. Batch resize JPG, PNG and WebP to exact pixel dimensions, drag a crop box on each image, and download everything as a ZIP.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Bulk Image Crop & Resize",
+      "url": "https://utilities.cagancalidag.com/tools/image/bulk-crop/",
+      "description": "Resize and crop multiple images at once in your browser. Batch resize JPG, PNG and WebP to exact pixel dimensions, drag a crop box on each image, and download everything as a ZIP.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "Batch resize many images to exact pixel dimensions",
+            "Drag-and-drop crop box on every image",
+            "Aspect-ratio lock (1:1, 4:3, 16:9, 3:2, custom)",
+            "Per-image size and format overrides",
+            "PNG, JPEG and WebP output",
+            "Download all results as one ZIP"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
   <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="/css/tools.css" />
   <link rel="stylesheet" href="styles/bulk-crop.css" />
   <script src="./js/pica.min.js"></script>
   <script src="./js/jszip.min.js"></script>
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
 
   <header class="tool-header">
     <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
@@ -117,6 +171,26 @@
     </div>
 
   </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>Resize and crop multiple images at once</h2>
+      <p>Drop in a folder of photos, set one output size, and every image comes out at exactly those
+        pixel dimensions. Each image gets its own draggable crop window, so you decide what stays in
+        frame instead of letting an automatic centre-crop cut off heads and edges. High-quality
+        downscaling is done with Lanczos resampling, so shrunk images stay sharp rather than muddy.</p>
+      <h3>Typical uses</h3>
+      <ul>
+        <li>Preparing a machine-learning dataset where every sample must be the same size (224&times;224, 512&times;512&hellip;).</li>
+        <li>Batch-resizing product photos, avatars or thumbnails for a shop or website.</li>
+        <li>Forcing a mixed set of photos into one aspect ratio for a grid or slideshow.</li>
+        <li>Converting a batch to WebP to cut page weight.</li>
+      </ul>
+      <p>Everything runs in your browser with the Canvas API. Your images are never uploaded to a
+        server — there is no upload limit, no queue and no watermark.</p>
+    </section>
+    <!-- /ABOUT -->
 
   <footer class="tool-footer">
     <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear())</script>

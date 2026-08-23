@@ -2,13 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Art Clipboard</title>
+    <!-- SEO -->
+    <title>Text Art & Kaomoji — Copy and Paste Emoticons and Symbols</title>
+    <meta name="description" content="Search and copy text emoticons, kaomoji, symbols and ASCII art with one click — shrug, Lenny face, table flip, hearts, arrows, stars, checkmarks, dividers and more.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/text/text-art/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="Text Art & Kaomoji — Copy and Paste Emoticons and Symbols">
+    <meta property="og:description" content="Search and copy text emoticons, kaomoji, symbols and ASCII art with one click — shrug, Lenny face, table flip, hearts, arrows, stars, checkmarks, dividers and more.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/text/text-art/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Text Art & Kaomoji — Copy and Paste Emoticons and Symbols">
+    <meta name="twitter:description" content="Search and copy text emoticons, kaomoji, symbols and ASCII art with one click — shrug, Lenny face, table flip, hearts, arrows, stars, checkmarks, dividers and more.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Text Art Clipboard",
+      "url": "https://utilities.cagancalidag.com/tools/text/text-art/",
+      "description": "Search and copy text emoticons, kaomoji, symbols and ASCII art with one click — shrug, Lenny face, table flip, hearts, arrows, stars, checkmarks, dividers and more.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "Japanese kaomoji and text emoticons",
+            "Symbols: arrows, hearts, stars, checkmarks, music notes",
+            "ASCII art and text dividers",
+            "Search by name, tag or character",
+            "Filter by category and maximum length",
+            "One-click copy"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/text-art.css">
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">Text Art Clipboard</h1>
@@ -43,6 +97,26 @@
         <div id="taGrid" class="ta-grid"></div>
 
     </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>Find the emoticon, copy it, move on</h2>
+      <p>A searchable clipboard of text emoticons (kaomoji), symbols and small ASCII art. Search by what
+        it is called (&ldquo;shrug&rdquo;, &ldquo;table flip&rdquo;, &ldquo;bear&rdquo;), by a tag (&ldquo;angry&rdquo;, &ldquo;cute&rdquo;,
+        &ldquo;arrow&rdquo;) or by typing part of the characters themselves. Click any tile to copy it.</p>
+      <h3>What is in here</h3>
+      <ul>
+        <li><strong>Faces &amp; emotions</strong> — shrug, Lenny face, disapproval, crying, hug, facepalm, sleeping.</li>
+        <li><strong>Symbols</strong> — arrows, checkmarks and crosses, stars, hearts, music notes, degree and currency-adjacent marks, dashes and ellipses.</li>
+        <li><strong>Dividers</strong> — lines and box-drawing characters for separating sections in a README, a bio or a chat message.</li>
+        <li><strong>ASCII art</strong> — small multi-line pieces that keep their shape in a monospaced font.</li>
+      </ul>
+      <p>All of it is plain Unicode, so it pastes into Discord, Twitch, GitHub, Reddit, Word or a terminal
+        without an image. Use the <strong>Max length</strong> filter when you have a character limit to
+        respect. The list is local to the page — nothing is requested from anywhere.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

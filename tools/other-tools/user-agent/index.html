@@ -2,13 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none';">
+    <!-- /CSP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What Is My User Agent?</title>
+    <!-- SEO -->
+    <title>What Is My User Agent? — Check & Parse Your Browser UA</title>
+    <meta name="description" content="See your browser's user agent string instantly, with the browser, rendering engine, operating system and device type parsed out. Copy it in one click, or paste any user agent string to decode it.">
+    <link rel="canonical" href="https://utilities.cagancalidag.com/tools/other-tools/user-agent/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#4a90e2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Independent Utilities">
+    <meta property="og:title" content="What Is My User Agent? — Check & Parse Your Browser UA">
+    <meta property="og:description" content="See your browser's user agent string instantly, with the browser, rendering engine, operating system and device type parsed out. Copy it in one click, or paste any user agent string to decode it.">
+    <meta property="og:url" content="https://utilities.cagancalidag.com/tools/other-tools/user-agent/">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="What Is My User Agent? — Check & Parse Your Browser UA">
+    <meta name="twitter:description" content="See your browser's user agent string instantly, with the browser, rendering engine, operating system and device type parsed out. Copy it in one click, or paste any user agent string to decode it.">
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "What Is My User Agent?",
+      "url": "https://utilities.cagancalidag.com/tools/other-tools/user-agent/",
+      "description": "See your browser's user agent string instantly, with the browser, rendering engine, operating system and device type parsed out. Copy it in one click, or paste any user agent string to decode it.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+      },
+      "featureList": [
+            "Shows your full user agent string",
+            "Parses browser, version, engine, OS and device type",
+            "Detects mobile, tablet and bot/crawler user agents",
+            "Decodes any user agent string you paste",
+            "One-click copy",
+            "No data leaves your browser"
+      ],
+      "creator": {
+            "@type": "Person",
+            "name": "Çağan Efe Çalıdağ",
+            "url": "https://cagancalidag.com"
+      },
+      "isPartOf": {
+            "@type": "WebSite",
+            "name": "Independent Utilities",
+            "url": "https://utilities.cagancalidag.com/"
+      }
+}
+    </script>
+    <!-- /SEO -->
     <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/tools.css">
     <link rel="stylesheet" href="styles/user-agent.css">
 </head>
-<body class="tool-body">
+<body class="tool-body has-about">
     <header class="tool-header">
         <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
         <h1 class="tool-title">What Is My User Agent?</h1>
@@ -39,6 +93,28 @@
         </div>
 
     </main>
+
+
+    <!-- ABOUT -->
+    <section class="tool-about">
+      <h2>Your user agent, decoded</h2>
+      <p>The user agent string is a line of text your browser sends with every request to identify itself.
+        This page reads it locally with <code>navigator.userAgent</code> and breaks it into the parts people
+        actually want: browser and version, rendering engine, operating system, and whether the request
+        looks like a phone, a tablet or a bot.</p>
+      <h3>When you need it</h3>
+      <ul>
+        <li>Filing a bug report — support teams almost always ask for it.</li>
+        <li>Checking that a device or emulator is presenting the browser you expect.</li>
+        <li>Debugging user-agent sniffing, feature detection or a device-specific CSS issue.</li>
+        <li>Decoding a UA string out of a server log: paste it into the second box to have it parsed.</li>
+      </ul>
+      <p>Modern user agent strings are deliberately misleading for historical reasons — nearly all of them
+        still begin with <code>Mozilla/5.0</code>, and Chrome, Edge and Opera all mention Safari and
+        WebKit. That is why the parsed breakdown is more useful than the raw line. Nothing here is logged
+        or transmitted; the string never leaves your browser.</p>
+    </section>
+    <!-- /ABOUT -->
 
     <footer class="tool-footer">
         <p class="tool-footer-text">&copy; 2024 –<script>document.write(new Date().getFullYear());</script> Çağan Efe Çalıdağ (<a href="https://cagancalidag.com" target="_blank" rel="noopener">cagancalidag.com</a>). All rights reserved.</p>

@@ -15,7 +15,69 @@ body.hub-body {
   color: white;
   padding: 2rem 1rem;
   text-align: center;
+  position: relative;
 }
+
+/* ── Source-code link (top-right of header) ──────────────────────────────── */
+.hub-github {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.hub-github:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.hub-github svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .hub-github {
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.4rem;
+  }
+  .hub-github .hub-github-label { display: none; }
+}
+
+/* Small globe marker on tools that contact a third-party service.
+   Pinned to the card corner rather than sitting next to the name, so it never
+   pushes the label around or forces an extra line. The tooltip lives on the
+   wrapper's title attribute rather than inside the SVG, so it stays out of the
+   link's textContent and out of hub search. */
+.web-icon {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  pointer-events: auto;
+}
+
+.web-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hub-link:hover .web-icon { opacity: 0.95; }
 
 .hub-title {
   margin: 0;
@@ -32,7 +94,7 @@ body.hub-body {
 .hub-desc {
   margin: 1rem auto 0;
   max-width: 600px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #eee;
   line-height: 1.5;
 }
@@ -92,12 +154,13 @@ body.hub-body {
 }
 
 .hub-link {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   width: 100%;
-  padding: 1rem 0.75rem;
+  padding: 1rem 1.5rem;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;
