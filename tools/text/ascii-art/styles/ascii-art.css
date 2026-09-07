@@ -112,16 +112,20 @@
     font-family: var(--font-mono);
     background: #1e1e2e;
     color: #cdd6f4;
-    line-height: 1.15;
+    /* Exactly 1, and no letter-spacing: ASCII art is a character grid, so any
+       gap between lines breaks the vertical strokes into dashes and any gap
+       between characters pulls the horizontal strokes apart. */
+    line-height: 1;
+    letter-spacing: 0;
     overflow-x: auto;
     white-space: pre;
     min-height: 120px;
-    font-size: 0.82rem; /* overridden by JS size class */
+    font-size: 0.9rem; /* overridden by JS size class */
 }
 
-.aa-output.size-small  { font-size: 0.62rem; line-height: 1.1; }
-.aa-output.size-medium { font-size: 0.82rem; line-height: 1.15; }
-.aa-output.size-large  { font-size: 1.05rem; line-height: 1.2; }
+.aa-output.size-small  { font-size: 0.7rem;  line-height: 1; }
+.aa-output.size-medium { font-size: 0.9rem;  line-height: 1; }
+.aa-output.size-large  { font-size: 1.15rem; line-height: 1; }
 
 .aa-output.empty {
     color: #6c7086;
