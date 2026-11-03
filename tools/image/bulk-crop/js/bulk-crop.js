@@ -34,13 +34,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressFill = document.getElementById('progress-fill');
   const progressLabel= document.getElementById('progress-label');
 
+  // Circle (profile picture) mode
+  const mainEl         = document.querySelector('.bc-main');
+  const gShape         = document.getElementById('g-shape');
+  const gWidthLabel    = document.getElementById('g-width-label');
+  const gCInside       = document.getElementById('g-c-inside');
+  const gCFill         = document.getElementById('g-c-fill');
+  const gCFillColor    = document.getElementById('g-c-fillcolor');
+  const gCBlur         = document.getElementById('g-c-blur');
+  const gCBright       = document.getElementById('g-c-bright');
+  const gCBgZoom       = document.getElementById('g-c-bgzoom');
+  const gCCorners      = document.getElementById('g-c-corners');
+  const gCCornerColor  = document.getElementById('g-c-cornercolor');
+  const gCRing         = document.getElementById('g-c-ring');
+  const gCRingColor    = document.getElementById('g-c-ringcolor');
+  const gCJpegHint     = document.getElementById('g-c-jpeg-hint');
+
   const EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
+
+  const VIEW       = 420;   // circle-mode viewport size (canvas px)
+  const FRAME_PX   = Math.round(VIEW * 0.72); // output frame size inside the viewport
+  const ZOOM_MIN   = 0.1;   // 100% = circle exactly spans the image's short side
+  const ZOOM_MAX   = 20;
+  const BG_MAX     = 1024;  // max dimension of the low-res copy used for fills
+
+  const isCircleMode = () => gShape.value === 'circle';
+  const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const normDeg = d => ((d + 180) % 360 + 360) % 360 - 180;
 
   // ── Global settings reactive updates ─────────────────────────────────────
   gFormat.addEventListener('change', () => {
     gQualityWrap.style.display = gFormat.value === 'image/png' ? 'none' : '';
+    updateCirclePanel();
     refreshAllCroppers();
   });
+  gShape.addEventListener('change', () => {
+    const circle = isCircleMode();
+    mainEl.classList.toggle('bc-mode-circle', circle);
+    gWidthLabel.textContent = circle ? 'Output size (px)' : 'Output width (px)';
+    // JPEG has no alpha, so a round picture would get filled corners.
+    // Default to PNG for circles; the user can still pick JPEG afterwards.
+    if (circle && gFormat.value === 'image/jpeg') {
+      gFormat.value = 'image/png';
+      gQualityWrap.style.display = 'none';
+      updateCirclePanel();
+    }
+    cards.forEach(c => c.onModeChange());
+  });
+  [gCInside, gCFill, gCFillColor, gCBlur, gCBright, gCBgZoom, gCCorners, gCCornerColor, gCRing, gCRingColor]
+    .forEach(el => el.addEventListener('input', () => {
+      updateCirclePanel();
+      cards.forEach(c => c.refresh());
+    }));
+
+  function updateCirclePanel() {
+    const fill = gCFill.value;
+    const show = (id, on) => { document.getElementById(id).style.display = on ? '' : 'none'; };
+    show('g-c-fillcolor-wrap',   fill === 'color');
+    show('g-c-blur-wrap',        fill === 'blur' || fill === 'edge' || fill === 'mirror');
+    show('g-c-bright-wrap',      fill === 'blur' || fill === 'edge' || fill === 'mirror');
+    show('g-c-bgzoom-wrap',      fill === 'blur');
+    show('g-c-cornercolor-wrap', gCCorners.value !== 'keep');
+    // Fill settings only apply once the circle can leave the image
+    document.querySelectorAll('.bc-fill-opt').forEach(el => el.classList.toggle('bc-faded', gCInside.checked));
+    document.getElementById('g-c-blur-val').textContent   = `(${gCBlur.value}%)`;
+    document.getElementById('g-c-bright-val').textContent = `(${gCBright.value}%)`;
+    document.getElementById('g-c-bgzoom-val').textContent = `(${gCBgZoom.value}%)`;
+    gCJpegHint.style.display = gFormat.value === 'image/jpeg' &&
+      (fill === 'transparent' || gCCorners.value === 'transparent') ? '' : 'none';
+  }
+  updateCirclePanel();
   gArLock.addEventListener('change', () => {
     gArCustomWrap.style.display = gArLock.value === 'custom' ? '' : 'none';
     refreshAllCroppers();
@@ -155,6 +218,66 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   }
 
+  // ── Canvas helpers (circle mode) ──────────────────────────────────────────
+  // ctx.filter is missing or a no-op in some browsers (older Safari), so test
+  // that a blur actually spreads a pixel before relying on it.
+  const CANVAS_FILTER = (() => {
+    try {
+      const c = document.createElement('canvas');
+      c.width = c.height = 9;
+      const x = c.getContext('2d');
+      if (!('filter' in x)) return false;
+      x.filter = 'blur(2px)';
+      x.fillStyle = '#000';
+      x.fillRect(4, 4, 1, 1);
+      return x.getImageData(2, 4, 1, 1).data[3] > 0;
+    } catch { return false; }
+  })();
+
+  function drawChecker(ctx, w, h, sq = 10) {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#d6d6d6';
+    for (let y = 0; y < h; y += sq)
+      for (let x = (y / sq) % 2 ? sq : 0; x < w; x += sq * 2)
+        ctx.fillRect(x, y, sq, sq);
+  }
+
+  /** Draws `src` at (dx,dy) with a gaussian blur (px) and brightness multiplier. */
+  function drawFiltered(ctx, src, dx, dy, blurPx, bright) {
+    if (CANVAS_FILTER) {
+      ctx.save();
+      ctx.filter = `blur(${blurPx}px) brightness(${bright})`;
+      ctx.drawImage(src, dx, dy);
+      ctx.restore();
+      return;
+    }
+    // Fallback: a downscale/upscale round trip approximates the blur and a
+    // black/white overlay approximates the brightness change.
+    const out = document.createElement('canvas');
+    out.width = src.width; out.height = src.height;
+    const oc = out.getContext('2d');
+    oc.imageSmoothingQuality = 'high';
+    if (blurPx > 0.5) {
+      const f = Math.max(1, blurPx / 1.5);
+      const small = document.createElement('canvas');
+      small.width  = Math.max(1, Math.round(src.width / f));
+      small.height = Math.max(1, Math.round(src.height / f));
+      const sc = small.getContext('2d');
+      sc.imageSmoothingQuality = 'high';
+      sc.drawImage(src, 0, 0, small.width, small.height);
+      oc.drawImage(small, 0, 0, out.width, out.height);
+    } else {
+      oc.drawImage(src, 0, 0);
+    }
+    if (bright !== 1) {
+      oc.globalCompositeOperation = 'source-atop';
+      oc.fillStyle = bright < 1 ? `rgba(0,0,0,${1 - bright})` : `rgba(255,255,255,${Math.min(1, bright - 1)})`;
+      oc.fillRect(0, 0, out.width, out.height);
+    }
+    ctx.drawImage(out, dx, dy);
+  }
+
   // ══════════════════════════════════════════════════════════════════════════
   // CropCard class
   // ══════════════════════════════════════════════════════════════════════════
@@ -176,12 +299,22 @@ document.addEventListener('DOMContentLoaded', () => {
       this.ovArMode  = null;   // same values as gArLock
       this.ovArCW    = null;
       this.ovArCH    = null;
+      this.ovCFill   = null;   // circle mode: outside-image fill override
+      this.ovCInside = null;   // circle mode: true/false override of "keep inside"
+
+      // Circle mode: circle center + radius in *image* coordinates, rotation
+      // in degrees and a horizontal flip. The circle stays fixed in the
+      // viewport; these describe which part of the image sits under it.
+      this.circ = { cx: 0, cy: 0, r: 1, rot: 0, flip: false };
 
       // Canvas display scale: canvas CSS px / image natural px
       this.scale = 1;
 
       // Interaction state
       this._drag = null; // { type: 'move'|'nw'|'ne'|'sw'|'se'|'n'|'s'|'e'|'w', startX, startY, startCrop }
+      this._ptrs = new Map(); // circle mode: active pointers (id → canvas xy)
+      this._gesture = null;   // circle mode: { c, pts } snapshot at gesture start
+      this._raf = 0;
 
       this._buildDOM();
       this._loadImage();
@@ -222,6 +355,55 @@ document.addEventListener('DOMContentLoaded', () => {
       canvasWrap.appendChild(this.canvas);
       el.appendChild(canvasWrap);
 
+      // Circle-mode controls
+      const circ = document.createElement('div');
+      circ.className = 'bc-circ-controls bc-circle-only';
+      circ.innerHTML = `
+        <div class="bc-circ-top">
+          <canvas class="bc-thumb" width="128" height="128" title="Output preview"></canvas>
+          <p class="bc-circ-hint">Drag to move · scroll or pinch to zoom · two fingers or Shift+scroll to rotate ·
+            double-click to reset. Arrow keys / + − / [ ] work when the image is focused.</p>
+        </div>
+        <div class="bc-slider-row">
+          <span class="bc-slider-name">Zoom</span>
+          <input class="bc-range bc-c-zoom" type="range" aria-label="Zoom"
+                 min="${Math.round(1000 * Math.log10(ZOOM_MIN))}" max="${Math.round(1000 * Math.log10(ZOOM_MAX))}" step="1" value="0" />
+          <span class="bc-slider-val bc-c-zoom-val">100%</span>
+        </div>
+        <div class="bc-slider-row">
+          <span class="bc-slider-name">Rotate</span>
+          <input class="bc-range bc-c-rot" type="range" aria-label="Rotation" min="-180" max="180" step="0.5" value="0" />
+          <span class="bc-slider-val bc-c-rot-val">0°</span>
+        </div>
+        <div class="bc-circ-btns">
+          <button class="tool-button bc-btn-ghost" type="button" data-c="rotl" title="Rotate 90° left">&#10226; 90°</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="rotr" title="Rotate 90° right">&#10227; 90°</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="flip" title="Mirror horizontally">&#8646; Flip</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="center" title="Center the image, keep zoom">Center</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="fill" title="Largest zoom-out that stays fully inside the image">Fill</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="fit" title="Show the whole image inside the frame">Fit whole image</button>
+          <button class="tool-button bc-btn-ghost" type="button" data-c="reset" title="Reset position, zoom, rotation and flip">Reset</button>
+        </div>
+      `;
+      this.thumb     = circ.querySelector('.bc-thumb');
+      this.cZoom     = circ.querySelector('.bc-c-zoom');
+      this.cZoomVal  = circ.querySelector('.bc-c-zoom-val');
+      this.cRot      = circ.querySelector('.bc-c-rot');
+      this.cRotVal   = circ.querySelector('.bc-c-rot-val');
+      this.cFitBtn   = circ.querySelector('[data-c="fit"]');
+      this.cZoom.addEventListener('input', () => {
+        if (!this.img) return;
+        this._zoomTo(this._baseR() / Math.pow(10, +this.cZoom.value / 1000));
+      });
+      this.cRot.addEventListener('input', () => {
+        if (!this.img) return;
+        this.circ.rot = +this.cRot.value;
+        this._afterCircleChange();
+      });
+      circ.querySelectorAll('[data-c]').forEach(b =>
+        b.addEventListener('click', () => this._circleAction(b.dataset.c)));
+      el.appendChild(circ);
+
       // Crop info bar
       const infoBar = document.createElement('div');
       infoBar.className = 'bc-info-bar';
@@ -251,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <label class="tool-label">Width (px) <span class="bc-ov-hint">leave blank = global</span></label>
             <input class="tool-input bc-num bc-ov-w" type="number" min="1" max="8192" placeholder="${gWidth.value}" />
           </div>
-          <div class="bc-field">
+          <div class="bc-field bc-rect-only">
             <label class="tool-label">Height (px)</label>
             <input class="tool-input bc-num bc-ov-h" type="number" min="1" max="8192" placeholder="${gHeight.value}" />
           </div>
@@ -268,7 +450,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <label class="tool-label">Quality (1–100)</label>
             <input class="tool-input bc-num bc-ov-q" type="number" min="1" max="100" placeholder="${gQuality.value}" />
           </div>
-          <div class="bc-field">
+          <div class="bc-field bc-circle-only">
+            <label class="tool-label">Outside fill</label>
+            <select class="tool-input bc-ov-cfill">
+              <option value="">— global —</option>
+              <option value="blur">Blurred image</option>
+              <option value="edge">Stretched edges</option>
+              <option value="mirror">Mirrored image</option>
+              <option value="color">Solid color</option>
+              <option value="transparent">Transparent</option>
+            </select>
+          </div>
+          <div class="bc-field bc-circle-only">
+            <label class="tool-label">Edges</label>
+            <select class="tool-input bc-ov-cinside">
+              <option value="">— global —</option>
+              <option value="1">Keep inside image</option>
+              <option value="0">Allow outside</option>
+            </select>
+          </div>
+          <div class="bc-field bc-rect-only">
             <label class="tool-label">AR lock</label>
             <select class="tool-input bc-ov-ar">
               <option value="">— global —</option>
@@ -282,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <option value="custom">Custom…</option>
             </select>
           </div>
-          <div class="bc-field bc-ov-custom-ar-wrap" style="display:none;">
+          <div class="bc-field bc-rect-only bc-ov-custom-ar-wrap" style="display:none;">
             <label class="tool-label">Custom ratio W : H</label>
             <div class="bc-ratio-row">
               <input class="tool-input bc-num bc-ov-arcw" type="number" min="1" value="16" />
@@ -306,6 +507,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const ovARCustomWrap = overridePanel.querySelector('.bc-ov-custom-ar-wrap');
       const ovARCW = overridePanel.querySelector('.bc-ov-arcw');
       const ovARCH = overridePanel.querySelector('.bc-ov-arch');
+      const ovCFill   = overridePanel.querySelector('.bc-ov-cfill');
+      const ovCInside = overridePanel.querySelector('.bc-ov-cinside');
+
+      [ovCFill, ovCInside].forEach(el => el.addEventListener('input', () => {
+        this.ovCFill   = ovCFill.value || null;
+        this.ovCInside = ovCInside.value ? ovCInside.value === '1' : null;
+        this.refresh();
+      }));
 
       const sync = () => {
         this.ovWidth   = ovW.value   ? +ovW.value   : null;
@@ -338,6 +547,8 @@ document.addEventListener('DOMContentLoaded', () => {
         this.img = img;
         this._initCanvas();
         this._initCrop();
+        this._circleFill();
+        this._syncCircControls();
         this._bindEvents();
         this._draw();
       };
@@ -351,6 +562,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Canvas init ──────────────────────────────────────────────────────────
     _initCanvas() {
+      if (this._isCircle()) {
+        this.canvas.width = this.canvas.height = VIEW;
+        this.canvas.tabIndex = 0;
+        this.canvas.style.cursor = 'grab';
+        return;
+      }
+      this.canvas.removeAttribute('tabindex');
       const MAX_DISPLAY = 480; // max canvas CSS width/height
       const iw = this.img.naturalWidth;
       const ih = this.img.naturalHeight;
@@ -406,12 +624,32 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
-    resetCrop() { this._initCrop(); this._draw(); }
+    resetCrop() {
+      if (!this.img) return;
+      if (this._isCircle()) { this._circleAction('reset'); return; }
+      this._initCrop(); this._draw();
+    }
 
     applyGlobalAR() {
+      if (!this.img) return;
       // Re-center crop to match new AR without shrinking below minimum
       this._initCrop();
+      this.refresh();
+    }
+
+    /** Re-validate against the current settings and redraw, keeping the crop. */
+    refresh() {
+      if (!this.img) return;
+      if (this._isCircle()) { this._clampCircle(); this._syncCircControls(); }
       this._draw();
+    }
+
+    onModeChange() {
+      if (!this.img) return;
+      this._ptrs.clear();
+      this._drag = null;
+      this._initCanvas();
+      this.refresh();
     }
 
     _clampCrop() {
@@ -426,6 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Draw ─────────────────────────────────────────────────────────────────
     _draw() {
+      if (this._isCircle()) this._drawCircle();
+      else this._drawRect();
+    }
+
+    _drawRect() {
       const canvas = this.canvas;
       const ctx    = canvas.getContext('2d');
       const s      = this.scale;
@@ -512,6 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
       c.addEventListener('touchstart', e => { e.preventDefault(); this._onDown(e.touches[0]); }, { passive: false });
       c.addEventListener('touchmove',  e => { e.preventDefault(); this._onMove(e.touches[0]); }, { passive: false });
       c.addEventListener('touchend',   e => this._onUp(e));
+      this._bindCircleEvents();
     }
 
     _canvasXY(e) {
@@ -553,6 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     _onDown(e) {
+      if (this._isCircle()) return;
       const { x, y } = this._canvasXY(e);
       const hit = this._hitTest(x, y);
       if (!hit) {
@@ -566,6 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     _onMove(e) {
+      if (this._isCircle()) return;
       const { x, y } = this._canvasXY(e);
       const s = this.scale;
       const iw = this.img.naturalWidth;
@@ -639,12 +885,542 @@ document.addEventListener('DOMContentLoaded', () => {
       this._drag = null;
     }
 
+    // ══ Circle (profile picture) mode ═════════════════════════════════════
+    _isCircle() { return isCircleMode(); }
+    _fmt()      { return this.ovFormat ?? gFormat.value; }
+    _outSize()  { return Math.max(1, this.ovWidth ?? +gWidth.value); }
+    _baseR()    { return Math.min(this.img.naturalWidth, this.img.naturalHeight) / 2; }
+
+    _circOpts() {
+      return {
+        inside:      this.ovCInside ?? gCInside.checked,
+        fill:        this.ovCFill ?? gCFill.value,
+        fillColor:   gCFillColor.value,
+        blur:        +gCBlur.value,                   // % of the output size
+        bright:      +gCBright.value / 100,
+        bgZoom:      +gCBgZoom.value / 100,
+        corners:     gCCorners.value,
+        cornerColor: gCCornerColor.value,
+        ring:        Math.max(0, +gCRing.value || 0), // output px
+        ringColor:   gCRingColor.value,
+      };
+    }
+
+    // Half-extent of the output shape per unit radius, measured along the
+    // image axes: 1 for the circle, |cos|+|sin| for a rotated square.
+    _ext(st = this.circ) {
+      if (this._circOpts().corners !== 'keep') return 1;
+      const t = st.rot * Math.PI / 180;
+      return Math.abs(Math.cos(t)) + Math.abs(Math.sin(t));
+    }
+
+    _clampR(r) {
+      const base = this._baseR();
+      const hi = this._circOpts().inside ? base / this._ext() : base / ZOOM_MIN;
+      return clamp(r, base / ZOOM_MAX, Math.max(base / ZOOM_MAX, hi));
+    }
+
+    _clampCircle() {
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      const c = this.circ;
+      c.rot = normDeg(c.rot);
+      c.r = this._clampR(c.r);
+      if (this._circOpts().inside) {
+        const e = c.r * this._ext();
+        c.cx = clamp(c.cx, e, iw - e);
+        c.cy = clamp(c.cy, e, ih - e);
+      } else {
+        // Anywhere, as long as the image still touches the frame.
+        c.cx = clamp(c.cx, -c.r, iw + c.r);
+        c.cy = clamp(c.cy, -c.r, ih + c.r);
+      }
+    }
+
+    _isOutside() {
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      const c = this.circ, e = c.r * this._ext(), eps = 0.5;
+      return c.cx - e < -eps || c.cy - e < -eps || c.cx + e > iw + eps || c.cy + e > ih + eps;
+    }
+
+    /** Largest view that stays fully inside the image, centered. */
+    _circleFill() {
+      const c = this.circ;
+      c.cx = this.img.naturalWidth / 2;
+      c.cy = this.img.naturalHeight / 2;
+      c.r  = this._baseR() / this._ext();
+      this._clampCircle();
+    }
+
+    /** Smallest view that shows the whole image, centered. */
+    _circleFit() {
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      const c = this.circ;
+      c.cx = iw / 2; c.cy = ih / 2;
+      if (this._circOpts().corners === 'keep') {
+        const t = c.rot * Math.PI / 180, cs = Math.abs(Math.cos(t)), sn = Math.abs(Math.sin(t));
+        c.r = Math.max(iw * cs + ih * sn, iw * sn + ih * cs) / 2;
+      } else {
+        c.r = Math.hypot(iw, ih) / 2;
+      }
+      this._clampCircle();
+    }
+
+    _circleAction(action) {
+      if (!this.img) return;
+      const c = this.circ;
+      switch (action) {
+        case 'rotl':   c.rot -= 90; break;
+        case 'rotr':   c.rot += 90; break;
+        // Mirror across the screen's vertical axis whatever the rotation.
+        case 'flip':   c.flip = !c.flip; c.rot = -c.rot; break;
+        case 'center': c.cx = this.img.naturalWidth / 2; c.cy = this.img.naturalHeight / 2; break;
+        case 'fill':   this._circleFill(); break;
+        case 'fit':    this._circleFit(); break;
+        case 'reset':  c.rot = 0; c.flip = false; this._circleFill(); break;
+      }
+      this._afterCircleChange();
+    }
+
+    _afterCircleChange() {
+      this._clampCircle();
+      this._syncCircControls();
+      this._scheduleDraw();
+    }
+
+    _scheduleDraw() {
+      if (this._raf) return;
+      this._raf = requestAnimationFrame(() => { this._raf = 0; this._draw(); });
+    }
+
+    _syncCircControls() {
+      const zoom = this._baseR() / this.circ.r;
+      this.cZoom.value = Math.round(1000 * Math.log10(zoom));
+      this.cZoomVal.textContent = Math.round(zoom * 100) + '%';
+      this.cRot.value = this.circ.rot;
+      this.cRotVal.textContent = `${+this.circ.rot.toFixed(1)}°`;
+      this.cFitBtn.disabled = this._circOpts().inside;
+    }
+
+    // ── Circle geometry ──────────────────────────────────────────────────────
+    // view = C + k·R(rot)·F·(img − center), F = horizontal flip.
+    _viewK(r = this.circ.r) { return FRAME_PX / 2 / r; }
+
+    /** Screen-space delta → image-space delta (before dividing by k). */
+    _unrotate(dx, dy, st = this.circ) {
+      const t = st.rot * Math.PI / 180, cs = Math.cos(t), sn = Math.sin(t);
+      const x = dx * cs + dy * sn;
+      return { x: st.flip ? -x : x, y: -dx * sn + dy * cs };
+    }
+
+    _toView(px, py) {
+      const c = this.circ, k = this._viewK(), t = c.rot * Math.PI / 180;
+      const dx = (px - c.cx) * (c.flip ? -1 : 1), dy = py - c.cy;
+      return [VIEW / 2 + k * (dx * Math.cos(t) - dy * Math.sin(t)),
+              VIEW / 2 + k * (dx * Math.sin(t) + dy * Math.cos(t))];
+    }
+
+    /** Image-space bounding box of a target rect, for a frame centered at (cx,cy) with scale k. */
+    _bboxInImage(x0, y0, x1, y1, cx, cy, k) {
+      const b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+      for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) {
+        const d = this._unrotate(x - cx, y - cy);
+        const ix = this.circ.cx + d.x / k, iy = this.circ.cy + d.y / k;
+        b.x0 = Math.min(b.x0, ix); b.x1 = Math.max(b.x1, ix);
+        b.y0 = Math.min(b.y0, iy); b.y1 = Math.max(b.y1, iy);
+      }
+      return b;
+    }
+
+    /** Change the radius keeping the image point under (sx,sy) fixed. */
+    _zoomTo(r, sx = VIEW / 2, sy = VIEW / 2) {
+      const d = this._unrotate(sx - VIEW / 2, sy - VIEW / 2);
+      const k0 = this._viewK();
+      const px = this.circ.cx + d.x / k0, py = this.circ.cy + d.y / k0;
+      this.circ.r = this._clampR(r);
+      const k1 = this._viewK();
+      this.circ.cx = px - d.x / k1;
+      this.circ.cy = py - d.y / k1;
+      this._afterCircleChange();
+    }
+
+    // ── Fill sources (low-res copies, cached) ────────────────────────────────
+    _bgSource() {
+      if (!this._bg) {
+        const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+        const s = Math.min(1, BG_MAX / Math.max(iw, ih));
+        const c = document.createElement('canvas');
+        c.width  = Math.max(1, Math.round(iw * s));
+        c.height = Math.max(1, Math.round(ih * s));
+        const x = c.getContext('2d');
+        x.imageSmoothingQuality = 'high';
+        x.drawImage(this.img, 0, 0, c.width, c.height);
+        this._bg = { canvas: c, sx: c.width / iw, sy: c.height / ih };
+      }
+      return this._bg;
+    }
+
+    /** 2×2 tile of the image and its reflections; repeats as an endless mirror. */
+    _mirrorTile() {
+      if (!this._mirror) {
+        const src = this._bgSource().canvas, w = src.width, h = src.height;
+        const t = document.createElement('canvas');
+        t.width = w * 2; t.height = h * 2;
+        const x = t.getContext('2d');
+        [[1, 1, 0, 0], [-1, 1, 2 * w, 0], [1, -1, 0, 2 * h], [-1, -1, 2 * w, 2 * h]].forEach(([sx, sy, tx, ty]) => {
+          x.setTransform(sx, 0, 0, sy, tx, ty);
+          x.drawImage(src, 0, 0);
+        });
+        this._mirror = t;
+      }
+      return this._mirror;
+    }
+
+    /**
+     * The image with its border pixels smeared outward by `need` image px.
+     * Built at a resolution that keeps the canvas bounded; `need` is bucketed
+     * to powers of two so dragging doesn't rebuild it every frame.
+     */
+    _edgeCanvas(need) {
+      const bucket = Math.pow(2, Math.ceil(Math.log2(Math.max(16, need))));
+      if (this._edge && this._edge.bucket === bucket) return this._edge;
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      const s = Math.min(this._bgSource().sx, 1536 / bucket);
+      const w = Math.max(1, Math.round(iw * s)), h = Math.max(1, Math.round(ih * s));
+      const p = Math.ceil(bucket * s);
+      const c = document.createElement('canvas');
+      c.width = w + 2 * p; c.height = h + 2 * p;
+      const x = c.getContext('2d');
+      x.imageSmoothingQuality = 'high';
+      x.drawImage(this._bgSource().canvas, p, p, w, h);
+      x.imageSmoothingEnabled = false;
+      x.drawImage(c, p, p, w, 1, p, 0, w, p);                             // top
+      x.drawImage(c, p, p + h - 1, w, 1, p, p + h, w, p);                 // bottom
+      x.drawImage(c, p, 0, 1, h + 2 * p, 0, 0, p, h + 2 * p);             // left (incl. corners)
+      x.drawImage(c, p + w - 1, 0, 1, h + 2 * p, p + w, 0, p, h + 2 * p); // right (incl. corners)
+      this._edge = { canvas: c, bucket, p, sx: w / iw, sy: h / ih };
+      return this._edge;
+    }
+
+    // ── Compositing ──────────────────────────────────────────────────────────
+    /**
+     * Renders the circle-mode result into ctx (tw × th). `frame` is where the
+     * output square sits in target px; anything beyond it is rendered too
+     * (the preview uses that to show context around the frame).
+     */
+    _compose(ctx, tw, th, frame, o, { mask, jpeg, fg = this.img }) {
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      const c  = this.circ;
+      const L  = frame.size, k = L / (2 * c.r);
+      const cx = frame.x + L / 2, cy = frame.y + L / 2;
+      const t  = c.rot * Math.PI / 180, fx = c.flip ? -1 : 1;
+      const toImageSpace = (x, ox = 0, oy = 0) => {
+        x.translate(cx + ox, cy + oy);
+        x.rotate(t);
+        x.scale(k * fx, k);
+        x.translate(-c.cx, -c.cy);
+      };
+
+      // 1. Fill around the image
+      let fill = o.fill;
+      if (fill === 'transparent' && jpeg) fill = 'color';
+      const vis = this._bboxInImage(0, 0, tw, th, cx, cy, k);
+      const covered = vis.x0 >= 0 && vis.y0 >= 0 && vis.x1 <= iw && vis.y1 <= ih;
+
+      if (fill === 'color') {
+        ctx.fillStyle = o.fillColor;
+        ctx.fillRect(0, 0, tw, th);
+      } else if (fill !== 'transparent' && !covered) {
+        // Render the fill on an oversized layer so the blur has real pixels
+        // to sample at the edges instead of fading to transparent.
+        const blurPx = o.blur / 100 * L;
+        const m = Math.ceil(blurPx * 3) + 2;
+        const layer = document.createElement('canvas');
+        layer.width = tw + 2 * m; layer.height = th + 2 * m;
+        const lc = layer.getContext('2d');
+        lc.imageSmoothingQuality = 'high';
+        const bg = this._bgSource();
+
+        if (fill === 'blur') {
+          // Whole image, scaled to cover the frame, centered on it.
+          const cover = (L + 2 * m) * (Math.abs(Math.cos(t)) + Math.abs(Math.sin(t)))
+                        / Math.min(iw, ih) * o.bgZoom;
+          lc.translate(cx + m, cy + m);
+          lc.rotate(t);
+          lc.scale(cover * fx, cover);
+          lc.drawImage(bg.canvas, -iw / 2, -ih / 2, iw, ih);
+        } else {
+          const bb = this._bboxInImage(-m, -m, tw + m, th + m, cx, cy, k);
+          toImageSpace(lc, m, m);
+          if (fill === 'mirror') {
+            lc.scale(1 / bg.sx, 1 / bg.sy);
+            lc.fillStyle = lc.createPattern(this._mirrorTile(), 'repeat');
+            lc.fillRect(bb.x0 * bg.sx, bb.y0 * bg.sy, (bb.x1 - bb.x0) * bg.sx, (bb.y1 - bb.y0) * bg.sy);
+          } else { // 'edge'
+            const ed = this._edgeCanvas(Math.max(-bb.x0, -bb.y0, bb.x1 - iw, bb.y1 - ih));
+            lc.drawImage(ed.canvas, -ed.p / ed.sx, -ed.p / ed.sy, ed.canvas.width / ed.sx, ed.canvas.height / ed.sy);
+          }
+        }
+        drawFiltered(ctx, layer, -m, -m, blurPx, o.bright);
+      }
+
+      // 2. The image
+      ctx.save();
+      toImageSpace(ctx);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(fg, 0, 0, iw, ih);
+      ctx.restore();
+
+      // 3. Corners outside the circle
+      if (mask && o.corners !== 'keep') {
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.beginPath();
+        ctx.arc(cx, cy, L / 2, 0, Math.PI * 2);
+        ctx.fill();
+        if (o.corners === 'color' || jpeg) {
+          ctx.globalCompositeOperation = 'destination-over';
+          ctx.fillStyle = o.cornerColor;
+          ctx.fillRect(frame.x, frame.y, L, L);
+        }
+        ctx.restore();
+      }
+
+      // 4. Ring (width is in output px)
+      if (o.ring > 0) {
+        const w = Math.min(L / 2, o.ring * L / this._outSize());
+        ctx.save();
+        ctx.strokeStyle = o.ringColor;
+        ctx.lineWidth = w;
+        ctx.beginPath();
+        ctx.arc(cx, cy, L / 2 - w / 2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    /** Final output (size × size), exactly what gets exported. */
+    _renderCircle(size, fg = this.img) {
+      const out = document.createElement('canvas');
+      out.width = out.height = size;
+      const ctx = out.getContext('2d');
+      const jpeg = this._fmt() === 'image/jpeg';
+      this._compose(ctx, size, size, { x: 0, y: 0, size }, this._circOpts(), { mask: true, jpeg, fg });
+      if (jpeg) {
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+      }
+      return out;
+    }
+
+    _drawCircle() {
+      const ctx = this.canvas.getContext('2d');
+      const o   = this._circOpts();
+      const D   = FRAME_PX, f0 = (VIEW - D) / 2, C = VIEW / 2;
+
+      const jpeg = this._fmt() === 'image/jpeg';
+      ctx.save();
+      // Checkerboard only when the fill really is transparent; otherwise a dark
+      // backdrop, so the far edges of the viewport beyond the fill aren't noisy.
+      if (o.fill === 'transparent' && !jpeg) {
+        drawChecker(ctx, VIEW, VIEW);
+      } else {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, VIEW, VIEW);
+      }
+      this._compose(ctx, VIEW, VIEW, { x: f0, y: f0, size: D }, o, { mask: false, jpeg });
+
+      // Dim everything outside the output shape
+      ctx.beginPath();
+      ctx.rect(0, 0, VIEW, VIEW);
+      if (o.corners === 'keep') ctx.rect(f0, f0, D, D);
+      else ctx.arc(C, C, D / 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fill('evenodd');
+
+      // Where the real image ends
+      const iw = this.img.naturalWidth, ih = this.img.naturalHeight;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      [[0, 0], [iw, 0], [iw, ih], [0, ih]].forEach(([x, y], i) => {
+        const [vx, vy] = this._toView(x, y);
+        if (i) ctx.lineTo(vx, vy); else ctx.moveTo(vx, vy);
+      });
+      ctx.closePath();
+      ctx.stroke();
+
+      // Frame outline (in square mode the circle is only a guide)
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash(o.corners === 'keep' ? [4, 4] : []);
+      ctx.beginPath();
+      ctx.arc(C, C, D / 2, 0, Math.PI * 2);
+      ctx.stroke();
+      if (o.corners === 'keep') {
+        ctx.setLineDash([]);
+        ctx.strokeRect(f0, f0, D, D);
+      }
+      ctx.restore();
+
+      // Output thumbnail
+      const T  = this.thumb.width;
+      const tc = this.thumb.getContext('2d');
+      drawChecker(tc, T, T, 8);
+      tc.drawImage(this._renderCircle(T), 0, 0);
+
+      const c = this.circ, n = this._outSize();
+      this.infoBar.textContent =
+        `Circle: ⌀ ${Math.round(c.r * 2)} px · zoom ${Math.round(this._baseR() / c.r * 100)}% · ` +
+        `${+c.rot.toFixed(1)}°${c.flip ? ' · flipped' : ''}  →  Output: ${n} × ${n} px` +
+        (this._isOutside() ? '  ·  extends past image' : '');
+    }
+
+    // ── Circle interaction ───────────────────────────────────────────────────
+    // Pointer events: one pointer pans, two pointers pinch-zoom + rotate + pan.
+    _bindCircleEvents() {
+      const cv = this.canvas;
+      cv.addEventListener('pointerdown', e => {
+        if (!this._isCircle()) return;
+        cv.setPointerCapture(e.pointerId);
+        this._ptrs.set(e.pointerId, this._canvasXY(e));
+        this._startGesture();
+        cv.style.cursor = 'grabbing';
+      });
+      cv.addEventListener('pointermove', e => {
+        if (!this._isCircle() || !this._ptrs.has(e.pointerId)) return;
+        this._ptrs.set(e.pointerId, this._canvasXY(e));
+        this._moveGesture();
+      });
+      const end = e => {
+        if (!this._ptrs.delete(e.pointerId)) return;
+        this._startGesture();
+        if (!this._ptrs.size && this._isCircle()) cv.style.cursor = 'grab';
+      };
+      cv.addEventListener('pointerup', end);
+      cv.addEventListener('pointercancel', end);
+
+      cv.addEventListener('wheel', e => {
+        if (!this._isCircle()) return;
+        e.preventDefault();
+        const unit = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1;
+        if (e.shiftKey) {
+          // Some browsers turn Shift+wheel into a horizontal scroll.
+          this.circ.rot += (e.deltaY || e.deltaX) * unit * 0.05;
+          this._afterCircleChange();
+          return;
+        }
+        // ctrlKey = trackpad pinch, which sends small, frequent deltas
+        const p = this._canvasXY(e);
+        this._zoomTo(this.circ.r * Math.exp(e.deltaY * unit * (e.ctrlKey ? 0.01 : 0.0015)), p.x, p.y);
+      }, { passive: false });
+
+      cv.addEventListener('dblclick', () => { if (this._isCircle()) this._circleAction('reset'); });
+      cv.addEventListener('keydown', e => this._onCircleKey(e));
+    }
+
+    _startGesture() {
+      this._gesture = { c: { ...this.circ }, pts: [...this._ptrs.values()].map(p => ({ ...p })) };
+    }
+
+    _moveGesture() {
+      const g = this._gesture;
+      if (!g || !this.img) return;
+      const pts = [...this._ptrs.values()];
+      const st = this.circ, C = VIEW / 2;
+
+      if (pts.length === 1 && g.pts.length === 1) {
+        const d = this._unrotate(pts[0].x - g.pts[0].x, pts[0].y - g.pts[0].y, g.c);
+        const k = this._viewK(g.c.r);
+        st.cx = g.c.cx - d.x / k;
+        st.cy = g.c.cy - d.y / k;
+      } else if (pts.length >= 2 && g.pts.length >= 2) {
+        const [a0, b0] = g.pts, [a1, b1] = pts;
+        const m0x = (a0.x + b0.x) / 2, m0y = (a0.y + b0.y) / 2;
+        const m1x = (a1.x + b1.x) / 2, m1y = (a1.y + b1.y) / 2;
+        // The image point under the starting midpoint follows the current midpoint
+        const k0 = this._viewK(g.c.r);
+        const u0 = this._unrotate(m0x - C, m0y - C, g.c);
+        const px = g.c.cx + u0.x / k0, py = g.c.cy + u0.y / k0;
+        st.rot = g.c.rot + (Math.atan2(b1.y - a1.y, b1.x - a1.x) - Math.atan2(b0.y - a0.y, b0.x - a0.x)) * 180 / Math.PI;
+        st.r = this._clampR(g.c.r * Math.hypot(b0.x - a0.x, b0.y - a0.y) / Math.max(1, Math.hypot(b1.x - a1.x, b1.y - a1.y)));
+        const k1 = this._viewK(st.r);
+        const u1 = this._unrotate(m1x - C, m1y - C, st);
+        st.cx = px - u1.x / k1;
+        st.cy = py - u1.y / k1;
+      }
+      this._afterCircleChange();
+    }
+
+    _onCircleKey(e) {
+      if (!this._isCircle() || !this.img) return;
+      const step = (e.shiftKey ? 0.1 : 0.02) * FRAME_PX;
+      const pan = (dx, dy) => {
+        const d = this._unrotate(dx, dy), k = this._viewK();
+        this.circ.cx -= d.x / k;
+        this.circ.cy -= d.y / k;
+      };
+      switch (e.key) {
+        case 'ArrowLeft':  pan(-step, 0); break;
+        case 'ArrowRight': pan(step, 0);  break;
+        case 'ArrowUp':    pan(0, -step); break;
+        case 'ArrowDown':  pan(0, step);  break;
+        case '[': this.circ.rot -= 1;  break;
+        case ']': this.circ.rot += 1;  break;
+        case '{': this.circ.rot -= 15; break;
+        case '}': this.circ.rot += 15; break;
+        case '+': case '=': e.preventDefault(); this._zoomTo(this.circ.r / 1.1); return;
+        case '-': case '_': e.preventDefault(); this._zoomTo(this.circ.r * 1.1); return;
+        case '0':           e.preventDefault(); this._circleAction('reset'); return;
+        default: return;
+      }
+      e.preventDefault();
+      this._afterCircleChange();
+    }
+
     // ── Export ───────────────────────────────────────────────────────────────
     async export() {
+      const fmt = this._fmt();
+      const q   = Math.min(1, Math.max(0.01, (this.ovQuality ?? +gQuality.value) / 100));
+
+      const out = this._isCircle() ? await this._exportCanvasCircle() : await this._exportCanvasRect(fmt);
+
+      // Encode
+      const blob = await (window.pica
+        ? pica().toBlob(out, fmt, q)
+        : new Promise(res => out.toBlob(res, fmt, q)));
+
+      // Build filename
+      const prefix = gPrefix.value.trim();
+      const suffix = gSuffix.value.trim();
+      const base   = this.file.name.replace(/\.[^/.]+$/, '');
+      const ext    = EXT[fmt] || 'png';
+      const name   = `${prefix}${base}${suffix}.${ext}`;
+
+      return { blob, name };
+    }
+
+    async _exportCanvasCircle() {
+      const size = this._outSize();
+      const k = size / (2 * this.circ.r);
+      let fg = this.img;
+      // Large downscales alias badly through drawImage, so pre-shrink the
+      // image with pica to the final scale and let the composite draw it ~1:1.
+      if (window.pica && k < 1) {
+        const tmp = document.createElement('canvas');
+        tmp.width  = Math.max(1, Math.round(this.img.naturalWidth * k));
+        tmp.height = Math.max(1, Math.round(this.img.naturalHeight * k));
+        await pica().resize(this.img, tmp, { unsharpAmount: 80, unsharpRadius: 0.6, unsharpThreshold: 2 });
+        fg = tmp;
+      }
+      return this._renderCircle(size, fg);
+    }
+
+    async _exportCanvasRect(fmt) {
       const ow  = Math.max(1, this.ovWidth  ?? +gWidth.value);
       const oh  = Math.max(1, this.ovHeight ?? +gHeight.value);
-      const fmt = this.ovFormat  ?? gFormat.value;
-      const q   = Math.min(1, Math.max(0.01, (this.ovQuality ?? +gQuality.value) / 100));
 
       const { x, y, w, h } = this.crop;
 
@@ -669,20 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         out.getContext('2d').drawImage(tmp, 0, 0, ow, oh);
       }
-
-      // 3. Encode
-      const blob = await (window.pica
-        ? pica().toBlob(out, fmt, q)
-        : new Promise(res => out.toBlob(res, fmt, q)));
-
-      // 4. Build filename
-      const prefix = gPrefix.value.trim();
-      const suffix = gSuffix.value.trim();
-      const base   = this.file.name.replace(/\.[^/.]+$/, '');
-      const ext    = EXT[fmt] || 'png';
-      const name   = `${prefix}${base}${suffix}.${ext}`;
-
-      return { blob, name };
+      return out;
     }
   } // end CropCard
 });

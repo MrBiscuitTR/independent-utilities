@@ -43,7 +43,9 @@
             "Aspect-ratio lock (1:1, 4:3, 16:9, 3:2, custom)",
             "Per-image size and format overrides",
             "PNG, JPEG and WebP output",
-            "Download all results as one ZIP"
+            "Download all results as one ZIP",
+            "Circular profile-picture crop with drag, zoom and rotate",
+            "Blurred, mirrored, stretched-edge or solid fill when the circle goes past the image"
       ],
       "creator": {
             "@type": "Person",
@@ -69,7 +71,7 @@
   <header class="tool-header">
     <a href="/" class="back-btn" aria-label="Back to hub">&#8592; <span class="back-label">Hub</span></a>
     <h1 class="tool-title">Bulk Image Crop &amp; Resize</h1>
-    <p class="tool-subtitle">Drag crop windows on each image · aspect-ratio lock · per-image overrides · ZIP download</p>
+    <p class="tool-subtitle">Drag crop windows on each image · circular profile pictures · aspect-ratio lock · per-image overrides · ZIP download</p>
   </header>
 
   <main class="tool-main bc-main">
@@ -81,10 +83,18 @@
       <div class="bc-grid">
 
         <div class="bc-field">
-          <label class="tool-label" for="g-width">Output width (px)</label>
+          <label class="tool-label" for="g-shape">Crop shape</label>
+          <select class="tool-input" id="g-shape">
+            <option value="rect" selected>Rectangle</option>
+            <option value="circle">Circle (profile picture)</option>
+          </select>
+        </div>
+
+        <div class="bc-field">
+          <label class="tool-label" for="g-width" id="g-width-label">Output width (px)</label>
           <input class="tool-input bc-num" id="g-width" type="number" min="1" max="8192" value="224" />
         </div>
-        <div class="bc-field">
+        <div class="bc-field bc-rect-only">
           <label class="tool-label" for="g-height">Output height (px)</label>
           <input class="tool-input bc-num" id="g-height" type="number" min="1" max="8192" value="224" />
         </div>
@@ -103,7 +113,7 @@
           <input class="tool-input bc-num" id="g-quality" type="number" min="1" max="100" value="92" />
         </div>
 
-        <div class="bc-field">
+        <div class="bc-field bc-rect-only">
           <label class="tool-label" for="g-ar-lock">Aspect ratio lock</label>
           <select class="tool-input" id="g-ar-lock">
             <option value="free">Free (no lock)</option>
@@ -117,7 +127,7 @@
           </select>
         </div>
 
-        <div class="bc-field" id="g-ar-custom-wrap" style="display:none;">
+        <div class="bc-field bc-rect-only" id="g-ar-custom-wrap" style="display:none;">
           <label class="tool-label">Custom ratio (W : H)</label>
           <div class="bc-ratio-row">
             <input class="tool-input bc-num" id="g-ar-cw" type="number" min="1" value="16" />
@@ -137,6 +147,81 @@
         </div>
 
       </div><!-- /.bc-grid -->
+
+      <!-- Circle / profile-picture options -->
+      <div class="bc-sub bc-circle-only" id="circle-panel">
+        <h3 class="bc-sub-title">Profile picture options</h3>
+        <div class="bc-grid">
+
+          <div class="bc-field bc-field-check">
+            <label class="bc-check">
+              <input type="checkbox" id="g-c-inside" />
+              <span>Keep the circle inside the image</span>
+            </label>
+            <span class="bc-ov-hint">Off = you can move / zoom past the image edges</span>
+          </div>
+
+          <div class="bc-field bc-fill-opt">
+            <label class="tool-label" for="g-c-fill">Outside the image, fill with</label>
+            <select class="tool-input" id="g-c-fill">
+              <option value="blur" selected>Blurred image</option>
+              <option value="edge">Stretched edges</option>
+              <option value="mirror">Mirrored image</option>
+              <option value="color">Solid color</option>
+              <option value="transparent">Transparent</option>
+            </select>
+          </div>
+
+          <div class="bc-field bc-fill-opt" id="g-c-fillcolor-wrap">
+            <label class="tool-label" for="g-c-fillcolor">Fill color</label>
+            <input class="tool-input bc-color" id="g-c-fillcolor" type="color" value="#ffffff" />
+          </div>
+
+          <div class="bc-field bc-fill-opt" id="g-c-blur-wrap">
+            <label class="tool-label" for="g-c-blur">Blur <span class="bc-range-val" id="g-c-blur-val"></span></label>
+            <input class="bc-range" id="g-c-blur" type="range" min="0" max="20" step="0.5" value="6" />
+          </div>
+
+          <div class="bc-field bc-fill-opt" id="g-c-bright-wrap">
+            <label class="tool-label" for="g-c-bright">Fill brightness <span class="bc-range-val" id="g-c-bright-val"></span></label>
+            <input class="bc-range" id="g-c-bright" type="range" min="20" max="160" step="1" value="85" />
+          </div>
+
+          <div class="bc-field bc-fill-opt" id="g-c-bgzoom-wrap">
+            <label class="tool-label" for="g-c-bgzoom">Background zoom <span class="bc-range-val" id="g-c-bgzoom-val"></span></label>
+            <input class="bc-range" id="g-c-bgzoom" type="range" min="100" max="300" step="5" value="100" />
+          </div>
+
+          <div class="bc-field">
+            <label class="tool-label" for="g-c-corners">Corners outside the circle</label>
+            <select class="tool-input" id="g-c-corners">
+              <option value="transparent" selected>Transparent (round PNG)</option>
+              <option value="color">Solid color</option>
+              <option value="keep">Keep (square output)</option>
+            </select>
+          </div>
+
+          <div class="bc-field" id="g-c-cornercolor-wrap">
+            <label class="tool-label" for="g-c-cornercolor">Corner color</label>
+            <input class="tool-input bc-color" id="g-c-cornercolor" type="color" value="#ffffff" />
+          </div>
+
+          <div class="bc-field">
+            <label class="tool-label" for="g-c-ring">Ring width (px)</label>
+            <input class="tool-input bc-num" id="g-c-ring" type="number" min="0" max="1000" value="0" />
+          </div>
+
+          <div class="bc-field" id="g-c-ringcolor-wrap">
+            <label class="tool-label" for="g-c-ringcolor">Ring color</label>
+            <input class="tool-input bc-color" id="g-c-ringcolor" type="color" value="#ffffff" />
+          </div>
+
+        </div>
+        <p class="bc-note" id="g-c-jpeg-hint" style="display:none;">
+          JPEG can't store transparency, so transparent areas are filled with the corner / fill color instead.
+          Choose PNG or WebP to get a truly round image.
+        </p>
+      </div>
     </section>
 
     <!-- ── File drop zone ────────────────────────────────────────────────── -->
@@ -186,7 +271,15 @@
         <li>Batch-resizing product photos, avatars or thumbnails for a shop or website.</li>
         <li>Forcing a mixed set of photos into one aspect ratio for a grid or slideshow.</li>
         <li>Converting a batch to WebP to cut page weight.</li>
+        <li>Making round profile pictures and avatars in bulk.</li>
       </ul>
+      <h3>Circular profile pictures</h3>
+      <p>Switch <em>Crop shape</em> to <em>Circle</em> to get a profile-picture style cropper: drag the
+        image under the circle, scroll or pinch to zoom, and rotate with two fingers, Shift+scroll or the
+        slider. The circle can stay inside the photo, or you can let it go past the edges and fill the gap
+        with a blurred copy of the photo (the WhatsApp look), stretched or mirrored edges, a solid color, or
+        transparency. Export a transparent round PNG, a circle on a colored square, or the full square with
+        the circle only as a guide.</p>
       <p>Everything runs in your browser with the Canvas API. Your images are never uploaded to a
         server — there is no upload limit, no queue and no watermark.</p>
     </section>
